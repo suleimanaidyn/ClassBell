@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Schedule</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #sticky-container {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background-color: white;
+            border-bottom: 1px solid #ddd;
+        }
+        #header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+        }
+        #datetime {
+            font-size: 1.5em;
+        }
+        #school-name {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+            position: relative;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .completed {
+            color: gray;
+        }
+        .upcoming {
+            font-weight: bold;
+            color: green;
+        }
+        .progress-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0;
+            background: linear-gradient(to right, #e0e0ff, #b3ffb3);
+            z-index: -1;
+        }
+        .break-popup-row {
+            display: none; /* Initially hidden */
+        }
+        #break-popup {
+            width: 100%;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            padding: 5px;
+        }
+        #break-time-text {
+            width: 100%;
+            text-align: center;
+            font-size: 0.8em;
+            color: white;
+            background-color: #C00000;
+            padding: 2px;
+            border-radius: 5px;
+        }
+        #break-progress {
+            width: 100%;
+            height: 20px;
+            position: relative;
+            display: flex;
+            border-radius: 5px;
+            background-color: white;
+        }
+        #break-progress-bar {
+            height: 100%;
+            background-color: #ffbf00;
+            transition: width 0.5s linear;
+        }
+        #break-cursor {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background-color: black;
+            transition: left 0.5s linear;
+        }
+        #digital-countdown {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            font-size: 1.5em;
+            color: black;
+            z-index: 1;
+            line-height: 20px;
+        }
+        /* Settings Panel */
+        #settings-panel {
+            display: none;
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 20px;
+            z-index: 2000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-height: 80%;
+            overflow-y: auto;
+            cursor: move; /* Change cursor to indicate draggable */
+        }
+        #settings-panel input, #settings-panel textarea {
+            margin: 5px 0;
+            width: calc(100% - 10px);
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        #settings-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .bell-schedule-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .bell-schedule {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .day-selection {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sticky Container for all header elements -->
+    <div id="sticky-container">
+        <div id="header-container">
+            <div id="school-name">HSA El Paso</div>
+            <div id="datetime"></div>
+        </div>
+        <!-- Embedded Break Time Popup -->
+        <div class="break-popup-row">
+            <div id="break-popup">
+                <div id="break-time-text">Break Time</div>
+                <div id="break-progress">
+                    <div id="break-progress-bar"></div>
+                    <div id="break-cursor"></div>
+                    <div id="digital-countdown"></div>
+                </div>
+            </div>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Period</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Remaining Time</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+
+    <table id="schedule">
+        <tbody>
+            <!-- Content rows are populated dynamically -->
+        </tbody>
+    </table>
+
+    <!-- Settings Panel -->
+    <div id="settings-panel">
+        <h3>Settings</h3>
+        <label for="school-name-input">School Name:</label>
+        <input type="text" id="school-name-input" placeholder="Enter school name">
+        
+        <div class="bell-schedule-container">
+            <div class="bell-schedule">
+                <h4>Schedule 1 (Default)</h4>
+                <textarea id="bell-times-input" rows="8" placeholder="Enter bell times for Schedule 1"></textarea>
+                <div class="day-selection">
+                    <label><input type="checkbox" id="mon-1" onclick="handleCheckboxClick('mon', 1)"> Mon</label>
+                    <label><input type="checkbox" id="tue-1" onclick="handleCheckboxClick('tue', 1)"> Tue</label>
+                    <label><input type="checkbox" id="wed-1" onclick="handleCheckboxClick('wed', 1)"> Wed</label>
+                    <label><input type="checkbox" id="thu-1" onclick="handleCheckboxClick('thu', 1)"> Thu</label>
+                    <label><input type="checkbox" id="fri-1" onclick="handleCheckboxClick('fri', 1)"> Fri</label>
+                    <label><input type="checkbox" id="sat-1" onclick="handleCheckboxClick('sat', 1)"> Sat</label>
+                    <label><input type="checkbox" id="sun-1" onclick="handleCheckboxClick('sun', 1)"> Sun</label>
+                </div>
+            </div>
+            <div class="bell-schedule">
+                <h4>Schedule 2 (Alternative)</h4>
+                <textarea id="alt-bell-times-input" rows="8" placeholder="Enter bell times for Schedule 2"></textarea>
+                <div class="day-selection">
+                    <label><input type="checkbox" id="mon-2" onclick="handleCheckboxClick('mon', 2)"> Mon</label>
+                    <label><input type="checkbox" id="tue-2" onclick="handleCheckboxClick('tue', 2)"> Tue</label>
+                    <label><input type="checkbox" id="wed-2" onclick="handleCheckboxClick('wed', 2)"> Wed</label>
+                    <label><input type="checkbox" id="thu-2" onclick="handleCheckboxClick('thu', 2)"> Thu</label>
+                    <label><input type="checkbox" id="fri-2" onclick="handleCheckboxClick('fri', 2)"> Fri</label>
+                    <label><input type="checkbox" id="sat-2" onclick="handleCheckboxClick('sat', 2)"> Sat</label>
+                    <label><input type="checkbox" id="sun-2" onclick="handleCheckboxClick('sun', 2)"> Sun</label>
+                </div>
+            </div>
+        </div>
+
+        <button onclick="saveSettings()">Save</button>
+        <button onclick="closeSettings()">Close</button>
+    </div>
+
+    <button id="settings-button" onclick="openSettings()">⚙</button>
+
+    <script>
+        let scheduleData = [];
+        let altScheduleData = [];
+
+        function parseTime(timeString) {
+            if (!timeString || typeof timeString !== 'string') return new Date().setHours(0, 0, 0, 0);
+            const [time, modifier] = timeString.split(' ');
+            const [hours, minutes] = time.split(':');
+            let hour = parseInt(hours, 10);
+
+            if (modifier === 'PM' && hour !== 12) {
+                hour += 12;
+            } else if (modifier === 'AM' && hour === 12) {
+                hour = 0;
+            }
+
+            return new Date().setHours(hour, parseInt(minutes, 10), 0, 0);
+        }
+
+        function updateSchedule() {
+            const currentTime = new Date();
+            const currentDay = currentTime.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+            const selectedSchedule = selectScheduleForDay(currentDay);
+
+            if (!selectedSchedule.length) {
+                document.getElementById('schedule').querySelector('tbody').innerHTML = '<tr><td colspan="4">No schedule data available.</td></tr>';
+                return;
+            }
+
+            const scheduleTable = document.getElementById('schedule');
+            const tbody = scheduleTable.querySelector('tbody');
+            tbody.innerHTML = '';
+
+            selectedSchedule.forEach(period => {
+                const startTime = new Date(parseTime(period.startTime));
+                const endTime = new Date(parseTime(period.endTime));
+                const totalTime = endTime - startTime;
+                const remainingTime = endTime - currentTime;
+                const elapsedTime = currentTime - startTime;
+                const isOngoing = currentTime >= startTime && currentTime < endTime;
+                const isCompleted = currentTime >= endTime;
+
+                const row = document.createElement('tr');
+                const progressBar = document.createElement('div');
+                progressBar.classList.add('progress-bar');
+                if (isOngoing) {
+                    const progress = Math.min(elapsedTime / totalTime, 1) * 100;
+                    progressBar.style.width = `${progress}%`;
+                } else if (isCompleted) {
+                    progressBar.style.width = '100%';
+                }
+
+                row.innerHTML = `
+                    <td>${period.period}</td>
+                    <td>${period.startTime}</td>
+                    <td>${period.endTime}</td>
+                    <td>${isOngoing ? Math.floor((endTime - currentTime) / (1000 * 60)) + ' min' : isCompleted ? 'Completed' : 'Upcoming'}</td>
+                `;
+
+                row.querySelector('td:last-child').appendChild(progressBar);
+
+                if (isOngoing) {
+                    row.classList.add('upcoming');
+                } else if (isCompleted) {
+                    row.classList.add('completed');
+                }
+
+                tbody.appendChild(row);
+            });
+
+            checkForBreaks(selectedSchedule);
+        }
+
+        function selectScheduleForDay(dayIndex) {
+            const daysForSchedule1 = getCheckedDays('1');
+            const daysForSchedule2 = getCheckedDays('2');
+
+            if (daysForSchedule1.includes(dayIndex)) {
+                return scheduleData;
+            } else if (daysForSchedule2.includes(dayIndex)) {
+                return altScheduleData;
+            }
+
+            return []; // Default if no schedules are assigned to the current day
+        }
+
+        function getCheckedDays(scheduleNumber) {
+            const daysMap = {
+                'mon': 1,
+                'tue': 2,
+                'wed': 3,
+                'thu': 4,
+                'fri': 5,
+                'sat': 6,
+                'sun': 0
+            };
+
+            return Object.keys(daysMap).filter(day => {
+                const checkbox = document.getElementById(`${day}-${scheduleNumber}`);
+                return checkbox && checkbox.checked;
+            }).map(day => daysMap[day]);
+        }
+
+        function handleCheckboxClick(day, scheduleNumber) {
+            const otherScheduleNumber = scheduleNumber === 1 ? 2 : 1;
+            document.getElementById(`${day}-${otherScheduleNumber}`).checked = false;
+        }
+
+        function checkForBreaks(currentSchedule) {
+            const currentTime = new Date();
+
+            const currentBreak = currentSchedule.find(period => {
+                if (!period.period.includes('Break')) return false;
+                const startTime = new Date(parseTime(period.startTime));
+                const endTime = new Date(parseTime(period.endTime));
+                return currentTime >= startTime && currentTime < endTime;
+            });
+
+            if (currentBreak) {
+                showBreakPopup(currentBreak);
+            } else {
+                hideBreakPopup();
+            }
+        }
+
+        function showBreakPopup(breakPeriod) {
+            const startTime = new Date(parseTime(breakPeriod.startTime));
+            const endTime = new Date(parseTime(breakPeriod.endTime));
+            const remainingTime = endTime - new Date();
+            const remainingSeconds = Math.floor(remainingTime / 1000);
+
+            const popup = document.getElementById('break-popup');
+            popup.parentElement.style.display = 'block'; // Show the break popup
+
+            updateDigitalCountdown(remainingSeconds, endTime - startTime);
+        }
+
+        function hideBreakPopup() {
+            const popup = document.getElementById('break-popup');
+            popup.parentElement.style.display = 'none'; // Hide the break popup
+        }
+
+        function updateDigitalCountdown(remainingSeconds, totalDuration) {
+            const seconds = remainingSeconds % 60;
+            const minutes = Math.floor(remainingSeconds / 60);
+
+            const digitalCountdown = document.getElementById('digital-countdown');
+            const progressBar = document.getElementById('break-progress-bar');
+            const cursor = document.getElementById('break-cursor');
+            const progressPercentage = ((totalDuration - remainingSeconds * 1000) / totalDuration) * 100;
+
+            digitalCountdown.textContent = `${minutes} min ${seconds < 10 ? '0' : ''}${seconds} sec`;
+
+            progressBar.style.width = `${progressPercentage}%`;
+            cursor.style.left = `${progressPercentage}%`;
+        }
+
+        function displayDateTime() {
+            const now = new Date();
+            const dateTimeElement = document.getElementById('datetime');
+            dateTimeElement.textContent = now.toLocaleString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' });
+        }
+
+        function openSettings() {
+            populateSettings();
+            document.getElementById('settings-panel').style.display = 'block';
+        }
+
+        function closeSettings() {
+            document.getElementById('settings-panel').style.display = 'none';
+        }
+
+        function populateSettings() {
+            document.getElementById('school-name-input').value = localStorage.getItem('schoolName') || '';
+            document.getElementById('bell-times-input').value = localStorage.getItem('bellTimes') || getDefaultSchedule();
+            document.getElementById('alt-bell-times-input').value = localStorage.getItem('altBellTimes') || getDefaultAltSchedule();
+
+            const daysForSchedule1 = JSON.parse(localStorage.getItem('daysForSchedule1') || '[]');
+            const daysForSchedule2 = JSON.parse(localStorage.getItem('daysForSchedule2') || '[]');
+
+            daysForSchedule1.forEach(day => document.getElementById(`${day}-1`).checked = true);
+            daysForSchedule2.forEach(day => document.getElementById(`${day}-2`).checked = true);
+        }
+
+        function saveSettings() {
+            const schoolName = document.getElementById('school-name-input').value;
+            const bellTimes = document.getElementById('bell-times-input').value;
+            const altBellTimes = document.getElementById('alt-bell-times-input').value;
+
+            localStorage.setItem('schoolName', schoolName);
+            localStorage.setItem('bellTimes', bellTimes);
+            localStorage.setItem('altBellTimes', altBellTimes);
+
+            scheduleData = parseBellTimes(bellTimes);
+            altScheduleData = parseBellTimes(altBellTimes);
+
+            const daysForSchedule1 = getCheckedDays('1').map(day => ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'][day - 1]);
+            const daysForSchedule2 = getCheckedDays('2').map(day => ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'][day - 1]);
+
+            localStorage.setItem('daysForSchedule1', JSON.stringify(daysForSchedule1));
+            localStorage.setItem('daysForSchedule2', JSON.stringify(daysForSchedule2));
+
+            applySettings();
+            closeSettings();
+            updateSchedule();
+        }
+
+        function parseBellTimes(bellTimes) {
+            return bellTimes.split('\n').map(line => {
+                const [period, startTime, endTime] = line.split(',').map(item => item.trim());
+                return { period: period || 'Unknown', startTime: startTime || '12:00 AM', endTime: endTime || '12:00 AM' };
+            }).filter(item => item.startTime && item.endTime); // Filter out any incomplete entries
+        }
+
+        function applySettings() {
+            const savedSchoolName = localStorage.getItem('schoolName');
+            const savedBellTimes = localStorage.getItem('bellTimes') || getDefaultSchedule();
+            const savedAltBellTimes = localStorage.getItem('altBellTimes') || getDefaultAltSchedule();
+
+            if (savedSchoolName) {
+                document.getElementById('school-name').textContent = savedSchoolName;
+            }
+
+            scheduleData = parseBellTimes(savedBellTimes);
+            altScheduleData = parseBellTimes(savedAltBellTimes);
+
+            // Refresh the page display with applied settings
+            updateSchedule();
+        }
+
+        function getDefaultSchedule() {
+            return `1, 7:45 AM, 8:33 AM
+2, 8:37 AM, 9:25 AM
+3, 9:29 AM, 10:17 AM
+4, 10:21 AM, 11:09 AM
+5, 11:13 AM, 12:01 PM
+6, 12:05 PM, 12:53 PM
+7, 12:57 PM, 1:45 PM
+8, 1:49 PM, 2:37 PM
+9, 2:41 PM, 3:29 PM
+10, 3:30 PM, 4:30 PM`;
+        }
+
+        function getDefaultAltSchedule() {
+            return `1, 7:45 AM, 8:18 AM
+2, 8:18 AM, 8:51 AM
+3, 8:55 AM, 9:28 AM
+4, 9:28 AM, 10:01 AM
+5, 10:05 AM, 10:38 AM
+6, 10:42 AM, 11:15 AM
+7, 11:19 AM, 11:52 AM
+8, 11:56 AM, 12:29 PM
+9, 12:29 PM, 1:02 PM`;
+        }
+
+        // Make the settings panel draggable
+        function makeDraggable(element) {
+            let offsetX = 0, offsetY = 0, startX = 0, startY = 0;
+
+            element.onmousedown = dragMouseDown;
+
+            function dragMouseDown(e) {
+                e = e || window.event;
+                e.preventDefault();
+                startX = e.clientX;
+                startY = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e = e || window.event;
+                e.preventDefault();
+                offsetX = startX - e.clientX;
+                offsetY = startY - e.clientY;
+                startX = e.clientX;
+                startY = e.clientY;
+                element.style.top = (element.offsetTop - offsetY) + "px";
+                element.style.left = (element.offsetLeft - offsetX) + "px";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+        }
+
+        // Apply draggable functionality to the settings panel
+        makeDraggable(document.getElementById('settings-panel'));
+
+        // Initialize and load default data
+        applySettings();
+        updateSchedule();
+        setInterval(updateSchedule, 60000);
+        setInterval(displayDateTime, 1000);
+        setInterval(() => checkForBreaks(selectScheduleForDay(new Date().getDay())), 1000);
+    </script>
+</body>
+</html>
