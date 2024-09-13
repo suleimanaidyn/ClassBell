@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Class Bell Schedule</title>
+    <title>Class Schedule</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -146,6 +145,22 @@
             cursor: pointer;
             font-size: 16px;
         }
+        .bell-schedule-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .bell-schedule {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .day-selection {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -189,9 +204,37 @@
         <h3>Settings</h3>
         <label for="school-name-input">School Name:</label>
         <input type="text" id="school-name-input" placeholder="Enter school name">
-        <h4>Bell Times:</h4>
-        <textarea id="bell-times-input" rows="12" style="width: 100%;" placeholder="Enter bell times in the format:&#10;Period 1, 07:45 AM, 08:33 AM&#10;Break, 08:33 AM, 08:37 AM&#10;..."></textarea>
-        <button id="save-settings-button">Save</button>
+        
+        <div class="bell-schedule-container">
+            <div class="bell-schedule">
+                <h4>Schedule 1 (Default)</h4>
+                <textarea id="bell-times-input" rows="8" placeholder="Enter bell times for Schedule 1"></textarea>
+                <div class="day-selection">
+                    <label><input type="checkbox" id="mon-1" onclick="handleCheckboxClick('mon', 1)"> Mon</label>
+                    <label><input type="checkbox" id="tue-1" onclick="handleCheckboxClick('tue', 1)"> Tue</label>
+                    <label><input type="checkbox" id="wed-1" onclick="handleCheckboxClick('wed', 1)"> Wed</label>
+                    <label><input type="checkbox" id="thu-1" onclick="handleCheckboxClick('thu', 1)"> Thu</label>
+                    <label><input type="checkbox" id="fri-1" onclick="handleCheckboxClick('fri', 1)"> Fri</label>
+                    <label><input type="checkbox" id="sat-1" onclick="handleCheckboxClick('sat', 1)"> Sat</label>
+                    <label><input type="checkbox" id="sun-1" onclick="handleCheckboxClick('sun', 1)"> Sun</label>
+                </div>
+            </div>
+            <div class="bell-schedule">
+                <h4>Schedule 2 (Alternative)</h4>
+                <textarea id="alt-bell-times-input" rows="8" placeholder="Enter bell times for Schedule 2"></textarea>
+                <div class="day-selection">
+                    <label><input type="checkbox" id="mon-2" onclick="handleCheckboxClick('mon', 2)"> Mon</label>
+                    <label><input type="checkbox" id="tue-2" onclick="handleCheckboxClick('tue', 2)"> Tue</label>
+                    <label><input type="checkbox" id="wed-2" onclick="handleCheckboxClick('wed', 2)"> Wed</label>
+                    <label><input type="checkbox" id="thu-2" onclick="handleCheckboxClick('thu', 2)"> Thu</label>
+                    <label><input type="checkbox" id="fri-2" onclick="handleCheckboxClick('fri', 2)"> Fri</label>
+                    <label><input type="checkbox" id="sat-2" onclick="handleCheckboxClick('sat', 2)"> Sat</label>
+                    <label><input type="checkbox" id="sun-2" onclick="handleCheckboxClick('sun', 2)"> Sun</label>
+                </div>
+            </div>
+        </div>
+
+        <button onclick="saveSettings()">Save</button>
         <button onclick="closeSettings()">Close</button>
     </div>
 
@@ -199,52 +242,32 @@
 
     <script>
         let scheduleData = [];
+        let altScheduleData = [];
 
-        // Load saved settings from localStorage on page load
-        function loadSettings() {
-            const savedSchoolName = localStorage.getItem('schoolName');
-            const savedBellTimes = localStorage.getItem('bellTimes');
+        function parseTime(timeString) {
+            const [time, modifier] = timeString.split(' ');
+            const [hours, minutes] = time.split(':');
+            let hour = parseInt(hours, 10);
 
-            if (savedSchoolName) {
-                document.getElementById('school-name').textContent = savedSchoolName;
+            if (modifier === 'PM' && hour !== 12) {
+                hour += 12;
+            } else if (modifier === 'AM' && hour === 12) {
+                hour = 0;
             }
 
-            if (savedBellTimes) {
-                // Parse saved bell times and set to scheduleData
-                scheduleData = savedBellTimes.split('\n').map(line => {
-                    const [period, startTime, endTime] = line.split(',').map(item => item.trim());
-                    return { period: period.replace('Period ', ''), startTime, endTime };
-                });
-                updateSchedule();
-            } else {
-                // If no data is available, display a message
-                document.getElementById('schedule').querySelector('tbody').innerHTML = '<tr><td colspan="4">No schedule data available.</td></tr>';
-            }
+            return new Date().setHours(hour, parseInt(minutes, 10), 0, 0);
         }
 
-        // Save settings to localStorage
-        function saveSettings() {
-            const schoolName = document.getElementById('school-name-input').value;
-            const bellTimes = document.getElementById('bell-times-input').value;
-
-            localStorage.setItem('schoolName', schoolName);
-            localStorage.setItem('bellTimes', bellTimes);
-
-            loadSettings(); // Load settings after saving to update the page
-            closeSettings();
-        }
-
-        // Function to update the schedule display
         function updateSchedule() {
             const currentTime = new Date();
+            const currentDay = currentTime.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+            const selectedSchedule = selectScheduleForDay(currentDay);
+
             const scheduleTable = document.getElementById('schedule');
             const tbody = scheduleTable.querySelector('tbody');
-
-            // Clear existing rows but keep the break popup row intact
             tbody.innerHTML = '';
 
-            // Add each period row to the table
-            scheduleData.forEach(period => {
+            selectedSchedule.forEach(period => {
                 const startTime = new Date(parseTime(period.startTime));
                 const endTime = new Date(parseTime(period.endTime));
                 const totalTime = endTime - startTime;
@@ -281,15 +304,48 @@
                 tbody.appendChild(row);
             });
 
-            checkForBreaks();
+            checkForBreaks(selectedSchedule);
         }
 
-        // Function to check for ongoing breaks
-        function checkForBreaks() {
+        function selectScheduleForDay(dayIndex) {
+            const daysForSchedule1 = getCheckedDays('1');
+            const daysForSchedule2 = getCheckedDays('2');
+
+            if (daysForSchedule1.includes(dayIndex)) {
+                return scheduleData;
+            } else if (daysForSchedule2.includes(dayIndex)) {
+                return altScheduleData;
+            }
+
+            return []; // Default if no schedules are assigned to the current day
+        }
+
+        function getCheckedDays(scheduleNumber) {
+            const daysMap = {
+                'mon': 1,
+                'tue': 2,
+                'wed': 3,
+                'thu': 4,
+                'fri': 5,
+                'sat': 6,
+                'sun': 0
+            };
+
+            return Object.keys(daysMap).filter(day => {
+                const checkbox = document.getElementById(`${day}-${scheduleNumber}`);
+                return checkbox && checkbox.checked;
+            }).map(day => daysMap[day]);
+        }
+
+        function handleCheckboxClick(day, scheduleNumber) {
+            const otherScheduleNumber = scheduleNumber === 1 ? 2 : 1;
+            document.getElementById(`${day}-${otherScheduleNumber}`).checked = false;
+        }
+
+        function checkForBreaks(currentSchedule) {
             const currentTime = new Date();
 
-            // Check if the current time is within a break period
-            const currentBreak = scheduleData.find(period => {
+            const currentBreak = currentSchedule.find(period => {
                 if (!period.period.includes('Break')) return false;
                 const startTime = new Date(parseTime(period.startTime));
                 const endTime = new Date(parseTime(period.endTime));
@@ -303,7 +359,6 @@
             }
         }
 
-        // Show break time popup
         function showBreakPopup(breakPeriod) {
             const startTime = new Date(parseTime(breakPeriod.startTime));
             const endTime = new Date(parseTime(breakPeriod.endTime));
@@ -313,17 +368,14 @@
             const popup = document.getElementById('break-popup');
             popup.parentElement.style.display = 'block'; // Show the break popup
 
-            // Update the digital countdown and progress bar
             updateDigitalCountdown(remainingSeconds, endTime - startTime);
         }
 
-        // Hide break time popup
         function hideBreakPopup() {
             const popup = document.getElementById('break-popup');
             popup.parentElement.style.display = 'none'; // Hide the break popup
         }
 
-        // Update digital countdown display
         function updateDigitalCountdown(remainingSeconds, totalDuration) {
             const seconds = remainingSeconds % 60;
             const minutes = Math.floor(remainingSeconds / 60);
@@ -333,59 +385,92 @@
             const cursor = document.getElementById('break-cursor');
             const progressPercentage = ((totalDuration - remainingSeconds * 1000) / totalDuration) * 100;
 
-            // Update digital countdown text
             digitalCountdown.textContent = `${minutes} min ${seconds < 10 ? '0' : ''}${seconds} sec`;
 
-            // Update progress bar and cursor position
             progressBar.style.width = `${progressPercentage}%`;
             cursor.style.left = `${progressPercentage}%`;
         }
 
-        // Display current date and time
         function displayDateTime() {
             const now = new Date();
             const dateTimeElement = document.getElementById('datetime');
             dateTimeElement.textContent = now.toLocaleString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' });
         }
 
-        // Open settings panel
         function openSettings() {
             populateSettings();
             document.getElementById('settings-panel').style.display = 'block';
         }
 
-        // Close settings panel
         function closeSettings() {
             document.getElementById('settings-panel').style.display = 'none';
         }
 
-        // Populate settings fields with saved data
         function populateSettings() {
             document.getElementById('school-name-input').value = localStorage.getItem('schoolName') || '';
-            const savedBellTimes = localStorage.getItem('bellTimes');
-            document.getElementById('bell-times-input').value = savedBellTimes ? savedBellTimes : scheduleData.map(period => `${period.period}, ${period.startTime}, ${period.endTime}`).join('\n');
+            document.getElementById('bell-times-input').value = localStorage.getItem('bellTimes') || '';
+            document.getElementById('alt-bell-times-input').value = localStorage.getItem('altBellTimes') || '';
+
+            const daysForSchedule1 = JSON.parse(localStorage.getItem('daysForSchedule1') || '[]');
+            const daysForSchedule2 = JSON.parse(localStorage.getItem('daysForSchedule2') || '[]');
+
+            daysForSchedule1.forEach(day => document.getElementById(`${day}-1`).checked = true);
+            daysForSchedule2.forEach(day => document.getElementById(`${day}-2`).checked = true);
         }
 
-        // Utility function to parse time from string
-        function parseTime(timeString) {
-            const [time, modifier] = timeString.split(' ');
-            const [hours, minutes] = time.split(':');
-            let hour = parseInt(hours, 10);
+        function saveSettings() {
+            const schoolName = document.getElementById('school-name-input').value;
+            const bellTimes = document.getElementById('bell-times-input').value;
+            const altBellTimes = document.getElementById('alt-bell-times-input').value;
 
-            if (modifier === 'PM' && hour !== 12) {
-                hour += 12;
-            } else if (modifier === 'AM' && hour === 12) {
-                hour = 0;
+            localStorage.setItem('schoolName', schoolName);
+            localStorage.setItem('bellTimes', bellTimes);
+            localStorage.setItem('altBellTimes', altBellTimes);
+
+            scheduleData = parseBellTimes(bellTimes);
+            altScheduleData = parseBellTimes(altBellTimes);
+
+            const daysForSchedule1 = getCheckedDays('1').map(day => ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'][day - 1]);
+            const daysForSchedule2 = getCheckedDays('2').map(day => ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'][day - 1]);
+
+            localStorage.setItem('daysForSchedule1', JSON.stringify(daysForSchedule1));
+            localStorage.setItem('daysForSchedule2', JSON.stringify(daysForSchedule2));
+
+            applySettings();
+            closeSettings();
+            updateSchedule();
+        }
+
+        function parseBellTimes(bellTimes) {
+            return bellTimes.split('\n').map(line => {
+                const [period, startTime, endTime] = line.split(',').map(item => item.trim());
+                return { period, startTime, endTime };
+            });
+        }
+
+        function applySettings() {
+            const savedSchoolName = localStorage.getItem('schoolName');
+            const savedBellTimes = localStorage.getItem('bellTimes');
+            const savedAltBellTimes = localStorage.getItem('altBellTimes');
+
+            if (savedSchoolName) {
+                document.getElementById('school-name').textContent = savedSchoolName;
             }
 
-            return new Date().setHours(hour, parseInt(minutes, 10), 0, 0);
+            if (savedBellTimes) {
+                scheduleData = parseBellTimes(savedBellTimes);
+            }
+
+            if (savedAltBellTimes) {
+                altScheduleData = parseBellTimes(savedAltBellTimes);
+            }
         }
 
-        // Initialize settings and update schedule
-        loadSettings();
+        applySettings();
+        updateSchedule();
         setInterval(updateSchedule, 60000);
         setInterval(displayDateTime, 1000);
-        setInterval(checkForBreaks, 1000); // Check every second for breaks
+        setInterval(() => checkForBreaks(selectScheduleForDay(new Date().getDay())), 1000);
     </script>
 </body>
 </html>
