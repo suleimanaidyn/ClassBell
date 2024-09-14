@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Manual</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        h2 {
+            font-size: 20px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        h3 {
+            font-size: 18px;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+        p {
+            margin-bottom: 10px;
+        }
+        ul, ol {
+            margin-bottom: 10px;
+            padding-left: 20px;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Class Schedule Management Tool - User Manual</h1>
+
+    <h2>Overview</h2>
+    <p>The Class Schedule Management Tool allows you to manage multiple schedules for your school, assigning specific schedules to different days of the week. This tool is designed to dynamically update and display the appropriate schedule based on the current day, ensuring that your class periods and break times are accurately reflected.</p>
+
+    <h2>Features</h2>
+    <ul>
+        <li><strong>Multiple Schedules:</strong> Set up two distinct schedules (Default and Alternative) to cater to different needs, such as a regular weekday schedule and a special Friday schedule.</li>
+        <li><strong>Day Assignments:</strong> Assign specific days of the week to each schedule, ensuring that only one schedule is active per day.</li>
+        <li><strong>Dynamic Updates:</strong> Automatically displays the correct schedule based on the current day of the week.</li>
+        <li><strong>Editable Schedules:</strong> Easily edit schedules directly within the settings panel.</li>
+        <li><strong>Real-time Display:</strong> Updates remaining time for ongoing periods and indicates upcoming periods.</li>
+    </ul>
+
+    <h2>Getting Started</h2>
+    <ol>
+        <li><strong>Accessing the Tool:</strong> Open the tool in your web browser. You will see the main schedule display along with a date and time header.</li>
+        <li><strong>Opening the Settings Panel:</strong> To configure the schedules, click the gear icon (⚙) located at the bottom-right corner of the screen. This will open the Settings Panel.</li>
+    </ol>
+
+    <h2>Configuring Schedules</h2>
+    <h3>1. Editing Schedules</h3>
+    <p>In the Settings Panel, you'll find two sections:</p>
+    <ul>
+        <li><strong>Schedule 1 (Default):</strong> Use this for your regular schedule.</li>
+        <li><strong>Schedule 2 (Alternative):</strong> Use this for a different schedule, such as for Fridays.</li>
+    </ul>
+    <p><strong>Edit the schedule times:</strong> Each schedule section contains a text area where you can enter periods, start times, and end times in the following format:</p>
+    <pre>
+Period 1, 7:45 AM, 8:33 AM
+Break, 8:33 AM, 8:37 AM
+Period 2, 8:37 AM, 9:25 AM
+    </pre>
+    <p><strong>Saving Changes:</strong> After editing the schedules, make sure to click the <em>Save</em> button at the bottom of the Settings Panel to apply the changes.</p>
+
+    <h3>2. Assigning Days to Schedules</h3>
+    <p>Below each schedule, there are checkboxes labeled with days of the week (Mon, Tue, Wed, Thu, Fri, Sat, Sun).</p>
+    <p><strong>Assigning a day:</strong></p>
+    <ul>
+        <li>To assign a day to <strong>Schedule 1 (Default)</strong>, check the appropriate day checkbox under Schedule 1.</li>
+        <li>To assign a day to <strong>Schedule 2 (Alternative)</strong>, check the appropriate day checkbox under Schedule 2.</li>
+    </ul>
+    <p><strong>Mutual Exclusivity:</strong> Each day can only be assigned to one schedule at a time. If you select a day for Schedule 1, it will automatically deselect the same day in Schedule 2, and vice versa.</p>
+
+    <h2>Viewing and Using the Schedule</h2>
+    <h3>1. Viewing the Active Schedule</h3>
+    <p>The schedule displayed on the main screen will automatically update based on the current day of the week and the assigned schedule for that day.</p>
+    <p>Periods will be shown with the following information:</p>
+    <ul>
+        <li>Period Number</li>
+        <li>Start Time</li>
+        <li>End Time</li>
+        <li>Remaining Time (for ongoing periods) or indicators for completed or upcoming periods.</li>
+    </ul>
+
+    <h3>2. Real-Time Updates</h3>
+    <p>The schedule refreshes every minute to provide the latest updates on ongoing and upcoming periods. Break periods will trigger a special popup to indicate the ongoing break and countdown the remaining time.</p>
+
+    <h2>Troubleshooting</h2>
+    <ul>
+        <li><strong>Schedule Not Displaying Correctly:</strong> Ensure that you have assigned the correct days to each schedule in the Settings Panel. Make sure to save your changes after editing schedules or day assignments.</li>
+        <li><strong>Changes Not Saving:</strong> Check that your browser’s local storage is enabled, as the tool uses local storage to save settings.</li>
+    </ul>
+
+    <h2>Contact and Support</h2>
+    <p>For further assistance, please contact the support team at <a href="mailto:saydin19@gmail.com">saydin19@gmail.com</a>.</p>
+
+    <button onclick="window.close()">Close</button>
+</body>
+</html>
