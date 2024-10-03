@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-M2QXES4LKK"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M2QXES4LKK"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
 
-  gtag('config', 'G-M2QXES4LKK');
-</script>
+        gtag('config', 'G-M2QXES4LKK');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Class Schedule</title>
@@ -26,18 +26,108 @@
             border-bottom: 1px solid #ddd;
         }
         #header-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            justify-items: center;
+            align-items: center;
+            padding: 10px;
+            background-color: #ffe0b2; /* Default background color */
+        }
+        #date, #time {
+            background-color: #e3f2fd; /* Light blue for date and time */
+            padding: 10px;
+            text-align: center;
+            width: 100%;
+        }
+        .date-day {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .date-separator {
+            margin: 0 5px;
+            font-size: 1.2em;
+            font-weight: normal;
+        }
+        .date-rest {
+            font-size: 1.2em;
+            font-weight: normal;
+        }
+        #school-name {
+            font-size: 1.8em;
+            font-weight: bold;
+            padding: 10px;
+            text-align: center;
+            width: 100%;
+            cursor: pointer;
+        }
+        #footer-buttons {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 10px;
         }
-        #datetime {
-            font-size: 1.5em;
+        .readme-button {
+            background-color: #007bff; /* Blue background for ReadMe */
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: inline-block;
+            margin-right: 5px;
         }
-        #school-name {
-            font-size: 1.2em;
-            font-weight: bold;
+        .readme-text {
+            font-size: 1em;
+            color: #000;
         }
+        .share-button {
+            margin: 0 5px;
+            font-size: 0.75em;
+            color: white;
+            text-decoration: none;
+            padding: 5px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        .share-button i {
+            margin-right: 8px;
+        }
+        /* Styles for individual platforms */
+        .share-button.twitter {
+            background-color: black;
+        }
+        .share-button.facebook {
+            background-color: #1877F2;
+        }
+        .share-button.linkedin {
+            background-color: #0A66C2;
+            color: white;
+        }
+        /* Customize Colors Panel */
+        #customize-colors-panel, #settings-panel {
+            display: none;
+            position: fixed;
+            top: 10%;
+            left: 50%;
+            transform: translate(-50%, 0);
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 20px;
+            z-index: 2000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-height: 80%;
+            overflow-y: auto;
+            width: 300px;
+        }
+        #customize-colors-panel input {
+            margin: 10px 0;
+            width: 100%;
+            padding: 5px;
+        }
+        #settings-panel textarea, #settings-panel input {
+            margin: 10px 0;
+            width: 100%;
+            padding: 5px;
+        }
+        /* Schedule Styles */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -68,6 +158,7 @@
             background: linear-gradient(to right, #e0e0ff, #b3ffb3);
             z-index: -1;
         }
+        /* Break Popup */
         .break-popup-row {
             display: none;
         }
@@ -82,6 +173,7 @@
             justify-content: space-around;
             align-items: center;
             padding: 5px;
+            margin-top: 10px; /* Added margin to position above the table */
         }
         #break-time-text {
             width: 100%;
@@ -122,77 +214,32 @@
             z-index: 1;
             line-height: 20px;
         }
-        #settings-panel {
-            display: none;
-            position: fixed;
-            top: 10%;
-            left: 50%;
-            transform: translate(-50%, 0);
-            background-color: white;
-            border: 1px solid #ddd;
-            padding: 20px;
-            z-index: 2000;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            max-height: 80%;
-            overflow-y: auto;
-            width: 300px;
-        }
-        #settings-panel input, #settings-panel textarea, #settings-panel select {
-            margin: 5px 0;
-            width: calc(100% - 10px);
-            padding: 8px;
-            box-sizing: border-box;
-        }
-        .schedule-settings {
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        .schedule-settings h4 {
-            margin: 0 0 5px 0;
-        }
-        .day-checkboxes {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 5px;
-        }
-        #settings-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        /* Mobile Responsive Adjustments */
-        @media only screen and (max-width: 768px) {
-            body {
-                margin: 10px;
-            }
-            #datetime {
-                font-size: 1.2em;
-            }
-            table th, table td {
-                padding: 5px;
-            }
-            #settings-button {
-                bottom: 10px;
-                right: 10px;
-            }
-        }
     </style>
+    <!-- Adding Font Awesome for Social Media Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" crossorigin="anonymous" />
 </head>
 <body>
     <div id="sticky-container">
         <div id="header-container">
-            <div id="school-name">HSA El Paso</div>
-            <div id="datetime"></div>
+            <div id="date"></div>
+            <div id="school-name" onclick="openCustomizeColors()">HSA El Paso</div>
+            <div id="time"></div>
         </div>
+
+        <!-- Schedule Table -->
+        <table id="schedule">
+            <thead>
+                <tr>
+                    <th>Period</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Remaining Time</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+
         <div class="break-popup-row">
             <div id="break-popup">
                 <div id="break-time-text">Break Time</div>
@@ -203,63 +250,85 @@
                 </div>
             </div>
         </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Period</th>
-                    <th>Start Time</th>
-                    <th>End Time</th>
-                    <th>Remaining Time</th>
-                </tr>
-            </thead>
-        </table>
-    </div>
 
-    <table id="schedule">
-        <tbody>
-        </tbody>
-    </table>
+        <!-- Footer Buttons: ReadMe and Share at the Bottom -->
+        <div id="footer-buttons">
+            <div class="readme-container">
+                <a href="readme.html" target="_blank" class="readme-button" aria-label="ReadMe"></a>
+                <span class="readme-text">ReadMe</span>
+            </div>
 
-    <div id="settings-panel">
-        <h3>Settings</h3>
-        <input type="text" id="school-name-input" placeholder="Enter school name">
-
-        <div class="schedule-settings">
-            <h4>Schedule 1 (Default)</h4>
-            <textarea id="default-schedule-input" rows="8" placeholder="Enter default schedule..."></textarea>
-            <div class="day-checkboxes">
-                <label><input type="checkbox" id="default-mon" onclick="toggleDay('default', 'mon')"> Mon</label>
-                <label><input type="checkbox" id="default-tue" onclick="toggleDay('default', 'tue')"> Tue</label>
-                <label><input type="checkbox" id="default-wed" onclick="toggleDay('default', 'wed')"> Wed</label>
-                <label><input type="checkbox" id="default-thu" onclick="toggleDay('default', 'thu')"> Thu</label>
-                <label><input type="checkbox" id="default-fri" onclick="toggleDay('default', 'fri')"> Fri</label>
-                <label><input type="checkbox" id="default-sat" onclick="toggleDay('default', 'sat')"> Sat</label>
-                <label><input type="checkbox" id="default-sun" onclick="toggleDay('default', 'sun')"> Sun</label>
+            <!-- Share Buttons -->
+            <div id="share-buttons">
+                <span>Share: </span>
+                <a href="https://twitter.com/intent/tweet?text=Excellent%20tool%20to%20track%20class%20schedule%20for%20all%20educators!&url=https://classbellschedule.com" target="_blank" class="share-button twitter" aria-label="Share on X (Twitter)">
+                    <i class="fab fa-twitter"></i>X
+                </a>
+                <a href="https://www.facebook.com/sharer/sharer.php?u=https://classbellschedule.com" target="_blank" class="share-button facebook" aria-label="Share on Facebook">
+                    <i class="fab fa-facebook"></i>Facebook
+                </a>
+                <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://classbellschedule.com&title=Excellent%20tool%20to%20track%20class%20schedule%20for%20all%20educators!" target="_blank" class="share-button linkedin" aria-label="Share on LinkedIn">
+                    <i class="fab fa-linkedin"></i>LinkedIn
+                </a>
             </div>
         </div>
 
-        <div class="schedule-settings">
-            <h4>Schedule 2 (Alternative)</h4>
-            <textarea id="alternative-schedule-input" rows="8" placeholder="Enter alternative schedule..."></textarea>
-            <div class="day-checkboxes">
-                <label><input type="checkbox" id="alt-mon" onclick="toggleDay('alt', 'mon')"> Mon</label>
-                <label><input type="checkbox" id="alt-tue" onclick="toggleDay('alt', 'tue')"> Tue</label>
-                <label><input type="checkbox" id="alt-wed" onclick="toggleDay('alt', 'wed')"> Wed</label>
-                <label><input type="checkbox" id="alt-thu" onclick="toggleDay('alt', 'thu')"> Thu</label>
-                <label><input type="checkbox" id="alt-fri" onclick="toggleDay('alt', 'fri')"> Fri</label>
-                <label><input type="checkbox" id="alt-sat" onclick="toggleDay('alt', 'sat')"> Sat</label>
-                <label><input type="checkbox" id="alt-sun" onclick="toggleDay('alt', 'sun')"> Sun</label>
-            </div>
+        <!-- Customize Colors Panel -->
+        <div id="customize-colors-panel">
+            <h3>Customize Colors</h3>
+            <label for="bg-color">Pick School Name, Date, and Time Background Color:</label>
+            <input type="color" id="bg-color" value="#ffe0b2">
+
+            <label for="text-color">Pick School Name, Date, and Time Text Color:</label>
+            <input type="color" id="text-color" value="#000000">
+
+            <button onclick="saveColors()">Save</button>
+            <button onclick="closeCustomizeColors()">Close</button>
         </div>
 
-        <button onclick="resetSettings()">Reset</button>
-        <button onclick="saveSettings()">Save</button>
-        <button onclick="closeSettings()">Close</button>
-    </div>
+        <!-- Settings Panel -->
+        <div id="settings-panel">
+            <h3>Settings</h3>
+            <input type="text" id="school-name-input" placeholder="Enter school name">
 
-    <button id="settings-button" aria-label="Open settings" onclick="openSettings()">⚙</button>
+            <div class="schedule-settings">
+                <h4>Schedule 1 (Default)</h4>
+                <textarea id="default-schedule-input" rows="8" placeholder="Enter default schedule..."></textarea>
+                <div class="day-checkboxes">
+                    <label><input type="checkbox" id="default-mon" onclick="toggleDay('default', 'mon')"> Mon</label>
+                    <label><input type="checkbox" id="default-tue" onclick="toggleDay('default', 'tue')"> Tue</label>
+                    <label><input type="checkbox" id="default-wed" onclick="toggleDay('default', 'wed')"> Wed</label>
+                    <label><input type="checkbox" id="default-thu" onclick="toggleDay('default', 'thu')"> Thu</label>
+                    <label><input type="checkbox" id="default-fri" onclick="toggleDay('default', 'fri')"> Fri</label>
+                    <label><input type="checkbox" id="default-sat" onclick="toggleDay('default', 'sat')"> Sat</label>
+                    <label><input type="checkbox" id="default-sun" onclick="toggleDay('default', 'sun')"> Sun</label>
+                </div>
+            </div>
+
+            <div class="schedule-settings">
+                <h4>Schedule 2 (Alternative)</h4>
+                <textarea id="alternative-schedule-input" rows="8" placeholder="Enter alternative schedule..."></textarea>
+                <div class="day-checkboxes">
+                    <label><input type="checkbox" id="alt-mon" onclick="toggleDay('alt', 'mon')"> Mon</label>
+                    <label><input type="checkbox" id="alt-tue" onclick="toggleDay('alt', 'tue')"> Tue</label>
+                    <label><input type="checkbox" id="alt-wed" onclick="toggleDay('alt', 'wed')"> Wed</label>
+                    <label><input type="checkbox" id="alt-thu" onclick="toggleDay('alt', 'thu')"> Thu</label>
+                    <label><input type="checkbox" id="alt-fri" onclick="toggleDay('alt', 'fri')"> Fri</label>
+                    <label><input type="checkbox" id="alt-sat" onclick="toggleDay('alt', 'sat')"> Sat</label>
+                    <label><input type="checkbox" id="alt-sun" onclick="toggleDay('alt', 'sun')"> Sun</label>
+                </div>
+            </div>
+
+            <button onclick="resetSettings()">Reset</button>
+            <button onclick="saveSettings()">Save</button>
+            <button onclick="closeSettings()">Close</button>
+        </div>
+
+        <button id="settings-button" aria-label="Open settings" onclick="openSettings()">⚙</button>
+    </div>
 
     <script>
+        // Schedule Data
         let defaultSchedule = [
             { period: "1", startTime: "7:45 AM", endTime: "8:33 AM" },
             { period: "Break", startTime: "8:33 AM", endTime: "8:37 AM" },
@@ -302,8 +371,7 @@
             { period: "9", startTime: "12:33 PM", endTime: "1:02 PM" }
         ];
 
-        let currentSchedule = defaultSchedule;
-
+        // Function to parse time
         function parseTime(timeString) {
             const [time, modifier] = timeString.split(' ');
             const [hours, minutes] = time.split(':');
@@ -319,24 +387,24 @@
             return new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), hour, parseInt(minutes, 10), 0, 0);
         }
 
+        // Function to update the schedule table
         function updateSchedule() {
             const currentTime = new Date();
             const scheduleTable = document.getElementById('schedule');
             const tbody = scheduleTable.querySelector('tbody');
             tbody.innerHTML = '';
 
-            // Check current day and select the correct schedule based on assigned days
-            const currentDay = currentTime.getDay();
+            const currentDay = currentTime.getDay(); // 0 (Sunday) - 6 (Saturday)
             const defaultDays = JSON.parse(localStorage.getItem('defaultDays')) || [];
             const alternativeDays = JSON.parse(localStorage.getItem('alternativeDays')) || [];
 
-            // Determine which schedule to use based on current day
+            // Determine which schedule to use
             if (alternativeDays.includes(currentDay)) {
                 currentSchedule = alternativeSchedule;
             } else if (defaultDays.includes(currentDay)) {
                 currentSchedule = defaultSchedule;
             } else {
-                currentSchedule = defaultSchedule; // Fallback to default
+                currentSchedule = defaultSchedule;
             }
 
             const filteredData = currentSchedule.filter(period => {
@@ -385,9 +453,9 @@
             checkForBreaks();
         }
 
+        // Break functionality
         function checkForBreaks() {
             const currentTime = new Date();
-
             const currentBreak = currentSchedule.find(period => {
                 if (!period.period.includes('Break')) return false;
                 const startTime = new Date(parseTime(period.startTime));
@@ -429,17 +497,73 @@
             const progressPercentage = ((totalDuration - remainingSeconds * 1000) / totalDuration) * 100;
 
             digitalCountdown.textContent = `${minutes} min ${seconds < 10 ? '0' : ''}${seconds} sec`;
-
             progressBar.style.width = `${progressPercentage}%`;
             cursor.style.left = `${progressPercentage}%`;
         }
 
         function displayDateTime() {
             const now = new Date();
-            const dateTimeElement = document.getElementById('datetime');
-            dateTimeElement.textContent = now.toLocaleString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' });
+            const dateElement = document.getElementById('date');
+            const timeElement = document.getElementById('time');
+
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            dateElement.innerHTML = `<span class="date-day">${now.toLocaleDateString('en-US', { weekday: 'long' })}</span>
+                                     <span class="date-separator"> </span>
+                                     <span class="date-rest">${now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>`;
+
+            const timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
+            timeElement.innerHTML = `<span class="current-time">${now.toLocaleTimeString('en-US', timeOptions)}</span>`;
         }
 
+        // Open and close customize colors panel
+        function openCustomizeColors() {
+            document.getElementById('customize-colors-panel').style.display = 'block';
+        }
+
+        function closeCustomizeColors() {
+            document.getElementById('customize-colors-panel').style.display = 'none';
+        }
+
+        // Save and apply custom colors
+        function saveColors() {
+            const bgColor = document.getElementById('bg-color').value;
+            const textColor = document.getElementById('text-color').value;
+
+            const headerContainer = document.getElementById('header-container');
+            const schoolName = document.getElementById('school-name');
+            const dateElement = document.getElementById('date');
+            const timeElement = document.getElementById('time');
+
+            headerContainer.style.backgroundColor = bgColor;
+            schoolName.style.color = textColor;
+            dateElement.style.color = textColor;
+            timeElement.style.color = textColor;
+
+            localStorage.setItem('headerBgColor', bgColor);
+            localStorage.setItem('schoolTextColor', textColor);
+
+            closeCustomizeColors();
+        }
+
+        function loadSettings() {
+            const savedBgColor = localStorage.getItem('headerBgColor') || '#ffe0b2';
+            const savedTextColor = localStorage.getItem('schoolTextColor') || '#000000';
+
+            const headerContainer = document.getElementById('header-container');
+            const schoolName = document.getElementById('school-name');
+            const dateElement = document.getElementById('date');
+            const timeElement = document.getElementById('time');
+
+            headerContainer.style.backgroundColor = savedBgColor;
+            schoolName.style.color = savedTextColor;
+            dateElement.style.color = savedTextColor;
+            timeElement.style.color = savedTextColor;
+
+            document.getElementById('bg-color').value = savedBgColor;
+            document.getElementById('text-color').value = savedTextColor;
+        }
+
+        // Settings Panel Functions
         function openSettings() {
             populateSettings();
             document.getElementById('settings-panel').style.display = 'block';
@@ -453,12 +577,10 @@
             document.getElementById('school-name-input').value = localStorage.getItem('schoolName') || '';
             document.getElementById('default-schedule-input').value = defaultSchedule.map(period => `${period.period}, ${period.startTime}, ${period.endTime}`).join('\n');
             document.getElementById('alternative-schedule-input').value = alternativeSchedule.map(period => `${period.period}, ${period.startTime}, ${period.endTime}`).join('\n');
-            
-            // Load the day assignments from localStorage
+
             const defaultDays = JSON.parse(localStorage.getItem('defaultDays')) || [];
             const alternativeDays = JSON.parse(localStorage.getItem('alternativeDays')) || [];
-            
-            // Check the appropriate checkboxes based on saved data
+
             document.getElementById('default-mon').checked = defaultDays.includes(1);
             document.getElementById('default-tue').checked = defaultDays.includes(2);
             document.getElementById('default-wed').checked = defaultDays.includes(3);
@@ -466,7 +588,7 @@
             document.getElementById('default-fri').checked = defaultDays.includes(5);
             document.getElementById('default-sat').checked = defaultDays.includes(6);
             document.getElementById('default-sun').checked = defaultDays.includes(0);
-            
+
             document.getElementById('alt-mon').checked = alternativeDays.includes(1);
             document.getElementById('alt-tue').checked = alternativeDays.includes(2);
             document.getElementById('alt-wed').checked = alternativeDays.includes(3);
@@ -477,12 +599,9 @@
         }
 
         function toggleDay(schedule, day) {
-            const dayMap = {
-                'mon': 1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, 'sat': 6, 'sun': 0
-            };
+            const dayMap = { 'mon': 1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, 'sat': 6, 'sun': 0 };
             const dayNum = dayMap[day];
 
-            // Ensure mutual exclusivity of days between schedules
             if (schedule === 'default') {
                 document.getElementById(`alt-${day}`).checked = false;
             } else {
@@ -493,21 +612,21 @@
         function saveSettings() {
             const schoolName = document.getElementById('school-name-input').value;
             localStorage.setItem('schoolName', schoolName);
+            document.getElementById('school-name').textContent = schoolName; // Update the school name on the page
 
             defaultSchedule = document.getElementById('default-schedule-input').value.split('\n').map(line => {
                 const [period, startTime, endTime] = line.split(',').map(item => item.trim());
-                return { period: period.replace('Period ', ''), startTime, endTime };
+                return { period, startTime, endTime };
             });
 
             alternativeSchedule = document.getElementById('alternative-schedule-input').value.split('\n').map(line => {
                 const [period, startTime, endTime] = line.split(',').map(item => item.trim());
-                return { period: period.replace('Period ', ''), startTime, endTime };
+                return { period, startTime, endTime };
             });
 
-            // Save the day assignments to localStorage
             const defaultDays = [];
             const alternativeDays = [];
-            
+
             if (document.getElementById('default-mon').checked) defaultDays.push(1);
             if (document.getElementById('default-tue').checked) defaultDays.push(2);
             if (document.getElementById('default-wed').checked) defaultDays.push(3);
@@ -515,7 +634,7 @@
             if (document.getElementById('default-fri').checked) defaultDays.push(5);
             if (document.getElementById('default-sat').checked) defaultDays.push(6);
             if (document.getElementById('default-sun').checked) defaultDays.push(0);
-            
+
             if (document.getElementById('alt-mon').checked) alternativeDays.push(1);
             if (document.getElementById('alt-tue').checked) alternativeDays.push(2);
             if (document.getElementById('alt-wed').checked) alternativeDays.push(3);
@@ -536,20 +655,11 @@
             location.reload();
         }
 
-        function applySettings() {
-            const savedSchoolName = localStorage.getItem('schoolName');
-            if (savedSchoolName) {
-                document.getElementById('school-name').textContent = savedSchoolName;
-            }
-        }
-
-        applySettings();
+        loadSettings();
         updateSchedule();
         setInterval(updateSchedule, 60000);
         setInterval(displayDateTime, 1000);
         setInterval(checkForBreaks, 1000);
     </script>
-<!-- Read Me Link (opens in a new tab) -->
-    <p><a href="readme.html" target="_blank" rel="noopener noreferrer">Read Me</a></p>
 </body>
 </html>
