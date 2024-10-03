@@ -5,9 +5,10 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-M2QXES4LKK"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
+        function gtag() {
+            dataLayer.push(arguments);
+        }
         gtag('js', new Date());
-
         gtag('config', 'G-M2QXES4LKK');
     </script>
     <meta charset="UTF-8">
@@ -18,6 +19,7 @@
             font-family: Arial, sans-serif;
             margin: 20px;
         }
+
         #sticky-container {
             position: sticky;
             top: 0;
@@ -25,6 +27,7 @@
             background-color: white;
             border-bottom: 1px solid #ddd;
         }
+
         #header-container {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -33,76 +36,122 @@
             padding: 10px;
             background-color: #ffe0b2; /* Default background color */
         }
+
         #date, #time {
             background-color: #e3f2fd; /* Light blue for date and time */
             padding: 10px;
             text-align: center;
             width: 100%;
+            font-weight: bold; /* Making time bold */
+            font-size: 1.5em; /* Making time larger */
         }
-        .date-day {
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-        .date-separator {
-            margin: 0 5px;
-            font-size: 1.2em;
-            font-weight: normal;
-        }
-        .date-rest {
-            font-size: 1.2em;
-            font-weight: normal;
-        }
+
         #school-name {
             font-size: 1.8em;
             font-weight: bold;
             padding: 10px;
             text-align: center;
             width: 100%;
-            cursor: pointer;
         }
-        #footer-buttons {
+
+        /* Schedule Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+            position: relative;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .completed {
+            color: gray;
+        }
+
+        .upcoming {
+            font-weight: bold;
+            color: green;
+        }
+
+        .progress-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0;
+            background: linear-gradient(to right, #e0e0ff, #b3ffb3);
+            z-index: -1;
+        }
+
+        /* Break Popup */
+        #break-popup {
+            width: 100%;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            justify-content: space-around;
             align-items: center;
-            padding: 10px;
-        }
-        .readme-button {
-            background-color: #007bff; /* Blue background for ReadMe */
-            border-radius: 50%;
-            width: 25px;
-            height: 25px;
-            display: inline-block;
-            margin-right: 5px;
-        }
-        .readme-text {
-            font-size: 1em;
-            color: #000;
-        }
-        .share-button {
-            margin: 0 5px;
-            font-size: 0.75em;
-            color: white;
-            text-decoration: none;
             padding: 5px;
-            border-radius: 5px;
-            display: inline-block;
+            margin-bottom: 10px; /* Added space below */
         }
-        .share-button i {
-            margin-right: 8px;
-        }
-        /* Styles for individual platforms */
-        .share-button.twitter {
-            background-color: black;
-        }
-        .share-button.facebook {
-            background-color: #1877F2;
-        }
-        .share-button.linkedin {
-            background-color: #0A66C2;
+
+        #break-time-text {
+            width: 100%;
+            text-align: center;
+            font-size: 0.8em;
             color: white;
+            background-color: #C00000;
+            padding: 2px;
+            border-radius: 5px;
         }
-        /* Customize Colors Panel */
-        #customize-colors-panel, #settings-panel {
+
+        #break-progress {
+            width: 100%;
+            height: 20px;
+            position: relative;
+            display: flex;
+            border-radius: 5px;
+            background-color: white;
+        }
+
+        #break-progress-bar {
+            height: 100%;
+            background-color: #ffbf00;
+            transition: width 0.5s linear;
+        }
+
+        #break-cursor {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background-color: black;
+            transition: left 0.5s linear;
+        }
+
+        #digital-countdown {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            font-size: 1.5em;
+            color: black;
+            z-index: 1;
+            line-height: 20px;
+        }
+
+        /* Settings Panel Styles */
+        #settings-panel {
             display: none;
             position: fixed;
             top: 10%;
@@ -117,106 +166,67 @@
             overflow-y: auto;
             width: 300px;
         }
-        #customize-colors-panel input {
-            margin: 10px 0;
-            width: 100%;
-            padding: 5px;
-        }
-        #settings-panel textarea, #settings-panel input {
-            margin: 10px 0;
-            width: 100%;
-            padding: 5px;
-        }
-        /* Schedule Styles */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-        }
-        th, td {
-            border: 1px solid #ddd;
+
+        #settings-panel input,
+        #settings-panel textarea,
+        #settings-panel select {
+            margin: 5px 0;
+            width: calc(100% - 10px);
             padding: 8px;
-            text-align: center;
-            position: relative;
+            box-sizing: border-box;
         }
-        th {
-            background-color: #f2f2f2;
+
+        .schedule-settings {
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
         }
-        .completed {
-            color: gray;
+
+        .schedule-settings h4 {
+            margin: 0 0 5px 0;
         }
-        .upcoming {
-            font-weight: bold;
-            color: green;
-        }
-        .progress-bar {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 0;
-            background: linear-gradient(to right, #e0e0ff, #b3ffb3);
-            z-index: -1;
-        }
-        /* Break Popup */
-        .break-popup-row {
-            display: none;
-        }
-        #break-popup {
-            width: 100%;
-            height: 40px;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+
+        .day-checkboxes {
             display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            align-items: center;
-            padding: 5px;
-            margin-top: 10px; /* Added margin to position above the table */
+            justify-content: space-between;
+            margin-top: 5px;
         }
-        #break-time-text {
-            width: 100%;
-            text-align: center;
-            font-size: 0.8em;
+
+        #settings-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px;
+            background-color: #007bff;
             color: white;
-            background-color: #C00000;
-            padding: 2px;
-            border-radius: 5px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
         }
-        #break-progress {
-            width: 100%;
-            height: 20px;
-            position: relative;
-            display: flex;
-            border-radius: 5px;
-            background-color: white;
-        }
-        #break-progress-bar {
-            height: 100%;
-            background-color: #ffbf00;
-            transition: width 0.5s linear;
-        }
-        #break-cursor {
-            position: absolute;
-            top: 0;
-            height: 100%;
-            width: 2px;
-            background-color: black;
-            transition: left 0.5s linear;
-        }
-        #digital-countdown {
-            position: absolute;
-            width: 100%;
-            text-align: center;
-            font-size: 1.5em;
-            color: black;
-            z-index: 1;
-            line-height: 20px;
+
+        /* Mobile Responsive Adjustments */
+        @media only screen and (max-width: 768px) {
+            body {
+                margin: 10px;
+            }
+
+            #datetime {
+                font-size: 1.2em;
+            }
+
+            table th,
+            table td {
+                padding: 5px;
+            }
+
+            #settings-button {
+                bottom: 10px;
+                right: 10px;
+            }
         }
     </style>
-    <!-- Adding Font Awesome for Social Media Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" crossorigin="anonymous" />
 </head>
 <body>
     <div id="sticky-container">
@@ -224,6 +234,16 @@
             <div id="date"></div>
             <div id="school-name" onclick="openCustomizeColors()">HSA El Paso</div>
             <div id="time"></div>
+        </div>
+
+        <!-- Break Popup -->
+        <div id="break-popup" style="display: none;">
+            <div id="break-time-text">Break Time</div>
+            <div id="break-progress">
+                <div id="break-progress-bar"></div>
+                <div id="break-cursor"></div>
+                <div id="digital-countdown"></div>
+            </div>
         </div>
 
         <!-- Schedule Table -->
@@ -236,22 +256,10 @@
                     <th>Remaining Time</th>
                 </tr>
             </thead>
-            <tbody>
-            </tbody>
+            <tbody></tbody>
         </table>
 
-        <div class="break-popup-row">
-            <div id="break-popup">
-                <div id="break-time-text">Break Time</div>
-                <div id="break-progress">
-                    <div id="break-progress-bar"></div>
-                    <div id="break-cursor"></div>
-                    <div id="digital-countdown"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer Buttons: ReadMe and Share at the Bottom -->
+        <!-- Footer Buttons -->
         <div id="footer-buttons">
             <div class="readme-container">
                 <a href="readme.html" target="_blank" class="readme-button" aria-label="ReadMe"></a>
@@ -323,12 +331,11 @@
             <button onclick="saveSettings()">Save</button>
             <button onclick="closeSettings()">Close</button>
         </div>
-
-        <button id="settings-button" aria-label="Open settings" onclick="openSettings()">⚙</button>
     </div>
 
+    <button id="settings-button" aria-label="Open settings" onclick="openSettings()">⚙</button>
+
     <script>
-        // Schedule Data
         let defaultSchedule = [
             { period: "1", startTime: "7:45 AM", endTime: "8:33 AM" },
             { period: "Break", startTime: "8:33 AM", endTime: "8:37 AM" },
@@ -371,7 +378,8 @@
             { period: "9", startTime: "12:33 PM", endTime: "1:02 PM" }
         ];
 
-        // Function to parse time
+        let currentSchedule = defaultSchedule;
+
         function parseTime(timeString) {
             const [time, modifier] = timeString.split(' ');
             const [hours, minutes] = time.split(':');
@@ -387,18 +395,16 @@
             return new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), hour, parseInt(minutes, 10), 0, 0);
         }
 
-        // Function to update the schedule table
         function updateSchedule() {
             const currentTime = new Date();
             const scheduleTable = document.getElementById('schedule');
             const tbody = scheduleTable.querySelector('tbody');
             tbody.innerHTML = '';
 
-            const currentDay = currentTime.getDay(); // 0 (Sunday) - 6 (Saturday)
+            const currentDay = currentTime.getDay();
             const defaultDays = JSON.parse(localStorage.getItem('defaultDays')) || [];
             const alternativeDays = JSON.parse(localStorage.getItem('alternativeDays')) || [];
 
-            // Determine which schedule to use
             if (alternativeDays.includes(currentDay)) {
                 currentSchedule = alternativeSchedule;
             } else if (defaultDays.includes(currentDay)) {
@@ -453,9 +459,9 @@
             checkForBreaks();
         }
 
-        // Break functionality
         function checkForBreaks() {
             const currentTime = new Date();
+
             const currentBreak = currentSchedule.find(period => {
                 if (!period.period.includes('Break')) return false;
                 const startTime = new Date(parseTime(period.startTime));
@@ -477,14 +483,14 @@
             const remainingSeconds = Math.floor(remainingTime / 1000);
 
             const popup = document.getElementById('break-popup');
-            popup.parentElement.style.display = 'block';
+            popup.style.display = 'flex'; // Show the popup
 
             updateDigitalCountdown(remainingSeconds, endTime - startTime);
         }
 
         function hideBreakPopup() {
             const popup = document.getElementById('break-popup');
-            popup.parentElement.style.display = 'none';
+            popup.style.display = 'none'; // Hide the popup
         }
 
         function updateDigitalCountdown(remainingSeconds, totalDuration) {
@@ -507,63 +513,12 @@
             const timeElement = document.getElementById('time');
 
             const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            dateElement.innerHTML = `<span class="date-day">${now.toLocaleDateString('en-US', { weekday: 'long' })}</span>
-                                     <span class="date-separator"> </span>
-                                     <span class="date-rest">${now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>`;
+            dateElement.innerHTML = now.toLocaleDateString('en-US', dateOptions).replace(',', ''); // No comma
 
             const timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
-            timeElement.innerHTML = `<span class="current-time">${now.toLocaleTimeString('en-US', timeOptions)}</span>`;
+            timeElement.textContent = now.toLocaleTimeString('en-US', timeOptions);
         }
 
-        // Open and close customize colors panel
-        function openCustomizeColors() {
-            document.getElementById('customize-colors-panel').style.display = 'block';
-        }
-
-        function closeCustomizeColors() {
-            document.getElementById('customize-colors-panel').style.display = 'none';
-        }
-
-        // Save and apply custom colors
-        function saveColors() {
-            const bgColor = document.getElementById('bg-color').value;
-            const textColor = document.getElementById('text-color').value;
-
-            const headerContainer = document.getElementById('header-container');
-            const schoolName = document.getElementById('school-name');
-            const dateElement = document.getElementById('date');
-            const timeElement = document.getElementById('time');
-
-            headerContainer.style.backgroundColor = bgColor;
-            schoolName.style.color = textColor;
-            dateElement.style.color = textColor;
-            timeElement.style.color = textColor;
-
-            localStorage.setItem('headerBgColor', bgColor);
-            localStorage.setItem('schoolTextColor', textColor);
-
-            closeCustomizeColors();
-        }
-
-        function loadSettings() {
-            const savedBgColor = localStorage.getItem('headerBgColor') || '#ffe0b2';
-            const savedTextColor = localStorage.getItem('schoolTextColor') || '#000000';
-
-            const headerContainer = document.getElementById('header-container');
-            const schoolName = document.getElementById('school-name');
-            const dateElement = document.getElementById('date');
-            const timeElement = document.getElementById('time');
-
-            headerContainer.style.backgroundColor = savedBgColor;
-            schoolName.style.color = savedTextColor;
-            dateElement.style.color = savedTextColor;
-            timeElement.style.color = savedTextColor;
-
-            document.getElementById('bg-color').value = savedBgColor;
-            document.getElementById('text-color').value = savedTextColor;
-        }
-
-        // Settings Panel Functions
         function openSettings() {
             populateSettings();
             document.getElementById('settings-panel').style.display = 'block';
@@ -653,6 +608,13 @@
         function resetSettings() {
             localStorage.clear();
             location.reload();
+        }
+
+        function loadSettings() {
+            const savedSchoolName = localStorage.getItem('schoolName');
+            if (savedSchoolName) {
+                document.getElementById('school-name').textContent = savedSchoolName;
+            }
         }
 
         loadSettings();
