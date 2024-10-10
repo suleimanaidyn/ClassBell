@@ -538,11 +538,85 @@
 	
 	
 <!-- Read Me Link (opens in a new tab) -->
-    <p><a href="readme.html" target="_blank" rel="noopener noreferrer">Read Me</a></p>
+    <html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Footer Layout</title>
+    <style>
+        .footer {
+            width: 100%;
+            border-top: 2px solid #ddd; /* Adding a top border line */
+			padding: 5px 20px; /* Added padding for better alignment */
+            display: flex;
+            align-items: center;
+            font-size: 0.8rem;
+            justify-content: flex-start; /* Aligns content to the left */
+        }
+        .footer > div, .footer > span {
+            display: flex;
+            align-items: center;
+            text-align: left;
+        }
+        .readme-section a {
+            background-color: blue; /* Blue background */
+            color: white; /* White text color */
+            padding: 5px 10px; /* Padding around text */
+            border-radius: 5px; /* Rounded corners */
+            text-decoration: none; /* No underline */
+            font-family: Arial, sans-serif; /* Arial font */
+            font-weight: normal; /* Bold font weight */
+			margin-right: 10px;
+        }
+        .share-buttons a {
+            padding: 5px 10px; /* Padding around text */
+            border-radius: 5px; /* Rounded corners */
+            color: white; /* Text color */
+            text-decoration: none; /* No underline */
+            margin: 0 5px; /* Space between buttons */
+        }
+        .share-buttons .twitter {
+            background-color: #000000; /* Black background for Twitter button */
+        }
+        .share-buttons .facebook {
+            background-color: #3B5998; /* Facebook color */
+        }
+        .share-buttons .linkedin {
+            background-color: #0A66C2; /* LinkedIn color */
+        }
+    </style>
+    <!-- Font Awesome for Icons (only if you need other icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="footer">
+        <div class="readme-section">
+            <a href="readme.html" target="_blank">ReadMe</a>
+        </div>
+        <div class="empty-section">
+            <!-- Intentionally left blank -->
+        </div>
+        <div class="share-buttons">
+            <span>Share: </span>
+            <a href="https://twitter.com/intent/tweet?text=Check%20out%20this%20great%20tool!&url=https://yourwebsite.com" target="_blank" class="twitter">
+                X
+            </a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https://yourwebsite.com" target="_blank" class="facebook">
+                <i class="fab fa-facebook"></i> Facebook
+            </a>
+            <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://yourwebsite.com&title=Check%20out%20this%20great%20tool!" target="_blank" class="linkedin">
+                <i class="fab fa-linkedin"></i> LinkedIn
+            </a>
+        </div>
+    </div>
+</body>
+</html>
+
+
 	
 </body>
 
 <!-- New header design -->
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -560,6 +634,7 @@
             padding: 1px;
             background-color: #000000; /* Default black background */
             color: #ffffff; /* Default white text color */
+			
         }
         #date, #time {
             padding: 1px;
@@ -567,25 +642,25 @@
             width: 100%;
             background-color: rgb(250, 200, 100); /* Light orange background */
             color: #ffffff; /* White text */
-            border: 3px solid #ffffff; /* Thin white outline around date and time */
+            border: 2px solid #ffffff; /* Thin white outline around date and time */
             border-radius: 5px; /* Rounded corners for the outline */
             margin: 1px 0; /* Small margin to separate elements */
         }
         #school-name {
-            font-size: 1.3em;
-            font-weight: light;
-            padding: 1px;
+            font-size: 1.5em;
+            font-weight: Light;
+            padding: 5px;
             text-align: center;
             width: 80%;
             cursor: pointer;
         }
         #time {
             font-size: 1.2em;
-            font-weight: bold;
+            font-weight: Light;
         }
         #day {
             font-size: 1.2em;
-            font-weight: light;
+            font-weight: Light;
         }
         .separator {
             margin: 0 5px;
@@ -704,6 +779,7 @@
 
 
 </body>
+
 
 
 
