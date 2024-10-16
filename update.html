@@ -1,6 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #header-container {
+            display: grid;
+            grid-template-columns: 0.3fr 1fr 0.3fr; /* 3 equal cells */
+            justify-items: center;
+            align-items: center;
+            padding: 1px;
+            background-color: #000000; /* Default black background */
+            color: #ffffff; /* Default white text color */
+			
+        }
+        #date, #time {
+            padding: 1px;
+            text-align: center;
+            width: 100%;
+           
+            color: #ffffff; /* White text */
+            
+           
+        }
+        #school-name {
+            font-size: 1.5em;
+            font-weight: Light;
+            padding: 5px;
+            text-align: center;
+            width: 80%;
+            cursor: pointer;
+        }
+        #time {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        #day {
+            font-size: 1.2em;
+            font-weight: Bold;
+        }
+        .separator {
+            margin: 0 5px;
+            font-weight: normal;
+        }
+        #custom-color-box {
+            display: none;
+            position: fixed;
+            top: 10%;
+            left: 50%;
+            transform: translate(-50%, 0);
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 20px;
+            z-index: 2000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        #custom-color-box input {
+            margin: 10px 0;
+            width: 100%;
+            padding: 5px;
+        }
+    </style>
+</head>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-M2QXES4LKK"></script>
 <script>
@@ -10,8 +78,7 @@
 
   gtag('config', 'G-M2QXES4LKK');
 </script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Class Schedule</title>
     <style>
         body {
@@ -343,6 +410,12 @@
                 const elapsedTime = currentTime - startTime;
                 const isOngoing = currentTime >= startTime && currentTime < endTime;
                 const isCompleted = currentTime >= endTime;
+				const remainingSeconds = Math.floor((endTime - currentTime) / 1000);
+				const seconds = remainingSeconds % 60;
+				const minutes = Math.floor(remainingSeconds / 60);
+
+				// Always show remaining minutes and seconds		
+				const remainingText = `${minutes} min ${seconds < 10 ? '0' : ''}${seconds} sec`;
 
                 const row = document.createElement('tr');
                 const progressBar = document.createElement('div');
@@ -359,7 +432,17 @@
                     <td>${period.period}</td>
                     <td>${period.startTime}</td>
                     <td>${period.endTime}</td>
-                    <td>${isOngoing ? Math.floor((endTime - currentTime) / (1000 * 60)) + ' min' : isCompleted ? 'Completed' : 'Upcoming'}</td>
+					<td>${
+					isOngoing 
+					? `${Math.floor((endTime - currentTime) / 1000 / 60)} min` + 
+					(Math.floor((endTime - currentTime) / 1000 / 60) <= 3 
+					? ` ${('0' + Math.floor((endTime - currentTime) / 1000 % 60)).slice(-2)} sec`
+					: '')
+				: isCompleted 
+				? 'Completed' 
+				: 'Upcoming'}</td>
+
+
                 `;
 
                 row.querySelector('td:last-child').appendChild(progressBar);
@@ -373,8 +456,21 @@
                 tbody.appendChild(row);
             });
 
+
             checkForBreaks();
         }
+	
+		// Call loadSchedule when the page loads
+			loadSchedule();
+
+// Then update the schedule on page load
+			updateSchedule();
+
+// Use setInterval to update the schedule every second
+			setInterval(updateSchedule, 1000);
+
+
+
 
         function checkForBreaks() {
             const currentTime = new Date();
@@ -423,12 +519,6 @@
 
             progressBar.style.width = `${progressPercentage}%`;
             cursor.style.left = `${progressPercentage}%`;
-        }
-
-        function displayDateTime() {
-            const now = new Date();
-            const dateTimeElement = document.getElementById('datetime');
-            dateTimeElement.textContent = now.toLocaleString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' });
         }
 
         function openSettings() {
@@ -481,60 +571,147 @@
             }
         }
 
-        function saveSettings() {
-            const schoolName = document.getElementById('school-name-input').value;
-            localStorage.setItem('schoolName', schoolName);
 
-            defaultSchedule = document.getElementById('default-schedule-input').value.split('\n').map(line => {
-                const [period, startTime, endTime] = line.split(',').map(item => item.trim());
-                return { period: period.replace('Period ', ''), startTime, endTime };
-            });
 
-            alternativeSchedule = document.getElementById('alternative-schedule-input').value.split('\n').map(line => {
-                const [period, startTime, endTime] = line.split(',').map(item => item.trim());
-                return { period: period.replace('Period ', ''), startTime, endTime };
-            });
 
-            // Save the day assignments to localStorage
-            const defaultDays = [];
-            const alternativeDays = [];
-            
-            if (document.getElementById('default-mon').checked) defaultDays.push(1);
-            if (document.getElementById('default-tue').checked) defaultDays.push(2);
-            if (document.getElementById('default-wed').checked) defaultDays.push(3);
-            if (document.getElementById('default-thu').checked) defaultDays.push(4);
-            if (document.getElementById('default-fri').checked) defaultDays.push(5);
-            if (document.getElementById('default-sat').checked) defaultDays.push(6);
-            if (document.getElementById('default-sun').checked) defaultDays.push(0);
-            
-            if (document.getElementById('alt-mon').checked) alternativeDays.push(1);
-            if (document.getElementById('alt-tue').checked) alternativeDays.push(2);
-            if (document.getElementById('alt-wed').checked) alternativeDays.push(3);
-            if (document.getElementById('alt-thu').checked) alternativeDays.push(4);
-            if (document.getElementById('alt-fri').checked) alternativeDays.push(5);
-            if (document.getElementById('alt-sat').checked) alternativeDays.push(6);
-            if (document.getElementById('alt-sun').checked) alternativeDays.push(0);
 
-            localStorage.setItem('defaultDays', JSON.stringify(defaultDays));
-            localStorage.setItem('alternativeDays', JSON.stringify(alternativeDays));
 
-            closeSettings();
-            updateSchedule();
-        }
 
-        function applySettings() {
-            const savedSchoolName = localStorage.getItem('schoolName');
-            if (savedSchoolName) {
-                document.getElementById('school-name').textContent = savedSchoolName;
-            }
-        }
 
-        applySettings();
-        updateSchedule();
-        setInterval(updateSchedule, 60000);
-        setInterval(displayDateTime, 1000);
-        setInterval(checkForBreaks, 1000);
+function loadSchedule() {
+    const savedSchedule = localStorage.getItem('customSchedule'); // Load the saved custom schedule from local storage
+    if (savedSchedule) {
+        currentSchedule = JSON.parse(savedSchedule); // Use the saved custom schedule
+    } else {
+        currentSchedule = defaultSchedule; // Use the default schedule if no custom schedule is found
+    }
+
+    updateSchedule(); // Refresh the table with the loaded schedule
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+       
+
+	function saveSettings() {
+    const schoolName = document.getElementById('school-name-input').value;
+    localStorage.setItem('schoolName', schoolName); // Save school name
+
+    // Get and save the custom schedule from the input area
+    const customSchedule = document.getElementById('default-schedule-input').value.split('\n').map(line => {
+        const [period, startTime, endTime] = line.split(',').map(item => item.trim());
+        return { period, startTime, endTime };
+    });
+
+    // Validate the custom schedule
+    if (customSchedule.length > 0 && customSchedule[0].startTime && customSchedule[0].endTime) {
+        localStorage.setItem('customSchedule', JSON.stringify(customSchedule)); // Save custom schedule to localStorage
+        currentSchedule = customSchedule; // Update current schedule immediately
+        updateSchedule(); // Immediately refresh the schedule display
+    } else {
+        alert('Invalid schedule format. Please enter period, start time, and end time separated by commas.');
+        return;
+    }
+
+    // Save alternative schedule
+    const alternativeSchedule = document.getElementById('alternative-schedule-input').value.split('\n').map(line => {
+        const [period, startTime, endTime] = line.split(',').map(item => item.trim());
+        return { period, startTime, endTime };
+    });
+    localStorage.setItem('alternativeSchedule', JSON.stringify(alternativeSchedule));
+
+    // Save the day assignments to localStorage
+    const defaultDays = [];
+    const alternativeDays = [];
+
+    if (document.getElementById('default-mon').checked) defaultDays.push(1);
+    if (document.getElementById('default-tue').checked) defaultDays.push(2);
+    if (document.getElementById('default-wed').checked) defaultDays.push(3);
+    if (document.getElementById('default-thu').checked) defaultDays.push(4);
+    if (document.getElementById('default-fri').checked) defaultDays.push(5);
+    if (document.getElementById('default-sat').checked) defaultDays.push(6);
+    if (document.getElementById('default-sun').checked) defaultDays.push(0);
+
+    if (document.getElementById('alt-mon').checked) alternativeDays.push(1);
+    if (document.getElementById('alt-tue').checked) alternativeDays.push(2);
+    if (document.getElementById('alt-wed').checked) alternativeDays.push(3);
+    if (document.getElementById('alt-thu').checked) alternativeDays.push(4);
+    if (document.getElementById('alt-fri').checked) alternativeDays.push(5);
+    if (document.getElementById('alt-sat').checked) alternativeDays.push(6);
+    if (document.getElementById('alt-sun').checked) alternativeDays.push(0);
+
+    localStorage.setItem('defaultDays', JSON.stringify(defaultDays));
+    localStorage.setItem('alternativeDays', JSON.stringify(alternativeDays));
+
+    // Close settings and update the schedule display immediately
+    closeSettings(); // Close the settings panel
+    updateSchedule(); // Refresh the table with the new schedule
+}
+
+
+
+       
+
+
+
+
+
+
+
+
+
+
+
+
+
+function applySettings() {
+    const savedSchoolName = localStorage.getItem('schoolName');
+    if (savedSchoolName) {
+        document.getElementById('school-name').textContent = savedSchoolName;
+    }
+}
+
+// Apply school name and schedule
+applySettings();
+loadSchedule();  // Load the schedule before updating it
+updateSchedule();  // Immediately update the schedule
+
+    // Call these functions when the page loads
+    window.onload = function() {
+        applySettings();  // Apply saved settings like school name
+        loadSchedule();   // Load the saved schedule from local storage
+    };
+
+
+// Update the schedule every minute
+setInterval(updateSchedule, 60000);
+
+// Check for breaks every second
+setInterval(checkForBreaks, 1000);
+
     </script>
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 <!-- Read Me Link (opens in a new tab) -->
@@ -615,74 +792,7 @@
 
 <!-- New header design -->
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        #header-container {
-            display: grid;
-            grid-template-columns: 0.3fr 1fr 0.3fr; /* 3 equal cells */
-            justify-items: center;
-            align-items: center;
-            padding: 1px;
-            background-color: #000000; /* Default black background */
-            color: #ffffff; /* Default white text color */
-			
-        }
-        #date, #time {
-            padding: 1px;
-            text-align: center;
-            width: 100%;
-           
-            color: #ffffff; /* White text */
-            
-           
-        }
-        #school-name {
-            font-size: 1.5em;
-            font-weight: Light;
-            padding: 5px;
-            text-align: center;
-            width: 80%;
-            cursor: pointer;
-        }
-        #time {
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-        #day {
-            font-size: 1.2em;
-            font-weight: Bold;
-        }
-        .separator {
-            margin: 0 5px;
-            font-weight: normal;
-        }
-        #custom-color-box {
-            display: none;
-            position: fixed;
-            top: 10%;
-            left: 50%;
-            transform: translate(-50%, 0);
-            background-color: white;
-            border: 1px solid #ddd;
-            padding: 20px;
-            z-index: 2000;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
-        }
-        #custom-color-box input {
-            margin: 10px 0;
-            width: 100%;
-            padding: 5px;
-        }
-    </style>
-</head>
 <body>
     <!-- Custom Color Box -->
     <div id="custom-color-box">
