@@ -1,74 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        #header-container {
-            display: grid;
-            grid-template-columns: 0.3fr 1fr 0.3fr; /* 3 equal cells */
-            justify-items: center;
-            align-items: center;
-            padding: 1px;
-            background-color: #000000; /* Default black background */
-            color: #ffffff; /* Default white text color */
-			
-        }
-        #date, #time {
-            padding: 1px;
-            text-align: center;
-            width: 100%;
-           
-            color: #ffffff; /* White text */
-            
-           
-        }
-        #school-name {
-            font-size: 1.5em;
-            font-weight: Light;
-            padding: 5px;
-            text-align: center;
-            width: 80%;
-            cursor: pointer;
-        }
-        #time {
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-        #day {
-            font-size: 1.2em;
-            font-weight: Bold;
-        }
-        .separator {
-            margin: 0 5px;
-            font-weight: normal;
-        }
-        #custom-color-box {
-            display: none;
-            position: fixed;
-            top: 10%;
-            left: 50%;
-            transform: translate(-50%, 0);
-            background-color: white;
-            border: 1px solid #ddd;
-            padding: 20px;
-            z-index: 2000;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
-        }
-        #custom-color-box input {
-            margin: 10px 0;
-            width: 100%;
-            padding: 5px;
-        }
-    </style>
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+            }
+            #header-container {
+                display: grid;
+                grid-template-columns: 0.3fr 1fr 0.3fr; /* 3 equal cells */
+                justify-items: center;
+                align-items: center;
+                padding: 1px;
+                background-color: #000000; /* Default black background */
+                color: #ffffff; /* Default white text color */
+                
+            }
+            #date, #time {
+                padding: 1px;
+                text-align: center;
+                width: 100%;
+               
+                color: #ffffff; /* White text */
+                
+               
+            }
+            #school-name {
+                font-size: 1.5em;
+                font-weight: Light;
+                padding: 5px;
+                text-align: center;
+                width: 80%;
+                cursor: pointer;
+            }
+            #time {
+                font-size: 1.5em;
+                font-weight: bold;
+            }
+            #day {
+                font-size: 1.2em;
+                font-weight: Bold;
+            }
+            .separator {
+                margin: 0 5px;
+                font-weight: normal;
+            }
+            #custom-color-box {
+                display: none;
+                position: fixed;
+                top: 10%;
+                left: 50%;
+                transform: translate(-50%, 0);
+                background-color: white;
+                border: 1px solid #ddd;
+                padding: 20px;
+                z-index: 2000;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                width: 300px;
+            }
+            #custom-color-box input {
+                margin: 10px 0;
+                width: 100%;
+                padding: 5px;
+            }
+        </style>
+    </head>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-M2QXES4LKK"></script>
 <script>
@@ -78,8 +78,9 @@
 
   gtag('config', 'G-M2QXES4LKK');
 </script>
-     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Class Schedule</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Bell Schedule</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -91,19 +92,6 @@
             z-index: 1000;
             background-color: white;
             border-bottom: 1px solid #ddd;
-        }
-        #header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-        }
-        #datetime {
-            font-size: 1.5em;
-        }
-        #school-name {
-            font-size: 1em;
-            font-weight: light;
         }
         table {
             width: 100%;
@@ -248,9 +236,9 @@
         </div>
         <div id="school-name">HSA El Paso</div>
         <div id="time"></div>
-    
-	
-	</div>
+        
+        
+        </div>
         <div class="break-popup-row">
             <div id="break-popup">
                 <div id="break-time-text">Break Time</div>
@@ -315,7 +303,6 @@
     </div>
 
     <button id="settings-button" onclick="openSettings()">⚙</button>
-	
 
     <script>
         let defaultSchedule = [
@@ -402,6 +389,7 @@
                 return !period.period.includes('Break') || currentTime < endTime;
             });
 
+
             filteredData.forEach(period => {
                 const startTime = new Date(parseTime(period.startTime));
                 const endTime = new Date(parseTime(period.endTime));
@@ -410,7 +398,7 @@
                 const elapsedTime = currentTime - startTime;
                 const isOngoing = currentTime >= startTime && currentTime < endTime;
                 const isCompleted = currentTime >= endTime;
-				const remainingSeconds = Math.floor((endTime - currentTime) / 1000);
+                const remainingSeconds = Math.floor((endTime - currentTime) / 1000);
 				const seconds = remainingSeconds % 60;
 				const minutes = Math.floor(remainingSeconds / 60);
 
@@ -441,8 +429,8 @@
 				: isCompleted 
 				? 'Completed' 
 				: 'Upcoming'}</td>
-
-
+                
+                
                 `;
 
                 row.querySelector('td:last-child').appendChild(progressBar);
@@ -456,21 +444,8 @@
                 tbody.appendChild(row);
             });
 
-
             checkForBreaks();
         }
-	
-		// Call loadSchedule when the page loads
-			loadSchedule();
-
-// Then update the schedule on page load
-			updateSchedule();
-
-// Use setInterval to update the schedule every second
-			setInterval(updateSchedule, 1000);
-
-
-
 
         function checkForBreaks() {
             const currentTime = new Date();
@@ -519,6 +494,12 @@
 
             progressBar.style.width = `${progressPercentage}%`;
             cursor.style.left = `${progressPercentage}%`;
+        }
+
+        function displayDateTime() {
+            const now = new Date();
+            const dateTimeElement = document.getElementById('datetime');
+            dateTimeElement.textContent = now.toLocaleString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' });
         }
 
         function openSettings() {
@@ -571,323 +552,271 @@
             }
         }
 
-
-
-
-
-
-
-
-function loadSchedule() {
-    const savedSchedule = localStorage.getItem('customSchedule'); // Load the saved custom schedule from local storage
-    if (savedSchedule) {
-        currentSchedule = JSON.parse(savedSchedule); // Use the saved custom schedule
-    } else {
-        currentSchedule = defaultSchedule; // Use the default schedule if no custom schedule is found
-    }
-
-    updateSchedule(); // Refresh the table with the loaded schedule
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-       
-
-	function saveSettings() {
-    const schoolName = document.getElementById('school-name-input').value;
-    localStorage.setItem('schoolName', schoolName); // Save school name
-
-    // Get and save the custom schedule from the input area
-    const customSchedule = document.getElementById('default-schedule-input').value.split('\n').map(line => {
-        const [period, startTime, endTime] = line.split(',').map(item => item.trim());
-        return { period, startTime, endTime };
-    });
-
-    // Validate the custom schedule
-    if (customSchedule.length > 0 && customSchedule[0].startTime && customSchedule[0].endTime) {
-        localStorage.setItem('customSchedule', JSON.stringify(customSchedule)); // Save custom schedule to localStorage
-        currentSchedule = customSchedule; // Update current schedule immediately
-        updateSchedule(); // Immediately refresh the schedule display
-    } else {
-        alert('Invalid schedule format. Please enter period, start time, and end time separated by commas.');
-        return;
-    }
-
-    // Save alternative schedule
-    const alternativeSchedule = document.getElementById('alternative-schedule-input').value.split('\n').map(line => {
-        const [period, startTime, endTime] = line.split(',').map(item => item.trim());
-        return { period, startTime, endTime };
-    });
-    localStorage.setItem('alternativeSchedule', JSON.stringify(alternativeSchedule));
-
-    // Save the day assignments to localStorage
-    const defaultDays = [];
-    const alternativeDays = [];
-
-    if (document.getElementById('default-mon').checked) defaultDays.push(1);
-    if (document.getElementById('default-tue').checked) defaultDays.push(2);
-    if (document.getElementById('default-wed').checked) defaultDays.push(3);
-    if (document.getElementById('default-thu').checked) defaultDays.push(4);
-    if (document.getElementById('default-fri').checked) defaultDays.push(5);
-    if (document.getElementById('default-sat').checked) defaultDays.push(6);
-    if (document.getElementById('default-sun').checked) defaultDays.push(0);
-
-    if (document.getElementById('alt-mon').checked) alternativeDays.push(1);
-    if (document.getElementById('alt-tue').checked) alternativeDays.push(2);
-    if (document.getElementById('alt-wed').checked) alternativeDays.push(3);
-    if (document.getElementById('alt-thu').checked) alternativeDays.push(4);
-    if (document.getElementById('alt-fri').checked) alternativeDays.push(5);
-    if (document.getElementById('alt-sat').checked) alternativeDays.push(6);
-    if (document.getElementById('alt-sun').checked) alternativeDays.push(0);
-
-    localStorage.setItem('defaultDays', JSON.stringify(defaultDays));
-    localStorage.setItem('alternativeDays', JSON.stringify(alternativeDays));
-
-    // Close settings and update the schedule display immediately
-    closeSettings(); // Close the settings panel
-    updateSchedule(); // Refresh the table with the new schedule
-}
-
-
-
-       
-
-
-
-
-
-
-
-
-
-
-
-
-
-function applySettings() {
-    const savedSchoolName = localStorage.getItem('schoolName');
-    if (savedSchoolName) {
-        document.getElementById('school-name').textContent = savedSchoolName;
-    }
-}
-
-// Apply school name and schedule
-applySettings();
-loadSchedule();  // Load the schedule before updating it
-updateSchedule();  // Immediately update the schedule
-
-    // Call these functions when the page loads
-    window.onload = function() {
-        applySettings();  // Apply saved settings like school name
-        loadSchedule();   // Load the saved schedule from local storage
-    };
-
-
-// Update the schedule every minute
-setInterval(updateSchedule, 60000);
-
-// Check for breaks every second
-setInterval(checkForBreaks, 1000);
-
-    </script>
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-<!-- Read Me Link (opens in a new tab) -->
-    <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Footer Layout</title>
-    <style>
-        .footer {
-            width: 100%;
-            border-top: 2px solid #ddd; /* Adding a top border line */
-			padding: 5px 20px; /* Added padding for better alignment */
-            display: flex;
-            align-items: center;
-            font-size: 0.8rem;
-            justify-content: flex-start; /* Aligns content to the left */
-        }
-        .footer > div, .footer > span {
-            display: flex;
-            align-items: center;
-            text-align: left;
-        }
-        .readme-section a {
-            background-color: blue; /* Blue background */
-            color: white; /* White text color */
-            padding: 5px 10px; /* Padding around text */
-            border-radius: 5px; /* Rounded corners */
-            text-decoration: none; /* No underline */
-            font-family: Arial, sans-serif; /* Arial font */
-            font-weight: normal; /* Bold font weight */
-			margin-right: 10px;
-        }
-        .share-buttons a {
-            padding: 5px 10px; /* Padding around text */
-            border-radius: 5px; /* Rounded corners */
-            color: white; /* Text color */
-            text-decoration: none; /* No underline */
-            margin: 0 5px; /* Space between buttons */
-        }
-        .share-buttons .twitter {
-            background-color: #000000; /* Black background for Twitter button */
-        }
-        .share-buttons .facebook {
-            background-color: #3B5998; /* Facebook color */
-        }
-        .share-buttons .linkedin {
-            background-color: #0A66C2; /* LinkedIn color */
-        }
-    </style>
-    <!-- Font Awesome for Icons (only if you need other icons) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-</head>
-<body>
-    <div class="footer">
-        <div class="readme-section">
-            <a href="readme.html" target="_blank">ReadMe</a>
-        </div>
-        <div class="empty-section">
-            <!-- Intentionally left blank -->
-        </div>
-        <div class="share-buttons">
-            <span>Share: </span>
-            <a href="https://twitter.com/intent/tweet?text=Explore%20this%20incredible%20free%20Bell%20Schedule%20Tool%20designed%20exclusively%20for%20educators!&url=https://classbellschedule.com" target="_blank" class="twitter">X</a>
-        <a href="https://www.facebook.com/sharer/sharer.php?u=https://classbellschedule.com" target="_blank" class="facebook">
-            <i class="fab fa-facebook"></i>
-        </a>
-        <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://classbellschedule.com&title=Explore%20this%20incredible%20free%20Bell%20Schedule%20Tool%20designed%20exclusively%20for%20educators!" target="_blank" class="linkedin">
-            <i class="fab fa-linkedin"></i> LinkedIn
-            </a>
-        </div>
-    </div>
-</body>
-</html>
-
-
-	
-</body>
-
-<!-- New header design -->
-
-
-<body>
-    <!-- Custom Color Box -->
-    <div id="custom-color-box">
-        <h3>Color Custom</h3>
-        <label for="bg-color">Pick School Name and Header Background Color:</label>
-        <input type="color" id="bg-color" value="#000000"> <!-- Default black background -->
-
-        <label for="text-color">Pick Text Color (Time, Date, School Name):</label>
-        <input type="color" id="text-color" value="#ffffff"> <!-- Default white text color -->
-
-        <button onclick="saveColorCustom()">Save</button>
-        <button onclick="closeColorCustom()">Close</button>
-    </div>
-
-    <script>
-        function openColorCustom() {
-            document.getElementById('custom-color-box').style.display = 'block';
+        function saveSettings() {
+            const schoolName = document.getElementById('school-name-input').value;
+            localStorage.setItem('schoolName', schoolName);
+
+            defaultSchedule = document.getElementById('default-schedule-input').value.split('\n').map(line => {
+                const [period, startTime, endTime] = line.split(',').map(item => item.trim());
+                return { period: period.replace('Period ', ''), startTime, endTime };
+            });
+
+            alternativeSchedule = document.getElementById('alternative-schedule-input').value.split('\n').map(line => {
+                const [period, startTime, endTime] = line.split(',').map(item => item.trim());
+                return { period: period.replace('Period ', ''), startTime, endTime };
+            });
+
+            // Save the schedules to localStorage
+            localStorage.setItem('defaultSchedule', JSON.stringify(defaultSchedule));
+            localStorage.setItem('alternativeSchedule', JSON.stringify(alternativeSchedule));
+
+            // Save the day assignments to localStorage
+            const defaultDays = [];
+            const alternativeDays = [];
+            
+            if (document.getElementById('default-mon').checked) defaultDays.push(1);
+            if (document.getElementById('default-tue').checked) defaultDays.push(2);
+            if (document.getElementById('default-wed').checked) defaultDays.push(3);
+            if (document.getElementById('default-thu').checked) defaultDays.push(4);
+            if (document.getElementById('default-fri').checked) defaultDays.push(5);
+            if (document.getElementById('default-sat').checked) defaultDays.push(6);
+            if (document.getElementById('default-sun').checked) defaultDays.push(0);
+            
+            if (document.getElementById('alt-mon').checked) alternativeDays.push(1);
+            if (document.getElementById('alt-tue').checked) alternativeDays.push(2);
+            if (document.getElementById('alt-wed').checked) alternativeDays.push(3);
+            if (document.getElementById('alt-thu').checked) alternativeDays.push(4);
+            if (document.getElementById('alt-fri').checked) alternativeDays.push(5);
+            if (document.getElementById('alt-sat').checked) alternativeDays.push(6);
+            if (document.getElementById('alt-sun').checked) alternativeDays.push(0);
+
+            localStorage.setItem('defaultDays', JSON.stringify(defaultDays));
+            localStorage.setItem('alternativeDays', JSON.stringify(alternativeDays));
+
+            closeSettings();
+            updateSchedule();
         }
 
-        function closeColorCustom() {
-            document.getElementById('custom-color-box').style.display = 'none';
+        function applySettings() {
+            const savedSchoolName = localStorage.getItem('schoolName');
+            if (savedSchoolName) {
+                document.getElementById('school-name').textContent = savedSchoolName;
+            }
+
+            // Load the schedules from localStorage
+            const savedDefaultSchedule = localStorage.getItem('defaultSchedule');
+            const savedAlternativeSchedule = localStorage.getItem('alternativeSchedule');
+            if (savedDefaultSchedule) {
+                defaultSchedule = JSON.parse(savedDefaultSchedule);
+            }
+            if (savedAlternativeSchedule) {
+                alternativeSchedule = JSON.parse(savedAlternativeSchedule);
+            }
+
+            // Load the day assignments from localStorage
+            const defaultDays = JSON.parse(localStorage.getItem('defaultDays')) || [];
+            const alternativeDays = JSON.parse(localStorage.getItem('alternativeDays')) || [];
+            
+            // Check the appropriate checkboxes based on saved data
+            document.getElementById('default-mon').checked = defaultDays.includes(1);
+            document.getElementById('default-tue').checked = defaultDays.includes(2);
+            document.getElementById('default-wed').checked = defaultDays.includes(3);
+            document.getElementById('default-thu').checked = defaultDays.includes(4);
+            document.getElementById('default-fri').checked = defaultDays.includes(5);
+            document.getElementById('default-sat').checked = defaultDays.includes(6);
+            document.getElementById('default-sun').checked = defaultDays.includes(0);
+            
+            document.getElementById('alt-mon').checked = alternativeDays.includes(1);
+            document.getElementById('alt-tue').checked = alternativeDays.includes(2);
+            document.getElementById('alt-wed').checked = alternativeDays.includes(3);
+            document.getElementById('alt-thu').checked = alternativeDays.includes(4);
+            document.getElementById('alt-fri').checked = alternativeDays.includes(5);
+            document.getElementById('alt-sat').checked = alternativeDays.includes(6);
+            document.getElementById('alt-sun').checked = alternativeDays.includes(0);
         }
 
-        function saveColorCustom() {
-            const bgColor = document.getElementById('bg-color').value;
-            const textColor = document.getElementById('text-color').value;
-
-            const headerContainer = document.getElementById('header-container');
-            const schoolName = document.getElementById('school-name');
-            const date = document.getElementById('date');
-            const time = document.getElementById('time');
-
-            // Apply the same color to the school name, date, and time
-            headerContainer.style.backgroundColor = bgColor;
-            schoolName.style.color = textColor;
-            date.style.color = textColor;
-            time.style.color = textColor;
-
-            // Save colors to localStorage
-            localStorage.setItem('headerBgColor', bgColor);
-            localStorage.setItem('textColor', textColor);
-
-            closeColorCustom();
-        }
-
-        // Display date and time with custom formatting
-        function displayDateTime() {
-            const now = new Date();
-            const dayElement = document.getElementById('day');
-            const dateElement = document.getElementById('full-date');
-            const timeElement = document.getElementById('time');
-
-            // Day and Date formatting
-            const dayOptions = { weekday: 'long' }; // Only day part in bold
-            const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-
-            dayElement.textContent = now.toLocaleDateString('en-US', dayOptions);
-            dateElement.textContent = now.toLocaleDateString('en-US', dateOptions);
-
-            // Time formatting
-            const timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
-            timeElement.textContent = now.toLocaleTimeString('en-US', timeOptions);
-        }
-
-        // Event listener to open color custom on school name click
-        document.getElementById('school-name').addEventListener('click', openColorCustom);
-
-        // Load saved colors on page load
-        function loadColorCustom() {
-            const savedBgColor = localStorage.getItem('headerBgColor') || '#000000';
-            const savedTextColor = localStorage.getItem('textColor') || '#ffffff';
-
-            const headerContainer = document.getElementById('header-container');
-            const schoolName = document.getElementById('school-name');
-            const date = document.getElementById('date');
-            const time = document.getElementById('time');
-
-            headerContainer.style.backgroundColor = savedBgColor;
-            schoolName.style.color = savedTextColor;
-            date.style.color = savedTextColor;
-            time.style.color = savedTextColor;
-
-            document.getElementById('bg-color').value = savedBgColor;
-            document.getElementById('text-color').value = savedTextColor;
-        }
-
-        loadColorCustom();
+        applySettings();
+        updateSchedule();
+        setInterval(updateSchedule, 60000);
         setInterval(displayDateTime, 1000);
-        displayDateTime(); // Initialize on page load
+        setInterval(checkForBreaks, 1000);
     </script>
 
 
-</body>
+<!-- Read Me Link (opens in a new tab) -->
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Footer Layout</title>
+        <style>
+            .footer {
+                width: 100%;
+                border-top: 2px solid #ddd; /* Adding a top border line */
+                padding: 5px 20px; /* Added padding for better alignment */
+                display: flex;
+                align-items: center;
+                font-size: 0.8rem;
+                justify-content: flex-start; /* Aligns content to the left */
+            }
+            .footer > div, .footer > span {
+                display: flex;
+                align-items: center;
+                text-align: left;
+            }
+            .readme-section a {
+                background-color: blue; /* Blue background */
+                color: white; /* White text color */
+                padding: 5px 10px; /* Padding around text */
+                border-radius: 5px; /* Rounded corners */
+                text-decoration: none; /* No underline */
+                font-family: Arial, sans-serif; /* Arial font */
+                font-weight: normal; /* Bold font weight */
+                margin-right: 10px;
+            }
+            .share-buttons a {
+                padding: 5px 10px; /* Padding around text */
+                border-radius: 5px; /* Rounded corners */
+                color: white; /* Text color */
+                text-decoration: none; /* No underline */
+                margin: 0 5px; /* Space between buttons */
+            }
+            .share-buttons .twitter {
+                background-color: #000000; /* Black background for Twitter button */
+            }
+            .share-buttons .facebook {
+                background-color: #3B5998; /* Facebook color */
+            }
+            .share-buttons .linkedin {
+                background-color: #0A66C2; /* LinkedIn color */
+            }
+        </style>
+        <!-- Font Awesome for Icons (only if you need other icons) -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    </head>
+    <body>
+        <div class="footer">
+            <div class="readme-section">
+                <a href="readme.html" target="_blank">ReadMe</a>
+            </div>
+            <div class="empty-section">
+                <!-- Intentionally left blank -->
+            </div>
+            <div class="share-buttons">
+                <span>Share: </span>
+                <a href="https://twitter.com/intent/tweet?text=Explore%20this%20incredible%20free%20Bell%20Schedule%20Tool%20designed%20exclusively%20for%20educators!&url=https://classbellschedule.com" target="_blank" class="twitter">X</a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https://classbellschedule.com" target="_blank" class="facebook">
+                <i class="fab fa-facebook"></i>
+            </a>
+            <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://classbellschedule.com&title=Explore%20this%20incredible%20free%20Bell%20Schedule%20Tool%20designed%20exclusively%20for%20educators!" target="_blank" class="linkedin">
+                <i class="fab fa-linkedin"></i> LinkedIn
+                </a>
+            </div>
+        </div>
+    </body>
+    </html>
+    
+    
+        
+    </body>
+    
+    <!-- New header design -->
+    
+    
+    <body>
+        <!-- Custom Color Box -->
+        <div id="custom-color-box">
+            <h3>Color Custom</h3>
+            <label for="bg-color">Pick School Name and Header Background Color:</label>
+            <input type="color" id="bg-color" value="#000000"> <!-- Default black background -->
+    
+            <label for="text-color">Pick Text Color (Time, Date, School Name):</label>
+            <input type="color" id="text-color" value="#ffffff"> <!-- Default white text color -->
+    
+            <button onclick="saveColorCustom()">Save</button>
+            <button onclick="closeColorCustom()">Close</button>
+        </div>
+    
+        <script>
+            function openColorCustom() {
+                document.getElementById('custom-color-box').style.display = 'block';
+            }
+    
+            function closeColorCustom() {
+                document.getElementById('custom-color-box').style.display = 'none';
+            }
+    
+            function saveColorCustom() {
+                const bgColor = document.getElementById('bg-color').value;
+                const textColor = document.getElementById('text-color').value;
+    
+                const headerContainer = document.getElementById('header-container');
+                const schoolName = document.getElementById('school-name');
+                const date = document.getElementById('date');
+                const time = document.getElementById('time');
+    
+                // Apply the same color to the school name, date, and time
+                headerContainer.style.backgroundColor = bgColor;
+                schoolName.style.color = textColor;
+                date.style.color = textColor;
+                time.style.color = textColor;
+    
+                // Save colors to localStorage
+                localStorage.setItem('headerBgColor', bgColor);
+                localStorage.setItem('textColor', textColor);
+    
+                closeColorCustom();
+            }
+    
+            // Display date and time with custom formatting
+            function displayDateTime() {
+                const now = new Date();
+                const dayElement = document.getElementById('day');
+                const dateElement = document.getElementById('full-date');
+                const timeElement = document.getElementById('time');
+    
+                // Day and Date formatting
+                const dayOptions = { weekday: 'long' }; // Only day part in bold
+                const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+    
+                dayElement.textContent = now.toLocaleDateString('en-US', dayOptions);
+                dateElement.textContent = now.toLocaleDateString('en-US', dateOptions);
+    
+                // Time formatting
+                const timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
+                timeElement.textContent = now.toLocaleTimeString('en-US', timeOptions);
+            }
+    
+            // Event listener to open color custom on school name click
+            document.getElementById('school-name').addEventListener('click', openColorCustom);
+    
+            // Load saved colors on page load
+            function loadColorCustom() {
+                const savedBgColor = localStorage.getItem('headerBgColor') || '#000000';
+                const savedTextColor = localStorage.getItem('textColor') || '#ffffff';
+    
+                const headerContainer = document.getElementById('header-container');
+                const schoolName = document.getElementById('school-name');
+                const date = document.getElementById('date');
+                const time = document.getElementById('time');
+    
+                headerContainer.style.backgroundColor = savedBgColor;
+                schoolName.style.color = savedTextColor;
+                date.style.color = savedTextColor;
+                time.style.color = savedTextColor;
+    
+                document.getElementById('bg-color').value = savedBgColor;
+                document.getElementById('text-color').value = savedTextColor;
+            }
+    
+            loadColorCustom();
+            setInterval(displayDateTime, 1000);
+            displayDateTime(); // Initialize on page load
+        </script>
+    
+        *Save function fixed
+    </body>
+    
 
-
-
-
-</html>
+    
+    
+    </html>
