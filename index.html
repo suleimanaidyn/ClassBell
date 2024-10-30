@@ -399,7 +399,11 @@
                 const seconds = remainingSeconds % 60;
                 const minutes = Math.floor(remainingSeconds / 60);
 
-                const remainingText = `${minutes} min ${seconds < 10 ? '0' : ''}${seconds} sec`;
+                // Display seconds only if remaining time is less than or equal to 3 minutes
+                const remainingText = remainingTime <= 3 * 60 * 1000
+                    ? `${minutes} min ${seconds < 10 ? '0' : ''}${seconds} sec`
+                    : `${minutes} min`;
+
                 const row = document.createElement('tr');
                 const progressBar = document.createElement('div');
                 progressBar.classList.add('progress-bar');
