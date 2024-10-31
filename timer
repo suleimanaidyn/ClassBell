@@ -143,6 +143,7 @@
         document.querySelectorAll('.timeOption').forEach(button => {
             button.addEventListener('click', () => {
                 const minutes = parseInt(button.getAttribute('data-minutes'));
+                resetTimer(); // Reset timer before setting a new time
                 setTimer(minutes);
             });
         });
@@ -150,6 +151,7 @@
         customMinutesInput.addEventListener('change', () => {
             const minutes = parseInt(customMinutesInput.value);
             if (!isNaN(minutes) && minutes > 0) {
+                resetTimer(); // Reset timer before setting a new custom time
                 setTimer(minutes);
             }
         });
