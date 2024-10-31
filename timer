@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timer / Stopwatch</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+        }
+        .popup {
+            display: block;
+            padding: 20px;
+            width: 320px;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        .timer-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        #timerDisplay {
+            font-size: 48px;
+            color: black;
+        }
+        #pausedText {
+            display: none;
+            font-size: 14px;
+            color: white;
+            background-color: red;
+            padding: 2px 8px;
+            border-radius: 3px;
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+        .time-options {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .timeOption {
+            padding: 10px 15px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .timeOption[data-minutes="1"] { background-color: #ff4d4d; }
+        .timeOption[data-minutes="2"] { background-color: #ff9933; }
+        .timeOption[data-minutes="5"] { background-color: #ffff66; color: #333; }
+        .timeOption[data-minutes="10"] { background-color: #66ff66; color: #333; }
+        .timeOption[data-minutes="15"] { background-color: #66b3ff; }
+        #customMinutesInput {
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 50px;
+            text-align: center;
+            font-size: 14px;
+        }
+        #progressBarContainer {
+            width: 100%;
+            height: 30px; /* Increase the height of the progress bar */
+            background-color: #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 20px 0;
+            position: relative;
+        }
+        #progressBar {
+            height: 100%;
+            width: 0;
+            background-color: #4caf50;
+            transition: width 0.5s ease;
+        }
+        .mode-toggle {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="timerPopup" class="popup">
+        <div class="timer-container">
+            <button id="startPauseButton">Start</button>
+            <div id="timerDisplay">00:00:00</div>
+            <button id="resetButton">Reset</button>
+        </div>
+        <div id="progressBarContainer">
+            <div id="pausedText">Paused</div>
+            <div id="progressBar"></div>
+        </div>
+        <div class="mode-toggle" id="modeToggle">
+            <label><input type="radio" name="mode" id="timerMode" checked> Timer</label>
+            <label><input type="radio" name="mode" id="stopwatchMode"> Stopwatch</label>
+        </div>
+        <div class="time-options" id="timeOptions">
+            <div class="timeOption" data-minutes="1">01</div>
+            <div class="timeOption" data-minutes="2">02</div>
+            <div class="timeOption" data-minutes="5">05</div>
+            <div class="timeOption" data-minutes="10">10</div>
+            <div class="timeOption" data-minutes="15">15</div>
+            <input type="number" id="customMinutesInput" placeholder="Custom">
+        </div>
+    </div>
+
+    <script>
+        const timerDisplay = document.getElementById('timerDisplay');
+        const pausedText = document.getElementById('pausedText');
+        const timeOptions = document.getElementById('timeOptions');
+        const customMinutesInput = document.getElementById('customMinutesInput');
+        const startPauseButton = document.getElementById('startPauseButton');
+        const resetButton = document.getElementById('resetButton');
+        const progressBar = document.getElementById('progressBar');
+        const timerMode = document.getElementById('timerMode');
+        const stopwatchMode = document.getElementById('stopwatchMode');
+        const modeToggle = document.getElementById('modeToggle');
+
+        let timerInterval;
+        let timeLeft;
+        let totalTime;
+        let isPaused = false;
+        let isStopwatch = false;
+
+        // Event Listeners
+        timerMode.addEventListener('change', switchMode);
+        stopwatchMode.addEventListener('change', switchMode);
+
+        document.querySelectorAll('.timeOption').forEach(button => {
+            button.addEventListener('click', () => {
+                const minutes = parseInt(button.getAttribute('data-minutes'));
+                setTimer(minutes);
+            });
+        });
+
+        customMinutesInput.addEventListener('change', () => {
+            const minutes = parseInt(customMinutesInput.value);
+            if (!isNaN(minutes) && minutes > 0) {
+                setTimer(minutes);
+            }
+        });
+
+        startPauseButton.addEventListener('click', () => {
+            if (isPaused) {
+                resumeTimer();
+            } else if (timerInterval) {
+                pauseTimer();
+            } else {
+                startTimer();
+            }
+        });
+
+        resetButton.addEventListener('click', resetTimer);
+
+        // Functions
+        function setTimer(minutes) {
+            clearInterval(timerInterval);
+            isStopwatch = false;
+            totalTime = minutes * 60;
+            timeLeft = totalTime;
+            updateDisplay();
+            updateProgressBar();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            isPaused = false;
+            pausedText.style.display = 'none';
+            startPauseButton.textContent = 'Pause';
+            timeOptions.style.display = 'none'; // Hide minute options on start
+            modeToggle.style.display = 'none'; // Hide mode toggle on start
+            timerInterval = setInterval(() => {
+                if (!isPaused) {
+                    if (isStopwatch) {
+                        timeLeft++;
+                    } else {
+                        timeLeft--;
+                        if (timeLeft <= 0) {
+                            clearInterval(timerInterval);
+                        }
+                    }
+                    updateDisplay();
+                    updateProgressBar();
+                }
+            }, isStopwatch ? 10 : 1000);
+        }
+
+        function resumeTimer() {
+            isPaused = false;
+            pausedText.style.display = 'none';
+            startPauseButton.textContent = 'Pause';
+        }
+
+        function pauseTimer() {
+            isPaused = true;
+            pausedText.style.display = 'block';
+            startPauseButton.textContent = 'Start';
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timeLeft = isStopwatch ? 0 : totalTime;
+            updateDisplay();
+            updateProgressBar();
+            pausedText.style.display = 'none';
+            startPauseButton.textContent = 'Start';
+            timerInterval = null;
+            if (!isStopwatch) {
+                timeOptions.style.display = 'flex'; // Show minute options only if in timer mode
+            }
+            modeToggle.style.display = 'block'; // Show mode toggle on reset
+        }
+
+        function switchMode() {
+            clearInterval(timerInterval);
+            isPaused = false;
+            pausedText.style.display = 'none';
+            startPauseButton.textContent = 'Start';
+            if (stopwatchMode.checked) {
+                isStopwatch = true;
+                timeLeft = 0;
+                timeOptions.style.display = 'none'; // Hide minute options in stopwatch mode
+                updateDisplay();
+            } else {
+                isStopwatch = false;
+                timeOptions.style.display = 'flex';
+                setTimer(5); // Default timer to 5 minutes on timer mode
+            }
+            resetTimer(); // Add reset action when switching modes
+            updateProgressBar();
+        }
+
+        function updateDisplay() {
+            let minutes, seconds, milliseconds;
+            if (isStopwatch) {
+                minutes = Math.floor(timeLeft / 6000);
+                seconds = Math.floor((timeLeft % 6000) / 100);
+                milliseconds = timeLeft % 100;
+                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}:${milliseconds.toString().padStart(2, '0')}`;
+            } else {
+                minutes = Math.floor(timeLeft / 60);
+                seconds = timeLeft % 60;
+                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+        }
+
+        function updateProgressBar() {
+            let progress = isStopwatch ? (timeLeft / totalTime) : (1 - timeLeft / totalTime);
+            progressBar.style.width = isStopwatch ? '100%' : `${progress * 100}%`;
+        }
+
+        // Initialize default mode as Timer with 5 minutes
+        switchMode();
+    </script>
+</body>
+</html>
