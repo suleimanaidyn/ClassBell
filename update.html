@@ -399,7 +399,11 @@
                 const seconds = remainingSeconds % 60;
                 const minutes = Math.floor(remainingSeconds / 60);
 
-                const remainingText = `${minutes} min ${seconds < 10 ? '0' : ''}${seconds} sec`;
+                // Display seconds only if remaining time is less than or equal to 3 minutes
+                const remainingText = remainingTime <= 3 * 60 * 1000
+                    ? `${minutes} min ${seconds < 10 ? '0' : ''}${seconds} sec`
+                    : `${minutes} min`;
+
                 const row = document.createElement('tr');
                 const progressBar = document.createElement('div');
                 progressBar.classList.add('progress-bar');
@@ -679,6 +683,19 @@
             .share-buttons .linkedin {
                 background-color: #0A66C2; /* LinkedIn color */
             }
+            .footer .timer-section a {
+                background-color: #ff9800; /* Orange background */
+                color: white; /* White text color */
+                padding: 5px 10px; /* Padding around text */
+                border-radius: 5px; /* Rounded corners */
+                text-decoration: none; /* No underline */
+                font-family: Arial, sans-serif; /* Arial font */
+                font-weight: normal; /* Normal font weight */
+                margin-right: 10px;
+            }
+            .footer .timer-section a:hover {
+                background-color: #e68a00; /* Darker orange on hover */
+            }
         </style>
         <!-- Font Awesome for Icons (only if you need other icons) -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -688,17 +705,22 @@
             <div class="readme-section">
                 <a href="readme.html" target="_blank">ReadMe</a>
             </div>
+            <div class="timer-section">
+                <a href="timer.html" target="_blank" class="timer-button">Timer</a>
+            </div>
             <div class="empty-section">
                 <!-- Intentionally left blank -->
             </div>
             <div class="share-buttons">
                 <span>Share: </span>
-                <a href="https://twitter.com/intent/tweet?text=Explore%20this%20incredible%20free%20Bell%20Schedule%20Tool%20designed%20exclusively%20for%20educators!&url=https://classbellschedule.com" target="_blank" class="twitter">X</a>
-            <a href="https://www.facebook.com/sharer/sharer.php?u=https://classbellschedule.com" target="_blank" class="facebook">
-                <i class="fab fa-facebook"></i>
-            </a>
-            <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://classbellschedule.com&title=Explore%20this%20incredible%20free%20Bell%20Schedule%20Tool%20designed%20exclusively%20for%20educators!" target="_blank" class="linkedin">
-                <i class="fab fa-linkedin"></i> LinkedIn
+                <a href="https://twitter.com/intent/tweet?text=Explore%20this%20incredible%20free%20Bell%20Schedule%20Tool%20designed%20exclusively%20for%20educators!&url=https://classbellschedule.com" target="_blank" class="twitter">
+                    <i class="fab fa-twitter"></i> Twitter
+                </a>
+                <a href="https://www.facebook.com/sharer/sharer.php?u=https://classbellschedule.com" target="_blank" class="facebook">
+                    <i class="fab fa-facebook"></i> Facebook
+                </a>
+                <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://classbellschedule.com&title=Explore%20this%20incredible%20free%20Bell%20Schedule%20Tool%20designed%20exclusively%20for%20educators!" target="_blank" class="linkedin">
+                    <i class="fab fa-linkedin"></i> LinkedIn
                 </a>
             </div>
         </div>
@@ -849,3 +871,4 @@
     
     
     </html>
+    
