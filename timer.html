@@ -234,208 +234,220 @@
     </div>
 
     <script>
-        const timerDisplay = document.getElementById('timerDisplay');
-        const pausedText = document.getElementById('pausedText');
-        const timeOptions = document.getElementById('timeOptions');
-        const customMinutesInput = document.getElementById('customMinutesInput');
-        const startPauseButton = document.getElementById('startPauseButton');
-        const resetButton = document.getElementById('resetButton');
-        const progressBar = document.getElementById('progressBar');
-        const modeSwitch = document.getElementById('modeSwitch');
-        const modeToggle = document.getElementById('modeToggle');
-        const timeUpText = document.getElementById('timeUpText');
-        const countdownSound = document.getElementById('countdownSound');
-        const endSound = document.getElementById('endSound');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const pausedText = document.getElementById('pausedText');
+    const timeOptions = document.getElementById('timeOptions');
+    const customMinutesInput = document.getElementById('customMinutesInput');
+    const startPauseButton = document.getElementById('startPauseButton');
+    const resetButton = document.getElementById('resetButton');
+    const progressBar = document.getElementById('progressBar');
+    const modeSwitch = document.getElementById('modeSwitch');
+    const modeToggle = document.getElementById('modeToggle');
+    const timeUpText = document.getElementById('timeUpText');
+    const countdownSound = document.getElementById('countdownSound');
+    const endSound = document.getElementById('endSound');
 
-        let timerInterval = null;
-        let timeLeft;
-        let totalTime = 300; // Default to 5 minutes
-        let isPaused = false;
-        let isStopwatch = false;
-        let lastTimestamp = null;
-        let lastSecond = null;
+    let timerInterval = null;
+    let timeLeft;
+    let totalTime = 300; // Default to 5 minutes
+    let isPaused = false;
+    let isStopwatch = false;
+    let lastTimestamp = null;
+    let lastSecond = null;
 
-        // Event Listeners
-        modeSwitch.addEventListener('change', switchMode);
+    // Event Listeners
+    modeSwitch.addEventListener('change', switchMode);
 
-        document.querySelectorAll('.timeOption').forEach(button => {
-            button.addEventListener('click', () => {
-                const minutes = parseInt(button.getAttribute('data-minutes'));
-                resetTimer(); // Reset timer before setting a new time
-                setTimer(minutes * 60);
-            });
+    document.querySelectorAll('.timeOption').forEach(button => {
+        button.addEventListener('click', () => {
+            const minutes = parseInt(button.getAttribute('data-minutes'));
+            resetTimer(); // Reset timer before setting a new time
+            setTimer(minutes * 60);
         });
+    });
 
-        customMinutesInput.addEventListener('change', () => {
-            const input = customMinutesInput.value.trim();
-            let seconds = 0;
+    customMinutesInput.addEventListener('change', () => {
+        const input = customMinutesInput.value.trim();
+        let seconds = 0;
 
-            if (input.includes(':')) {
-                const parts = input.split(':');
-                if (parts.length === 2) {
-                    const minutes = parseInt(parts[0]) || 0;
-                    seconds = parseInt(parts[1]) || 0;
-                    seconds += minutes * 60;
-                }
-            } else {
-                seconds = parseInt(input) * 60 || 0;
+        if (input.includes(':')) {
+            const parts = input.split(':');
+            if (parts.length === 2) {
+                const minutes = parseInt(parts[0]) || 0;
+                seconds = parseInt(parts[1]) || 0;
+                seconds += minutes * 60;
             }
-
-            if (!isNaN(seconds) && seconds > 0) {
-                resetTimer(); // Reset timer before setting a new custom time
-                setTimer(seconds);
-            }
-        });
-
-        startPauseButton.addEventListener('click', () => {
-            if (isPaused) {
-                resumeTimer();
-            } else if (timerInterval) {
-                pauseTimer();
-            } else {
-                startTimer();
-            }
-        });
-
-        resetButton.addEventListener('click', resetTimer);
-
-        // Functions
-        function setTimer(seconds) {
-            cancelAnimationFrame(timerInterval);
-            isStopwatch = false;
-            totalTime = seconds;
-            timeLeft = totalTime;
-            updateDisplay();
-            updateProgressBar();
-            timeUpText.style.display = 'none'; // Hide "Time is up" text
+        } else {
+            seconds = parseInt(input) * 60 || 0;
         }
 
-        function startTimer() {
-            if (timerInterval) return; // Prevent multiple intervals
-            isPaused = false;
-            pausedText.style.display = 'none';
-            startPauseButton.textContent = 'Pause';
-            startPauseButton.classList.add('pause'); // Change button color to pause
-            hideTimeOptions(); // Hide minute options
-            modeToggle.classList.add('hidden'); // Add hidden class
-            lastTimestamp = performance.now();
-            timerInterval = requestAnimationFrame(updateTimer);
+        if (!isNaN(seconds) && seconds > 0) {
+            resetTimer(); // Reset timer before setting a new custom time
+            setTimer(seconds);
         }
+    });
 
-        function updateTimer(timestamp) {
-            if (!isPaused) {
-                const elapsed = (timestamp - lastTimestamp) / 1000;
-                lastTimestamp = timestamp;
-                if (isStopwatch) {
-                    timeLeft += elapsed;
-                } else {
-                    timeLeft -= elapsed;
-                    const currentSecond = Math.ceil(timeLeft);
-                    if (timeLeft <= 5 && timeLeft > 0 && currentSecond !== lastSecond) {
-                        countdownSound.play(); // Play countdown sound for last 5 seconds
-                        lastSecond = currentSecond;
-                    }
-                    if (timeLeft <= 0) {
-                        timeLeft = 0;
-                        cancelAnimationFrame(timerInterval);
-                        timerInterval = null;
-                        timeUpText.style.display = 'block'; // Show "Time is up" text
-                        endSound.play(); // Play end sound
-                    }
-                }
-                updateDisplay();
-                updateProgressBar();
-            }
-            if (timerInterval) {
-                timerInterval = requestAnimationFrame(updateTimer);
-            }
+    startPauseButton.addEventListener('click', () => {
+        if (isPaused) {
+            resumeTimer();
+        } else if (timerInterval) {
+            pauseTimer();
+        } else {
+            startTimer();
         }
+    });
 
-        function resumeTimer() {
-            isPaused = false;
-            pausedText.style.display = 'none';
-            startPauseButton.textContent = 'Pause';
-            startPauseButton.classList.add('pause'); // Change button color to pause
-            lastTimestamp = performance.now();
-            timerInterval = requestAnimationFrame(updateTimer);
-        }
+    resetButton.addEventListener('click', resetTimer);
 
-        function pauseTimer() {
-            isPaused = true;
-            pausedText.style.display = 'block';
-            startPauseButton.textContent = 'Start';
-            startPauseButton.classList.remove('pause'); // Change button color back to start
-            cancelAnimationFrame(timerInterval);
-        }
+    // Functions
+    function setTimer(seconds) {
+        cancelAnimationFrame(timerInterval);
+        isStopwatch = false;
+        totalTime = seconds;
+        timeLeft = totalTime;
+        updateDisplay();
+        updateProgressBar();
+        timeUpText.style.display = 'none'; // Hide "Time is up" text
+    }
 
-        function resetTimer() {
-            cancelAnimationFrame(timerInterval);
-            timerInterval = null; // Ensure the timerInterval is reset
-            timeLeft = isStopwatch ? 0 : totalTime;
-            updateDisplay();
-            updateProgressBar();
-            pausedText.style.display = 'none';
-            startPauseButton.textContent = 'Start';
-            startPauseButton.classList.remove('pause'); // Change button color back to start
-            isPaused = false; // Ensure isPaused is reset
-            timeUpText.style.display = 'none'; // Hide "Time is up" text
-            modeToggle.classList.remove('hidden'); // Show mode toggle on reset
-            if (!isStopwatch) {
-                showTimeOptions(); // Show minute options only if in Timer mode
-            }
-        }
+    function startTimer() {
+        if (timerInterval) return; // Prevent multiple intervals
+        isPaused = false;
+        pausedText.style.display = 'none';
+        startPauseButton.textContent = 'Pause';
+        startPauseButton.classList.add('pause'); // Change button color to pause
+        hideTimeOptions(); // Hide minute options
+        modeToggle.classList.add('hidden'); // Add hidden class
+        lastTimestamp = performance.now();
+        timerInterval = requestAnimationFrame(updateTimer);
+    }
 
-        function switchMode() {
-            cancelAnimationFrame(timerInterval);
-            timerInterval = null; // Ensure interval is cleared on mode switch
-            isPaused = false;
-            pausedText.style.display = 'none';
-            startPauseButton.textContent = 'Start';
-            startPauseButton.classList.remove('pause'); // Change button color back to start
-            if (modeSwitch.checked) {
-                isStopwatch = true;
-                hideTimeOptions(); // Hide minute options immediately in Stopwatch mode
-                updateDisplay();
-            } else {
-                isStopwatch = false;
-                setTimer(5 * 60); // Default timer to 5 minutes in Timer mode
-                showTimeOptions(); // Show minute options in Timer mode
-            }
-            resetTimer(); // Reset timer on mode switch
-            updateProgressBar();
-        }
-
-        function hideTimeOptions() {
-            timeOptions.classList.add('hidden'); // Add hidden class
-            setTimeout(() => timeOptions.style.display = 'none', 500); // Hide minute options after transition
-        }
-
-        function showTimeOptions() {
-            timeOptions.style.display = 'flex';
-            setTimeout(() => timeOptions.classList.remove('hidden'), 0); // Show minute options
-        }
-
-        function updateDisplay() {
-            let minutes, seconds, milliseconds;
+    function updateTimer(timestamp) {
+        if (!isPaused) {
+            const elapsed = (timestamp - lastTimestamp) / 1000;
+            lastTimestamp = timestamp;
             if (isStopwatch) {
-                minutes = Math.floor(timeLeft / 60);
-                seconds = Math.floor(timeLeft % 60);
-                milliseconds = Math.floor((timeLeft * 100) % 100);
-                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}:${milliseconds.toString().padStart(2, '0')}`;
+                timeLeft += elapsed;
             } else {
-                minutes = Math.floor(timeLeft / 60);
-                seconds = Math.floor(timeLeft % 60);
-                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                timeLeft -= elapsed;
+                const currentSecond = Math.ceil(timeLeft);
+                if (timeLeft <= 11 && timeLeft > 0 && currentSecond !== lastSecond) {
+                    countdownSound.play(); // Play countdown sound for last 11 seconds
+                    lastSecond = currentSecond;
+                }
+                if (timeLeft <= 0) {
+                    timeLeft = 0;
+                    cancelAnimationFrame(timerInterval);
+                    timerInterval = null;
+                    timeUpText.style.display = 'block'; // Show "Time is up" text
+                    endSound.play(); // Play end sound
+                }
             }
+            updateDisplay();
+            updateProgressBar();
         }
-
-        function updateProgressBar() {
-            let progress = isStopwatch ? (timeLeft / totalTime) : (1 - timeLeft / totalTime);
-            progressBar.style.width = isStopwatch ? '100%' : `${progress * 100}%`;
+        if (timerInterval) {
+            timerInterval = requestAnimationFrame(updateTimer);
         }
+    }
 
-        // Initialize default mode as Timer with 5 minutes
-        switchMode();
-    </script>
+    function resumeTimer() {
+        isPaused = false;
+        pausedText.style.display = 'none';
+        startPauseButton.textContent = 'Pause';
+        startPauseButton.classList.add('pause'); // Change button color to pause
+        lastTimestamp = performance.now();
+        timerInterval = requestAnimationFrame(updateTimer);
+    }
+
+    function pauseTimer() {
+        isPaused = true;
+        pausedText.style.display = 'block';
+        startPauseButton.textContent = 'Start';
+        startPauseButton.classList.remove('pause'); // Change button color back to start
+        cancelAnimationFrame(timerInterval);
+    }
+
+    function resetTimer() {
+        cancelAnimationFrame(timerInterval);
+        timerInterval = null; // Ensure the timerInterval is reset
+        timeLeft = isStopwatch ? 0 : totalTime;
+        updateDisplay();
+        updateProgressBar();
+        pausedText.style.display = 'none';
+        startPauseButton.textContent = 'Start';
+        startPauseButton.classList.remove('pause'); // Change button color back to start
+        isPaused = false; // Ensure isPaused is reset
+        timeUpText.style.display = 'none'; // Hide "Time is up" text
+        modeToggle.classList.remove('hidden'); // Show mode toggle on reset
+        if (!isStopwatch) {
+            showTimeOptions(); // Show minute options only if in Timer mode
+        }
+    }
+
+    function switchMode() {
+        cancelAnimationFrame(timerInterval);
+        timerInterval = null; // Ensure interval is cleared on mode switch
+        isPaused = false;
+        pausedText.style.display = 'none';
+        startPauseButton.textContent = 'Start';
+        startPauseButton.classList.remove('pause'); // Change button color back to start
+        if (modeSwitch.checked) {
+            isStopwatch = true;
+            hideTimeOptions(); // Hide minute options immediately in Stopwatch mode
+            timeLeft = 0; // Reset time for stopwatch
+            updateDisplay();
+        } else {
+            isStopwatch = false;
+            setTimer(5 * 60); // Default timer to 5 minutes in Timer mode
+            showTimeOptions(); // Show minute options in Timer mode
+        }
+        resetTimer(); // Reset timer on mode switch
+        updateProgressBar();
+    }
+
+    function hideTimeOptions() {
+        timeOptions.classList.add('hidden'); // Add hidden class
+        setTimeout(() => timeOptions.style.display = 'none', 500); // Hide minute options after transition
+    }
+
+    function showTimeOptions() {
+        timeOptions.style.display = 'flex';
+        setTimeout(() => timeOptions.classList.remove('hidden'), 0); // Show minute options
+    }
+
+    function updateDisplay() {
+        let minutes, seconds, milliseconds;
+        if (isStopwatch) {
+            minutes = Math.floor(timeLeft / 60);
+            seconds = Math.floor(timeLeft % 60);
+            milliseconds = Math.floor((timeLeft * 100) % 100);
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}:${milliseconds.toString().padStart(2, '0')}`;
+        } else {
+            minutes = Math.floor(timeLeft / 60);
+            seconds = Math.floor(timeLeft % 60);
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+    }
+
+    function updateProgressBar() {
+        let progress;
+        if (isStopwatch) {
+            progress = timeLeft / totalTime;
+            progressBar.style.width = '100%';
+            progressBar.style.background = `linear-gradient(270deg, #ff4d4d, #ff9933, #ffff66, #66ff66, #66b3ff)`;
+            progressBar.style.backgroundSize = '1000% 1000%';
+            progressBar.style.animation = 'wave 10s ease infinite';
+        } else {
+            progress = 1 - timeLeft / totalTime;
+            progressBar.style.width = `${progress * 100}%`;
+            progressBar.style.background = `linear-gradient(to right, lightgreen, lightcoral)`;
+            progressBar.style.animation = 'none';
+        }
+    }
+
+    // Initialize default mode as Timer with 5 minutes
+    switchMode();
+</script>
 </body>
 </html>
