@@ -224,6 +224,44 @@
             cursor: pointer;
             font-size: 16px;
         }
+        .footer .timer-section a {
+            background-color: #ff9800; /* Orange background */
+            color: white; /* White text color */
+            padding: 5px 10px; /* Padding around text */
+            border-radius: 5px; /* Rounded corners */
+            text-decoration: none; /* No underline */
+            font-family: Arial, sans-serif; /* Arial font */
+            font-weight: normal; /* Normal font weight */
+            margin-right: 10px;
+        }
+        .footer .timer-section a:hover {
+            background-color: #e68a00; /* Darker orange on hover */
+        }
+        #whats-new {
+            font-family: 'Open Sans', sans-serif;
+            font-size: 12px; /* Adjust this size to be smaller than the current text in the table */
+            font-style: italic; /* Make the text italic */
+        }
+        #whats-new h3 {
+            font-size: 16px; /* Adjust this size for the heading */
+            font-style: italic; /* Make the heading italic */
+            cursor: pointer; /* Make the heading clickable */
+            display: inline-flex;
+            align-items: center;
+        }
+        #whats-new ul {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+        #whats-new li {
+            margin-bottom: 10px;
+        }
+        #whats-new-content {
+            display: none; /* Hide the content initially */
+        }
+        .toggle-arrow {
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
@@ -634,6 +672,19 @@
         updateSchedule();
         setInterval(displayDateTime, 1000);
         setInterval(checkForBreaks, 1000);
+
+        // Add this function to your existing JavaScript
+        function toggleWhatsNew() {
+            const content = document.getElementById('whats-new-content');
+            const arrow = document.querySelector('.toggle-arrow');
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                arrow.innerHTML = '&#9650;'; // Up arrow
+            } else {
+                content.style.display = 'none';
+                arrow.innerHTML = '&#9660;'; // Down arrow
+            }
+        }
     </script>
 
 
@@ -847,28 +898,26 @@
     }
 </style>
 
-<!-- What's New Section -->
-<div id="whats-new">
-    <h3>What's New</h3>
-    <ul>
-        <li>Fixed issue with saving custom schedules.</li>
-        <li>You can now change the school name and schedule in the settings, accessible via the gear icon on the right end of the page.</li>
-        <li>Introduced a new header design.</li>
-        <li>Added optional background and text color customization for the header and date-time display.</li>
-        <li>Implemented a share function.</li>
-        <li>During the last 3 minutes of class, the remaining time will display seconds.</li>
-    </ul>
-</div>
-
-
-
-
-
-	    
+    
     </body>
     
 
     
     
     </html>
-    
+
+<!-- Add this for the "What's New" section -->
+<div id="whats-new">
+    <h3 onclick="toggleWhatsNew()">What's New <span class="toggle-arrow">&#9660;</span></h3>
+    <div id="whats-new-content">
+        <ul>
+            <li>Added Timer Page 11/3/2024</li>
+            <li>Fixed issue with saving custom schedules. 10/27/2024</li>
+            <li>You can now change the school name and schedule in the settings, accessible via the gear icon on the right end of the page.</li>
+            <li>Introduced a new header design.</li>
+            <li>Added optional background and text color customization for the header and date-time display.</li>
+            <li>Implemented a share function.</li>
+            <li>During the last 3 minutes of class, the remaining time will display seconds.</li>
+        </ul>
+    </div>
+</div>
