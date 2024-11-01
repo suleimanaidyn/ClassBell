@@ -91,6 +91,11 @@
         .mode-toggle {
             margin-top: 10px;
         }
+        #startPauseButton, #resetButton {
+            font-size: 20px; /* Increase font size */
+            padding: 10px 20px; /* Increase padding */
+            border-radius: 5px; /* Optional: Add rounded corners */
+        }
     </style>
 </head>
 <body>
@@ -130,9 +135,9 @@
         const stopwatchMode = document.getElementById('stopwatchMode');
         const modeToggle = document.getElementById('modeToggle');
 
-        let timerInterval;
+        let timerInterval = null;
         let timeLeft;
-        let totalTime;
+        let totalTime = 300; // Default to 5 minutes
         let isPaused = false;
         let isStopwatch = false;
 
@@ -179,7 +184,7 @@
         }
 
         function startTimer() {
-            clearInterval(timerInterval);
+            if (timerInterval) return; // Prevent multiple intervals
             isPaused = false;
             pausedText.style.display = 'none';
             startPauseButton.textContent = 'Pause';
@@ -193,6 +198,7 @@
                         timeLeft--;
                         if (timeLeft <= 0) {
                             clearInterval(timerInterval);
+                            timerInterval = null;
                         }
                     }
                     updateDisplay();
@@ -215,12 +221,13 @@
 
         function resetTimer() {
             clearInterval(timerInterval);
+            timerInterval = null; // Ensure the timerInterval is reset
             timeLeft = isStopwatch ? 0 : totalTime;
             updateDisplay();
             updateProgressBar();
             pausedText.style.display = 'none';
             startPauseButton.textContent = 'Start';
-            timerInterval = null;
+            isPaused = false; // Ensure isPaused is reset
             if (!isStopwatch) {
                 timeOptions.style.display = 'flex'; // Show minute options only if in timer mode
             }
@@ -229,6 +236,7 @@
 
         function switchMode() {
             clearInterval(timerInterval);
+            timerInterval = null; // Ensure interval is cleared on mode switch
             isPaused = false;
             pausedText.style.display = 'none';
             startPauseButton.textContent = 'Start';
@@ -242,7 +250,7 @@
                 timeOptions.style.display = 'flex';
                 setTimer(5); // Default timer to 5 minutes on timer mode
             }
-            resetTimer(); // Add reset action when switching modes
+            resetTimer(); // Reset timer on mode switch
             updateProgressBar();
         }
 
