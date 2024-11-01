@@ -368,9 +368,11 @@
             pausedText.style.display = 'none';
             startPauseButton.textContent = 'Start';
             isPaused = false; // Ensure isPaused is reset
-            showTimeOptions(); // Show minute options
-            modeToggle.classList.remove('hidden'); // Remove hidden class
             timeUpText.style.display = 'none'; // Hide "Time is up" text
+            modeToggle.classList.remove('hidden'); // Show mode toggle on reset
+            if (!isStopwatch) {
+                showTimeOptions(); // Show minute options only if in Timer mode
+            }
         }
 
         function switchMode() {
@@ -381,12 +383,12 @@
             startPauseButton.textContent = 'Start';
             if (modeSwitch.checked) {
                 isStopwatch = true;
-                hideTimeOptions(); // Hide minute options
+                hideTimeOptions(); // Hide minute options immediately in Stopwatch mode
                 updateDisplay();
             } else {
                 isStopwatch = false;
-                showTimeOptions(); // Show minute options
-                setTimer(5 * 60); // Default timer to 5 minutes on timer mode
+                setTimer(5 * 60); // Default timer to 5 minutes in Timer mode
+                showTimeOptions(); // Show minute options in Timer mode
             }
             resetTimer(); // Reset timer on mode switch
             updateProgressBar();
