@@ -67,6 +67,52 @@
                 width: 100%;
                 padding: 5px;
             }
+            /* Floating Button */
+            #floatingButton {
+                position: fixed;
+                bottom: 20px;
+                left: 20px;
+                background-color: #007bff;
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 40px; /* Adjusted size to match settings button */
+                height: 40px; /* Adjusted size to match settings button */
+                font-size: 20px;
+                cursor: pointer;
+                z-index: 1000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            #floatingButton::before {
+                content: '\23F1'; /* Unicode for clock symbol */
+            }
+
+            /* Timer Popup */
+            .popup {
+                display: none;
+                padding: 20px;
+                width: 400px;
+                border-radius: 10px;
+                background-color: transparent; /* Completely transparent background */
+                text-align: center;
+                box-shadow: none;
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 1000;
+                cursor: default; /* Not movable */
+            }
+            /* Timer Display */
+            #timerDisplay {
+                font-size: 48px;
+                color: white;
+                background-color: rgba(0, 0, 0, 0.5); /* Add a small transparent black background */
+                padding: 5px; /* Add some padding for better visibility */
+                border-radius: 5px; /* Optional: Add rounded corners */
+            }
         </style>
     </head>
 <!-- Google tag (gtag.js) -->
@@ -262,6 +308,199 @@
         .toggle-arrow {
             margin-left: 5px;
         }
+        .popup {
+            display: none;
+            padding: 20px;
+            width: 400px;
+            border-radius: 10px;
+            background-color: transparent; /* Completely transparent background */
+            text-align: center;
+            box-shadow: none;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            cursor: default; /* Not movable */
+        }
+        .timer-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        #timerDisplay {
+            font-size: 48px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5); /* Add a small transparent black background */
+            padding: 5px; /* Add some padding for better visibility */
+            border-radius: 5px; /* Optional: Add rounded corners */
+        }
+        #pausedText {
+            display: none;
+            font-size: 14px;
+            color: white;
+            background-color: red;
+            padding: 2px 8px;
+            border-radius: 3px;
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+        .time-options {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            position: relative;
+            opacity: 1;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+        .timeOption {
+            padding: 10px 15px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            position: relative;
+        }
+        .timeOption[data-minutes="1"] { background-color: #ff4d4d; }
+        .timeOption[data-minutes="2"] { background-color: #ff9933; }
+        .timeOption[data-minutes="5"] { background-color: #ffff66; color: #333; }
+        .timeOption[data-minutes="10"] { background-color: #66ff66; color: #333; }
+        #customMinutesInput {
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: none;
+            background-color: #66b3ff;
+            color: white;
+            font-weight: bold;
+            width: 50px;
+            text-align: center;
+            font-size: 14px;
+            position: relative;
+        }
+        #progressBarContainer {
+            width: 100%;
+            height: 50px;
+            background-color: #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 20px 0;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #progressBar {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(to right, lightgreen, lightcoral);
+            transition: width 0.5s ease;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .mode-toggle {
+            display: flex;
+            align-items: center;
+            z-index: 1;
+            color: purple;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            margin: 0 10px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        #startPauseButton, #resetButton {
+            font-size: 20px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            position: relative;
+            border: none;
+            cursor: pointer;
+        }
+        #startPauseButton {
+            margin-right: 10px;
+            background-color: #4caf50;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+        #startPauseButton.pause {
+            background-color: #f0ad4e;
+        }
+        #startPauseButton:hover {
+            background-color: #45a049;
+        }
+        #startPauseButton.pause:hover {
+            background-color: #ec971f;
+        }
+        #resetButton {
+            margin-left: 10px;
+            background-color: #f44336;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+        #resetButton:hover {
+            background-color: #e53935;
+        }
+        .hidden {
+            transform: translateY(100px);
+            opacity: 0;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+        .visible {
+            transform: translateY(0);
+            opacity: 1;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+        #timeUpText {
+            display: none;
+            font-size: 24px;
+            color: black;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+        }
+
     </style>
 </head>
 <body>
@@ -869,6 +1108,7 @@
     
                 document.getElementById('bg-color').value = savedBgColor;
                 document.getElementById('text-color').value = savedTextColor;
+    
             }
     
             loadColorCustom();
@@ -921,3 +1161,278 @@
         </ul>
     </div>
 </div>
+
+<!-- Timer Popup -->
+<div id="timerPopup" class="popup">
+    <div class="time-options" id="timeOptions">
+        <div class="timeOption" data-minutes="1">01</div>
+        <div class="timeOption" data-minutes="2">02</div>
+        <div class="timeOption" data-minutes="5">05</div>
+        <div class="timeOption" data-minutes="10">10</div>
+        <input type="text" id="customMinutesInput" placeholder="Custom (MM:SS or :SS)">
+    </div>
+    <div class="timer-container">
+        <button id="startPauseButton">Start</button>
+        <div id="timerDisplay">00:00:00</div>
+        <button id="resetButton">Reset</button>
+    </div>
+    <div id="progressBarContainer">
+        <div id="pausedText">Paused</div>
+        <div id="progressBar"></div>
+        <div id="timeUpText">Time is up!</div>
+        <div class="mode-toggle" id="modeToggle">
+            <span>Timer</span>
+            <label class="switch">
+                <input type="checkbox" id="modeSwitch">
+                <span class="slider"></span>
+            </label>
+            <span>Stopwatch</span>
+        </div>
+    </div>
+    <audio id="countdownSound" src="https://www.soundjay.com/buttons/button-35.mp3" preload="auto"></audio>
+    <audio id="endSound" src="https://www.soundjay.com/buttons/beep-09.mp3" preload="auto"></audio>
+</div>
+
+<!-- Floating Button -->
+<button id="floatingButton" onclick="toggleTimerPopup()"></button>
+
+<script>
+    const timerDisplay = document.getElementById('timerDisplay');
+    const pausedText = document.getElementById('pausedText');
+    const timeOptions = document.getElementById('timeOptions');
+    const customMinutesInput = document.getElementById('customMinutesInput');
+    const startPauseButton = document.getElementById('startPauseButton');
+    const resetButton = document.getElementById('resetButton');
+    const progressBar = document.getElementById('progressBar');
+    const modeSwitch = document.getElementById('modeSwitch');
+    const modeToggle = document.getElementById('modeToggle');
+    const timeUpText = document.getElementById('timeUpText');
+    const countdownSound = document.getElementById('countdownSound');
+    const endSound = document.getElementById('endSound');
+    const timerPopup = document.getElementById('timerPopup');
+    const floatingButton = document.getElementById('floatingButton');
+
+    let timerInterval = null;
+    let timeLeft;
+    let totalTime = 300; // Default to 5 minutes
+    let isPaused = false;
+    let isStopwatch = false;
+    let lastTimestamp = null;
+    let lastSecond = null;
+
+    // Event Listeners
+    modeSwitch.addEventListener('change', switchMode);
+
+    document.querySelectorAll('.timeOption').forEach(button => {
+        button.addEventListener('click', () => {
+            const minutes = parseInt(button.getAttribute('data-minutes'));
+            resetTimer(); // Reset timer before setting a new time
+            setTimer(minutes * 60);
+        });
+    });
+
+    customMinutesInput.addEventListener('change', () => {
+        setCustomTimer();
+    });
+
+    customMinutesInput.addEventListener('click', () => {
+        setCustomTimer();
+    });
+
+    function setCustomTimer() {
+        const input = customMinutesInput.value.trim();
+        let seconds = 0;
+
+        if (input.includes(':')) {
+            const parts = input.split(':');
+            if (parts.length === 2) {
+                const minutes = parseInt(parts[0]) || 0;
+                seconds = parseInt(parts[1]) || 0;
+                seconds += minutes * 60;
+            }
+        } else {
+            seconds = parseInt(input) * 60 || 0;
+        }
+
+        if (!isNaN(seconds) && seconds > 0) {
+            resetTimer(); // Reset timer before setting a new custom time
+            setTimer(seconds);
+        }
+    }
+
+    startPauseButton.addEventListener('click', () => {
+        if (isPaused) {
+            resumeTimer();
+        } else if (timerInterval) {
+            pauseTimer();
+        } else {
+            startTimer();
+        }
+    });
+
+    resetButton.addEventListener('click', resetTimer);
+
+    // Functions
+    function setTimer(seconds) {
+        cancelAnimationFrame(timerInterval);
+        isStopwatch = false;
+        totalTime = seconds;
+        timeLeft = totalTime;
+        updateDisplay();
+        updateProgressBar();
+        timeUpText.style.display = 'none'; // Hide "Time is up" text
+    }
+
+    function startTimer() {
+        if (timerInterval) return; // Prevent multiple intervals
+        isPaused = false;
+        pausedText.style.display = 'none';
+        startPauseButton.textContent = 'Pause';
+        startPauseButton.classList.add('pause'); // Change button color to pause
+        hideTimeOptions(); // Hide minute options
+        modeToggle.classList.add('hidden'); // Add hidden class
+        lastTimestamp = performance.now();
+        timerInterval = requestAnimationFrame(updateTimer);
+    }
+
+    function updateTimer(timestamp) {
+        if (!isPaused) {
+            const elapsed = (timestamp - lastTimestamp) / 1000;
+            lastTimestamp = timestamp;
+            if (isStopwatch) {
+                timeLeft += elapsed;
+            } else {
+                timeLeft -= elapsed;
+                const currentSecond = Math.ceil(timeLeft);
+                if (timeLeft <= 11 && timeLeft > 0 && currentSecond !== lastSecond) {
+                    countdownSound.play(); // Play countdown sound for last 11 seconds
+                    lastSecond = currentSecond;
+                }
+                if (timeLeft <= 0) {
+                    timeLeft = 0;
+                    cancelAnimationFrame(timerInterval);
+                    timerInterval = null;
+                    timeUpText.style.display = 'block'; // Show "Time is up" text
+                    endSound.play(); // Play end sound
+                }
+            }
+            updateDisplay();
+            updateProgressBar();
+        }
+        if (timerInterval) {
+            timerInterval = requestAnimationFrame(updateTimer);
+        }
+    }
+
+    function resumeTimer() {
+        isPaused = false;
+        pausedText.style.display = 'none';
+        startPauseButton.textContent = 'Pause';
+        startPauseButton.classList.add('pause'); // Change button color to pause
+        lastTimestamp = performance.now();
+        timerInterval = requestAnimationFrame(updateTimer);
+    }
+
+    function pauseTimer() {
+        isPaused = true;
+        pausedText.style.display = 'block';
+        startPauseButton.textContent = 'Start';
+        startPauseButton.classList.remove('pause'); // Change button color back to start
+        cancelAnimationFrame(timerInterval);
+    }
+
+    function resetTimer() {
+        cancelAnimationFrame(timerInterval);
+        timerInterval = null; // Ensure the timerInterval is reset
+        timeLeft = isStopwatch ? 0 : totalTime;
+        updateDisplay();
+        updateProgressBar();
+        pausedText.style.display = 'none';
+        startPauseButton.textContent = 'Start';
+        startPauseButton.classList.remove('pause'); // Change button color back to start
+        isPaused = false; // Ensure isPaused is reset
+        timeUpText.style.display = 'none'; // Hide "Time is up" text
+        modeToggle.classList.remove('hidden'); // Show mode toggle on reset
+        if (!isStopwatch) {
+            showTimeOptions(); // Show minute options only if in Timer mode
+        }
+    }
+
+    function switchMode() {
+        cancelAnimationFrame(timerInterval);
+        timerInterval = null; // Ensure interval is cleared on mode switch
+        isPaused = false;
+        pausedText.style.display = 'none';
+        startPauseButton.textContent = 'Start';
+        startPauseButton.classList.remove('pause'); // Change button color back to start
+        if (modeSwitch.checked) {
+            isStopwatch = true;
+            hideTimeOptions(); // Hide minute options immediately in Stopwatch mode
+            timeLeft = 0; // Reset time for stopwatch
+            updateDisplay();
+        } else {
+            isStopwatch = false;
+            setTimer(5 * 60); // Default timer to 5 minutes in Timer mode
+            showTimeOptions(); // Show minute options in Timer mode
+        }
+        resetTimer(); // Reset timer on mode switch
+        updateProgressBar();
+    }
+
+    function hideTimeOptions() {
+        timeOptions.classList.add('hidden'); // Add hidden class
+        setTimeout(() => timeOptions.style.display = 'none', 500); // Hide minute options after transition
+    }
+
+    function showTimeOptions() {
+        timeOptions.style.display = 'flex';
+        setTimeout(() => timeOptions.classList.remove('hidden'), 0); // Show minute options
+    }
+
+    function updateDisplay() {
+        let minutes, seconds, milliseconds;
+        if (isStopwatch) {
+            minutes = Math.floor(timeLeft / 60);
+            seconds = Math.floor(timeLeft % 60);
+            milliseconds = Math.floor((timeLeft * 100) % 100);
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}:${milliseconds.toString().padStart(2, '0')}`;
+        } else {
+            minutes = Math.floor(timeLeft / 60);
+            seconds = Math.floor(timeLeft % 60);
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+    }
+
+    function updateProgressBar() {
+        let progress;
+        if (isStopwatch) {
+            progress = timeLeft / totalTime;
+            progressBar.style.width = '100%';
+            progressBar.style.background = `linear-gradient(270deg, #ff4d4d, #ff9933, #ffff66, #66ff66, #66b3ff)`;
+            progressBar.style.backgroundSize = '1000% 1000%';
+            progressBar.style.animation = 'wave 10s ease infinite';
+        } else {
+            progress = 1 - timeLeft / totalTime;
+            progressBar.style.width = `${progress * 100}%`;
+            progressBar.style.background = `linear-gradient(to right, lightgreen, lightcoral)`;
+            progressBar.style.animation = 'none';
+        }
+    }
+
+    function toggleTimerPopup() {
+        if (timerPopup.style.display === 'none' || timerPopup.style.display === '') {
+            timerPopup.style.display = 'block';
+        } else {
+            timerPopup.style.display = 'none';
+        }
+    }
+
+    // Remove the draggable functionality
+    timerPopup.onmousedown = null;
+    timerPopup.ondragstart = null;
+
+    // Initialize default mode as Timer with 5 minutes
+    switchMode();
+</script>
+</body>
+</html>
