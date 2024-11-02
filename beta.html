@@ -113,6 +113,75 @@
                 padding: 5px; /* Add some padding for better visibility */
                 border-radius: 5px; /* Optional: Add rounded corners */
             }
+            /* Time Options Container */
+            .time-options-container {
+                background-color: rgba(0, 0, 0, 0.5); /* 50% transparent background */
+                padding: 10px;
+                border-radius: 10px; /* Optional: Add rounded corners */
+                margin-bottom: 10px; /* Add some space below */
+                display: flex;
+                align-items: center; /* Center align the buttons vertically */
+                height: 25px; /* Adjust height to match or slightly exceed button height */
+                transition: transform 0.5s ease, opacity 0.5s ease; /* Smooth transition */
+            }
+            /* Time Options */
+            .time-options {
+                display: flex;
+                justify-content: space-between;
+                width: 100%;
+                transition: transform 0.5s ease, opacity 0.5s ease; /* Smooth transition */
+            }
+            /* Hidden class for time options */
+            .hidden {
+                transform: translateY(100px); /* Move down */
+                opacity: 0; /* Make it invisible */
+                transition: transform 0.5s ease, opacity 0.5s ease; /* Smooth transition */
+            }
+            /* Visible class for time options */
+            .visible {
+                transform: translateY(0);
+                opacity: 1;
+                transition: transform 0.5s ease, opacity 0.5s ease;
+            }
+            /* Time Option */
+            .timeOption {
+                padding: 10px 15px;
+                border-radius: 5px;
+                color: white;
+                font-weight: bold;
+                cursor: pointer;
+                position: relative;
+                margin-top: 5px; /* Move buttons 5px down */
+                
+            }
+            /* Custom Minutes Input */
+            #customMinutesInput {
+                padding: 10px 15px; /* Match padding with .timeOption */
+                border-radius: 5px; /* Match border radius with .timeOption */
+                border: none;
+                background-color: #66b3ff;
+                color: white;
+                font-weight: bold;
+                width: auto; /* Keep width as auto */
+                height: 17px; /* Set a fixed height to match .timeOption */
+                text-align: center;
+                font-size: 14px;
+                position: relative;
+                margin-top: 5px; /* Move buttons 5px down */
+            }
+            /* Progress Bar Animation */
+            @keyframes wave {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+            }
+            #progressBar {
+                height: 100%;
+                width: 100%;
+                background: linear-gradient(270deg, #ff4d4d, #ff9933, #ffff66, #66ff66, #66b3ff);
+                background-size: 1000% 1000%;
+                animation: wave 10s ease infinite;
+            }
         </style>
     </head>
 <!-- Google tag (gtag.js) -->
@@ -291,9 +360,6 @@
         #whats-new h3 {
             font-size: 16px; /* Adjust this size for the heading */
             font-style: italic; /* Make the heading italic */
-            cursor: pointer; /* Make the heading clickable */
-            display: inline-flex;
-            align-items: center;
         }
         #whats-new ul {
             list-style-type: disc;
@@ -364,6 +430,7 @@
             font-weight: bold;
             cursor: pointer;
             position: relative;
+            margin-top: 5px; /* Move buttons 5px down */
         }
         .timeOption[data-minutes="1"] { background-color: #ff4d4d; }
         .timeOption[data-minutes="2"] { background-color: #ff9933; }
@@ -395,12 +462,10 @@
         }
         #progressBar {
             height: 100%;
-            width: 0;
-            background: linear-gradient(to right, lightgreen, lightcoral);
-            transition: width 0.5s ease;
-            position: absolute;
-            top: 0;
-            left: 0;
+            width: 100%;
+            background: linear-gradient(270deg, #ff4d4d, #ff9933, #ffff66, #66ff66, #66b3ff);
+            background-size: 1000% 1000%;
+            animation: wave 10s ease infinite;
         }
         .mode-toggle {
             display: flex;
@@ -770,9 +835,27 @@
 
         function displayDateTime() {
             const now = new Date();
-            const dateTimeElement = document.getElementById('datetime');
-            dateTimeElement.textContent = now.toLocaleString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' });
+            const dayElement = document.getElementById('day');
+            const dateElement = document.getElementById('full-date');
+            const timeElement = document.getElementById('time');
+
+            if (dayElement && dateElement && timeElement) {
+                // Day and Date formatting
+                const dayOptions = { weekday: 'long' }; // Only day part in bold
+                const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+
+                dayElement.textContent = now.toLocaleDateString('en-US', dayOptions);
+                dateElement.textContent = now.toLocaleDateString('en-US', dateOptions);
+
+                // Time formatting
+                const timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
+                timeElement.textContent = now.toLocaleTimeString('en-US', timeOptions);
+            }
         }
+
+        // Call displayDateTime initially and set interval
+        displayDateTime();
+        setInterval(displayDateTime, 1000);
 
         function openSettings() {
             populateSettings();
@@ -923,6 +1006,18 @@
                 content.style.display = 'none';
                 arrow.innerHTML = '&#9660;'; // Down arrow
             }
+        }
+        
+        function hideTimeOptions() {
+            const timeOptionsContainer = document.querySelector('.time-options-container');
+            timeOptionsContainer.classList.add('hidden'); // Add hidden class
+            setTimeout(() => timeOptionsContainer.style.display = 'none', 500); // Hide minute options after transition
+        }
+
+        function showTimeOptions() {
+            const timeOptionsContainer = document.querySelector('.time-options-container');
+            timeOptionsContainer.style.display = 'flex';
+            setTimeout(() => timeOptionsContainer.classList.remove('hidden'), 0); // Show minute options
         }
     </script>
 
@@ -1164,12 +1259,14 @@
 
 <!-- Timer Popup -->
 <div id="timerPopup" class="popup">
-    <div class="time-options" id="timeOptions">
-        <div class="timeOption" data-minutes="1">01</div>
-        <div class="timeOption" data-minutes="2">02</div>
-        <div class="timeOption" data-minutes="5">05</div>
-        <div class="timeOption" data-minutes="10">10</div>
-        <input type="text" id="customMinutesInput" placeholder="Custom (MM:SS or :SS)">
+    <div class="time-options-container">
+        <div class="time-options" id="timeOptions">
+            <div class="timeOption" data-minutes="1">01</div>
+            <div class="timeOption" data-minutes="2">02</div>
+            <div class="timeOption" data-minutes="5">05</div>
+            <div class="timeOption" data-minutes="10">10</div>
+            <input type="text" id="customMinutesInput" placeholder="Custom (MM:SS or :SS)">
+        </div>
     </div>
     <div class="timer-container">
         <button id="startPauseButton">Start</button>
@@ -1380,13 +1477,15 @@
     }
 
     function hideTimeOptions() {
-        timeOptions.classList.add('hidden'); // Add hidden class
-        setTimeout(() => timeOptions.style.display = 'none', 500); // Hide minute options after transition
+        const timeOptionsContainer = document.querySelector('.time-options-container');
+        timeOptionsContainer.classList.add('hidden'); // Add hidden class
+        setTimeout(() => timeOptionsContainer.style.display = 'none', 500); // Hide minute options after transition
     }
 
     function showTimeOptions() {
-        timeOptions.style.display = 'flex';
-        setTimeout(() => timeOptions.classList.remove('hidden'), 0); // Show minute options
+        const timeOptionsContainer = document.querySelector('.time-options-container');
+        timeOptionsContainer.style.display = 'flex';
+        setTimeout(() => timeOptionsContainer.classList.remove('hidden'), 0); // Show minute options
     }
 
     function updateDisplay() {
