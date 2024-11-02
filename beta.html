@@ -152,6 +152,8 @@
                 cursor: pointer;
                 position: relative;
                 margin-top: 5px; /* Move buttons 5px down */
+                height: 20px; /* Set a fixed height */
+                line-height: 20px; /* Center text vertically */
                 
             }
             /* Custom Minutes Input */
@@ -163,11 +165,12 @@
                 color: white;
                 font-weight: bold;
                 width: auto; /* Keep width as auto */
-                height: 17px; /* Set a fixed height to match .timeOption */
+                height: 20px; /* Set a fixed height to match .timeOption */
                 text-align: center;
                 font-size: 14px;
                 position: relative;
                 margin-top: 5px; /* Move buttons 5px down */
+                line-height: 20px; /* Center text vertically */
             }
             /* Progress Bar Animation */
             @keyframes wave {
@@ -181,6 +184,32 @@
                 background: linear-gradient(270deg, #ff4d4d, #ff9933, #ffff66, #66ff66, #66b3ff);
                 background-size: 1000% 1000%;
                 animation: wave 10s ease infinite;
+            }
+            /* Progress Bar Container */
+            #progressBarContainer {
+                width: 100%;
+                height: 50px; /* Increase the height of the progress bar */
+                background-color: #ddd;
+                border-radius: 5px;
+                overflow: hidden;
+                margin: 20px 0;
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* Progress Bar */
+            #progressBar {
+                height: 100%;
+                width: 0; /* Start with 0 width */
+                background: linear-gradient(to right, lightgreen, lightcoral); /* Gradient color */
+                background-size: 1000% 1000%;
+                animation: wave 10s ease infinite;
+                transition: width 0.5s ease; /* Smooth transition for width */
+                position: absolute;
+                top: 0;
+                left: 0;
             }
         </style>
     </head>
