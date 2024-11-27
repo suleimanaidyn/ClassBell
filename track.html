@@ -1,11 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"></html>
 <head>
     <!-- Meta Tags and Title -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Check-In/Out System</title>
     
+
+ <!-- Google tag (gtag.js) -->
+ <script async src="https://www.googletagmanager.com/gtag/js?id=G-M2QXES4LKK"></script>
+ <script>
+   window.dataLayer = window.dataLayer || [];
+   function gtag(){dataLayer.push(arguments);}
+   gtag('js', new Date());
+
+   gtag('config', 'G-M2QXES4LKK');
+ </script>
+
+
     <!-- CSS Styles -->
     <style>
         /* General Styles */
@@ -383,6 +395,26 @@
             margin: 0;
             margin-left: 5px;
         }
+
+        .navigation {
+            text-align: left;
+            margin-bottom: 20px;
+            padding-left: 20px; /* Optional: Add padding to align with other content */
+        }
+
+        .navigation button {
+            background-color: blue;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .navigation button:hover {
+            opacity: 0.9;
+        }
     </style>
 </head>
 <body>
@@ -396,6 +428,11 @@
         <span id="teacher-room-header">
             <span id="teacher-name-header">Teacher</span>
         </span>
+    </div>
+
+    <!-- Add Home Button Here -->
+    <div class="navigation">
+        <button onclick="window.location.href='https://classbellschedule.com';">Home</button>
     </div>
 
     <!-- Main Section -->
