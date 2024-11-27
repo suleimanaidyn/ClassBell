@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Meta Tags and Title -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Check-In/Out System</title>
+    
+    <!-- CSS Styles -->
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background-color: black;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .header span {
+            display: block;
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        #school-name-header {
+            float: left;
+            width: 33%;
+            text-align: left;
+        }
+
+        #app-title {
+            float: left;
+            width: 33%;
+            text-align: center;
+        }
+
+        #app-title-text {
+            font-size: 24px;
+        }
+
+        #room-number-header {
+            font-size: 16px;
+        }
+
+        #teacher-room-header {
+            float: right;
+            width: 33%;
+            text-align: right;
+        }
+
+        #teacher-room-header span {
+            display: block;
+        }
+
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+
+        .main-section {
+            background-color: white;
+            color: black;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            width: 90%;
+            max-width: 600px;
+            margin: 40px auto;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .main-section input, .main-section select {
+            width: 80%;
+            font-size: 20px;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        .main-section button {
+            width: 40%;
+            margin: 0 10px;
+            padding: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+        }
+
+        #go-button {
+            background-color: green;
+            color: white;
+        }
+
+        #back-button {
+            background-color: red;
+            color: white;
+        }
+
+        .footer-buttons {
+            display: flex;
+            justify-content: space-between;
+            width: 90%;
+            max-width: 600px;
+            margin: 40px auto;
+        }
+
+        .footer-buttons button {
+            background-color: blue;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 20px;
+            width: 45%;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            width: 90%;
+            max-width: 800px;
+            height: 80%;
+            overflow-y: auto;
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+        }
+
+        .modal .card {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 20px;
+            align-items: center;
+        }
+
+        .card-content label {
+            text-align: left;
+            margin-right: 5px;
+            font-size: 14px;
+        }
+
+        .card-content input,
+        .card-content select {
+            width: 100%;
+            padding: 5px;
+            font-size: 14px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        .card-content .full-width {
+            grid-column: span 2;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table th, table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #f4f4f9;
+            cursor: pointer;
+        }
+
+        #student-list {
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .input-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-group input {
+            width: 60%;
+        }
+
+        .input-group select {
+            width: 30%;
+            font-size: 16px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        #warning-message {
+            color: red;
+            font-weight: bold;
+            font-size: 16px;
+            margin: 10px auto;
+            text-align: center;
+            display: none;
+        }
+
+        /* Additional Styles for Accessibility and Responsiveness */
+        @media screen and (max-width: 600px) {
+            .main-section input, .main-section select, .main-section button {
+                width: 100%;
+            }
+
+            .footer-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .footer-buttons button {
+                width: 80%;
+                margin-bottom: 10px;
+            }
+
+            .card-content {
+                grid-template-columns: 1fr;
+            }
+
+            .card-content label {
+                text-align: left;
+                margin-right: 0;
+            }
+        }
+
+        /* Editable Table Styles */
+        .editable td[contenteditable="true"] {
+            background-color: #eaf2ff;
+            border: 1px solid #a0c4ff;
+        }
+
+        .edit-controls {
+            margin-bottom: 10px;
+            text-align: right;
+        }
+
+        .edit-controls button {
+            background-color: #007bff;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+
+        .edit-controls button:hover {
+            opacity: 0.9;
+        }
+
+        .delete-button {
+            background-color: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .filter-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .filter-controls label {
+            margin-right: 5px;
+        }
+
+        .history-buttons {
+            text-align: right;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .student-list-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .student-list-controls input {
+            width: 200px;
+            padding: 5px;
+        }
+
+        .student-list-controls button {
+            background-color: #007bff;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .currently-out-table th:nth-child(2),
+        .currently-out-table td:nth-child(2) {
+            width: 30%;
+            font-weight: bold;
+            color: blue;
+        }
+
+        #currently-out-table-body td:nth-child(4) {
+            width: 150px;
+        }
+
+        #close-settings {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <div class="header clearfix">
+        <span id="school-name-header">Example School</span>
+        <span id="app-title">
+            <span id="app-title-text">Hallway Tracker</span>
+            <span id="room-number-header">Room: 101</span>
+        </span>
+        <span id="teacher-room-header">
+            <span id="teacher-name-header">Teacher</span>
+        </span>
+    </div>
+
+    <!-- Main Section -->
+    <div class="main-section">
+        <div class="input-group">
+            <input type="text" id="student-id" placeholder="Enter Student ID">
+            <select id="reason">
+                <option value="Restroom" selected>Restroom</option>
+                <option value="Water/locker">Water/locker</option>
+                <option value="Nurse">Nurse</option>
+                <option value="Office">Office</option>
+            </select>
+        </div>
+        <button id="go-button">GO</button>
+        <button id="back-button">I'm Back</button>
+    </div>
+
+    <!-- Warning Message -->
+    <p id="warning-message"></p>
+
+    <!-- Currently Out Section -->
+    <div class="main-section">
+        <h3>Currently Out</h3>
+        <table class="currently-out-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Name</th>
+                    <th>Grade</th>
+                    <th>Class</th>
+                    <th>Time Out</th>
+                    <th>Duration</th>
+                    <th>Reason</th>
+                </tr>
+            </thead>
+            <tbody id="currently-out-table-body"></tbody>
+        </table>
+    </div>
+
+    <div class="footer-buttons">
+        <button id="settings-button">Settings</button>
+        <button id="history-button">History</button>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <h2>Settings</h2>
+        <button id="close-settings" style="margin-top: 10px;">Close</button>
+
+        <!-- School Details Card -->
+        <div class="card">
+            <h3>School Details</h3>
+            <div class="card-content">
+                <label for="school-name">School Name:</label>
+                <input type="text" id="school-name" placeholder="School Name">
+                <label for="app-title-input">App Title:</label>
+                <input type="text" id="app-title-input" placeholder="App Title">
+                <label for="teacher-name">Teacher Name:</label>
+                <input type="text" id="teacher-name" placeholder="Teacher Name">
+                <label for="room-number">Room Number:</label>
+                <input type="text" id="room-number" placeholder="Room Number">
+            </div>
+        </div>
+
+        <!-- Limit Hallway Access Card -->
+        <div class="card">
+            <h3>Limit Hallway Access</h3>
+            <div class="card-content">
+                <label for="limit-go">Do you want to limit GO?</label>
+                <input type="checkbox" id="limit-go">
+            </div>
+            <div id="limit-go-section" style="display: none;">
+                <div id="limit-period-section" class="card-content">
+                    <label for="limit-period">Limit Period:</label>
+                    <select id="limit-period">
+                        <option value="">Choose Period</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="date-range">Date Range</option>
+                    </select>
+                </div>
+
+                <!-- Weekly Options Section -->
+                <div id="weekly-text-section" class="card-content" style="display: none;">
+                    <label>Max Visits:</label>
+                    <input type="number" id="max-visits" placeholder="times" min="1">
+                    <label>time(s) in</label>
+                    <input type="number" id="weekly-weeks" placeholder="weeks" min="1">
+                    <label>Week(s)</label>
+                </div>
+
+                <!-- Date Range Options Section -->
+                <div id="date-range-section" class="card-content" style="display: none;">
+                    <label for="start-date">Start Date:</label>
+                    <input type="date" id="start-date">
+                    <label for="end-date">End Date:</label>
+                    <input type="date" id="end-date">
+                    <label for="max-visits-date-range">Max Visits:</label>
+                    <input type="number" id="max-visits-date-range" placeholder="times" min="1">
+                </div>
+            </div>
+        </div>
+
+        <!-- Student List Card -->
+        <div class="card">
+            <h3>Student List</h3>
+            <div class="edit-controls">
+                <button id="toggle-student-list">Show Student List</button>
+                <button id="edit-student-list" style="display: none;">Edit</button>
+                <button id="save-student-list" style="display: none;">Save</button>
+                <button id="clear-student-list" style="display: none;">Clear List</button>
+            </div>
+            <div id="student-list" style="display: none;">
+                <div class="student-list-controls">
+                    <input type="text" id="student-filter" placeholder="Filter by Name or ID">
+                </div>
+                <table id="student-table">
+                    <thead>
+                        <tr>
+                            <th data-column="id">Student ID</th>
+                            <th data-column="firstName">First Name</th>
+                            <th data-column="lastName">Last Name</th>
+                            <th data-column="grade">Grade</th>
+                            <th data-column="classSection">Class</th>
+                            <th id="actions-header" style="display: none;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="student-list-body">
+                        <!-- Student data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Upload or Copy Student Data Card -->
+        <div class="card">
+            <h3>Upload or Copy Student Data</h3>
+            <div class="card-content full-width">
+                <button id="copy-paste-option">Copy-Paste</button>
+                <button id="upload-option">Upload File</button>
+            </div>
+            <div id="copy-paste-area" style="display: none;">
+                <textarea id="student-data-input" rows="10" style="width: 100%;">Copy and paste student list here in this format:
+Last Name	First Name	Student Number	Grade	Homeroom Code
+                </textarea>
+                <button id="process-paste-data">Process Data</button>
+            </div>
+            <div id="upload-area" style="display: none;">
+                <input type="file" id="file-upload" accept=".csv, .xls, .xlsx">
+            </div>
+        </div>
+
+    </div>
+
+    <!-- History Modal -->
+    <div id="history-modal" class="modal">
+        <h2>History</h2>
+        <button id="close-history" style="position: absolute; top: 10px; right: 10px;">Close</button>
+        <div class="history-buttons">
+            <button id="export-excel">Export to CSV</button>
+            <label style="display: flex; align-items: center;">
+                <input type="checkbox" id="auto-export" style="margin-right: 5px;">
+                Auto Export
+            </label>
+            <button id="copy-data">Copy</button>
+            <button id="toggle-filters">Filter</button>
+        </div>
+        <!-- Filter controls, initially hidden -->
+        <div id="filter-controls" class="filter-controls" style="display: none;">
+            <label for="history-start-date">Start Date:</label>
+            <input type="date" id="history-start-date">
+            <label for="history-end-date">End Date:</label>
+            <input type="date" id="history-end-date">
+            <label for="history-class-section">Class Section:</label>
+            <input type="text" id="history-class-section" placeholder="e.g., 6A">
+            <label for="history-grade">Grade:</label>
+            <input type="text" id="history-grade" placeholder="e.g., 06">
+            <button id="apply-filters">Apply Filters</button>
+            <button id="clear-filters">Clear Filters</button>
+        </div>
+        <table id="history-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Name</th>
+                    <th>Grade</th>
+                    <th>Class</th>
+                    <th>Time Out</th>
+                    <th>Time In</th>
+                    <th>Duration</th>
+                    <th>Reason</th>
+                </tr>
+            </thead>
+            <tbody id="history-table-body"></tbody>
+        </table>
+    </div>
+
+    <div id="overlay"></div>
+
+    <!-- JavaScript Code -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let isEditing = false;
+            const settingsButton = document.getElementById("settings-button");
+            const historyButton = document.getElementById("history-button");
+            const settingsModal = document.getElementById("settings-modal");
+            const historyModal = document.getElementById("history-modal");
+            const overlay = document.getElementById("overlay");
+            const closeSettings = document.getElementById("close-settings");
+            const closeHistory = document.getElementById("close-history");
+            const limitGoCheckbox = document.getElementById("limit-go");
+            const limitGoSection = document.getElementById("limit-go-section");
+            const limitPeriod = document.getElementById("limit-period");
+            const weeklyWeeks = document.getElementById("weekly-weeks");
+            const weeklyTextSection = document.getElementById("weekly-text-section");
+            const dateRangeSection = document.getElementById("date-range-section");
+            const startDateInput = document.getElementById("start-date");
+            const endDateInput = document.getElementById("end-date");
+            const maxVisits = document.getElementById("max-visits");
+            const maxVisitsDateRange = document.getElementById("max-visits-date-range");
+            const toggleStudentList = document.getElementById("toggle-student-list");
+            const studentList = document.getElementById("student-list");
+            const studentListBody = document.getElementById("student-list-body");
+            const editStudentListButton = document.getElementById("edit-student-list");
+            const saveStudentListButton = document.getElementById("save-student-list");
+            const clearStudentListButton = document.getElementById("clear-student-list");
+            const studentTable = document.getElementById("student-table");
+            const goButton = document.getElementById("go-button");
+            const backButton = document.getElementById("back-button");
+            const studentIdInput = document.getElementById("student-id");
+            const reasonSelect = document.getElementById("reason");
+            const currentlyOutTableBody = document.getElementById("currently-out-table-body");
+            const historyTableBody = document.getElementById("history-table-body");
+            const exportExcelButton = document.getElementById("export-excel");
+            const copyDataButton = document.getElementById("copy-data");
+            const applyFiltersButton = document.getElementById("apply-filters");
+            const historyStartDate = document.getElementById("history-start-date");
+            const historyEndDate = document.getElementById("history-end-date");
+            const historyClassSection = document.getElementById("history-class-section");
+            const historyGrade = document.getElementById("history-grade");
+            const toggleFiltersButton = document.getElementById("toggle-filters");
+            const filterControls = document.getElementById("filter-controls");
+            const clearFiltersButton = document.getElementById("clear-filters");
+            const studentFilterInput = document.getElementById("student-filter");
+            const actionsHeader = document.getElementById("actions-header");
+
+            const copyPasteOption = document.getElementById("copy-paste-option");
+            const uploadOption = document.getElementById("upload-option");
+            const copyPasteArea = document.getElementById("copy-paste-area");
+            const uploadArea = document.getElementById("upload-area");
+            const studentDataInput = document.getElementById("student-data-input");
+            const processPasteData = document.getElementById("process-paste-data");
+            const fileUpload = document.getElementById("file-upload");
+
+            const schoolNameHeader = document.getElementById("school-name-header");
+            const appTitleText = document.getElementById("app-title-text");
+            const teacherNameHeader = document.getElementById("teacher-name-header");
+            const roomNumberHeader = document.getElementById("room-number-header");
+            const schoolNameInput = document.getElementById("school-name");
+            const appTitleInput = document.getElementById("app-title-input");
+            const teacherNameInput = document.getElementById("teacher-name");
+            const roomNumberInput = document.getElementById("room-number");
+
+            const warningMessage = document.getElementById("warning-message");
+
+            const autoExportCheckbox = document.getElementById("auto-export");
+
+            const students = JSON.parse(localStorage.getItem("students")) || [];
+
+            const currentlyOut = [];
+            const history = JSON.parse(localStorage.getItem("history")) || [];
+
+            function loadSettings() {
+                const schoolName = localStorage.getItem("schoolName") || "Example School";
+                const appTitle = localStorage.getItem("appTitle") || "Hallway Tracker";
+                const teacherName = localStorage.getItem("teacherName") || "Teacher";
+                const roomNumber = localStorage.getItem("roomNumber") || "101";
+                const limitGo = localStorage.getItem("limitGo") === "true";
+                const maxVisitsValue = localStorage.getItem("maxVisits") || "";
+                const maxVisitsDateRangeValue = localStorage.getItem("maxVisitsDateRange") || "";
+                const limitPeriodValue = localStorage.getItem("limitPeriod") || "";
+                const weeklyWeeksValue = localStorage.getItem("weeklyWeeks") || "";
+                const startDateValue = localStorage.getItem("startDate") || "";
+                const endDateValue = localStorage.getItem("endDate") || "";
+
+                const autoExport = localStorage.getItem("autoExport") === "true";
+
+                schoolNameInput.value = schoolName;
+                appTitleInput.value = appTitle;
+                teacherNameInput.value = teacherName;
+                roomNumberInput.value = roomNumber;
+                limitGoCheckbox.checked = limitGo;
+                maxVisits.value = maxVisitsValue;
+                maxVisitsDateRange.value = maxVisitsDateRangeValue;
+                limitPeriod.value = limitPeriodValue;
+                weeklyWeeks.value = weeklyWeeksValue;
+                startDateInput.value = startDateValue;
+                endDateInput.value = endDateValue;
+
+                autoExportCheckbox.checked = autoExport;
+
+                schoolNameHeader.textContent = schoolName;
+                appTitleText.textContent = appTitle;
+                teacherNameHeader.textContent = teacherName;
+                roomNumberHeader.textContent = `Room: ${roomNumber}`;
+
+                limitGoSection.style.display = limitGo ? "block" : "none";
+                if (limitPeriodValue === "weekly") {
+                    weeklyTextSection.style.display = "block";
+                    dateRangeSection.style.display = "none";
+                } else if (limitPeriodValue === "date-range") {
+                    weeklyTextSection.style.display = "none";
+                    dateRangeSection.style.display = "block";
+                } else {
+                    weeklyTextSection.style.display = "none";
+                    dateRangeSection.style.display = "none";
+                }
+            }
+
+            function saveSettings() {
+                localStorage.setItem("schoolName", schoolNameInput.value);
+                localStorage.setItem("appTitle", appTitleInput.value);
+                localStorage.setItem("teacherName", teacherNameInput.value);
+                localStorage.setItem("roomNumber", roomNumberInput.value);
+                localStorage.setItem("limitGo", limitGoCheckbox.checked);
+                localStorage.setItem("maxVisits", maxVisits.value);
+                localStorage.setItem("maxVisitsDateRange", maxVisitsDateRange.value);
+                localStorage.setItem("limitPeriod", limitPeriod.value);
+                localStorage.setItem("weeklyWeeks", weeklyWeeks.value);
+                localStorage.setItem("startDate", startDateInput.value);
+                localStorage.setItem("endDate", endDateInput.value);
+
+                localStorage.setItem("autoExport", autoExportCheckbox.checked);
+
+                loadSettings();
+            }
+
+            function loadStudentData() {
+                const savedStudents = JSON.parse(localStorage.getItem("students"));
+                if (savedStudents && Array.isArray(savedStudents)) {
+                    students.length = 0;
+                    students.push(...savedStudents);
+                } else {
+                    saveStudentData();
+                }
+            }
+
+            function saveStudentData() {
+                localStorage.setItem("students", JSON.stringify(students));
+            }
+
+            loadSettings();
+            loadStudentData();
+            renderHistory();
+
+            closeSettings.addEventListener("click", () => {
+                saveSettings();
+                settingsModal.style.display = "none";
+                overlay.style.display = "none";
+                // Hide Delete buttons after saving
+                actionsHeader.style.display = "none";
+                isEditing = false;
+                renderStudentList();
+            });
+
+            if (limitGoCheckbox) {
+                limitGoCheckbox.addEventListener("change", () => {
+                    const isEnabled = limitGoCheckbox.checked;
+                    limitGoSection.style.display = isEnabled ? "block" : "none";
+                    document.getElementById("limit-period-section").style.display = isEnabled ? "block" : "none";
+
+                    if (!isEnabled) {
+                        weeklyTextSection.style.display = "none";
+                        dateRangeSection.style.display = "none";
+                        limitPeriod.value = "";
+                    }
+                });
+            }
+
+            if (limitPeriod) {
+                limitPeriod.addEventListener("change", () => {
+                    const selectedValue = limitPeriod.value;
+                    weeklyTextSection.style.display = selectedValue === "weekly" ? "block" : "none";
+                    dateRangeSection.style.display = selectedValue === "date-range" ? "block" : "none";
+                });
+            }
+
+            function hasExceededLimit(studentId) {
+                const limitGo = limitGoCheckbox.checked;
+                if (!limitGo) return false;
+
+                const limitPeriodValue = limitPeriod.value;
+                const now = new Date();
+                let visits = 0;
+                let maxVisitsValue = 0;
+
+                if (limitPeriodValue === "weekly") {
+                    const weeks = parseInt(weeklyWeeks.value) || 1;
+                    maxVisitsValue = parseInt(maxVisits.value) || 1;
+                    const startLimitDate = new Date(now);
+                    startLimitDate.setDate(startLimitDate.getDate() - (weeks * 7));
+
+                    visits = history.filter(record => record.id === studentId && record.reason === "Restroom" && new Date(record.date) >= startLimitDate).length;
+                } else if (limitPeriodValue === "date-range") {
+                    const startLimitDate = new Date(startDateInput.value);
+                    const endLimitDate = new Date(endDateInput.value);
+                    endLimitDate.setHours(23, 59, 59, 999);
+                    maxVisitsValue = parseInt(maxVisitsDateRange.value) || 1;
+
+                    visits = history.filter(record => record.id === studentId && record.reason === "Restroom" && new Date(record.date) >= startLimitDate && new Date(record.date) <= endLimitDate).length;
+                }
+
+                return visits >= maxVisitsValue;
+            }
+
+            copyPasteOption.addEventListener("click", () => {
+                copyPasteArea.style.display = "block";
+                uploadArea.style.display = "none";
+            });
+
+            uploadOption.addEventListener("click", () => {
+                uploadArea.style.display = "block";
+                copyPasteArea.style.display = "none";
+            });
+
+            let isStudentDataInputClicked = false;
+            studentDataInput.addEventListener("focus", () => {
+                if (!isStudentDataInputClicked) {
+                    studentDataInput.value = "";
+                    isStudentDataInputClicked = true;
+                }
+            });
+
+            processPasteData.addEventListener("click", () => {
+                const data = studentDataInput.value.trim().split("\n");
+                if (data.length > 0) {
+                    const header = data[0].split(/[\t,]+/).map(s => s.trim());
+                    const headerMap = {
+                        'Student Number': 'id',
+                        'First Name': 'firstName',
+                        'Last Name': 'lastName',
+                        'Homeroom Code': 'classSection',
+                        'Grade': 'grade'
+                    };
+
+                    data.shift(); // Remove header
+                    const newStudents = data.map(line => {
+                        const values = line.split(/[\t,]+/).map(s => s.trim());
+                        const student = {};
+                        values.forEach((value, index) => {
+                            const key = headerMap[header[index]];
+                            if (key) {
+                                student[key] = value;
+                            }
+                        });
+                        return student;
+                    });
+
+                    const duplicateIds = [];
+                    newStudents.forEach(newStudent => {
+                        if (students.some(s => s.id === newStudent.id)) {
+                            duplicateIds.push(newStudent.id);
+                        } else {
+                            students.push(newStudent);
+                        }
+                    });
+
+                    if (duplicateIds.length > 0) {
+                        alert(`The following IDs are duplicates and were not added: ${duplicateIds.join(", ")}`);
+                    }
+
+                    saveStudentData();
+                    renderStudentList();
+                    studentDataInput.value = "";
+                    isStudentDataInputClicked = false;
+                    alert("Student data processed and saved successfully.");
+                } else {
+                    alert("No data found.");
+                }
+            });
+
+            fileUpload.addEventListener("change", (event) => {
+                const file = event.target.files[0];
+                const reader = new FileReader();
+                if (file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) {
+                    reader.onload = (e) => {
+                        const data = e.target.result;
+                        const workbook = XLSX.read(data, { type: 'binary' });
+                        const firstSheetName = workbook.SheetNames[0];
+                        const worksheet = workbook.Sheets[firstSheetName];
+                        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+                        processStudentData(jsonData);
+                    };
+                    reader.readAsBinaryString(file);
+                } else if (file.name.endsWith('.csv')) {
+                    reader.onload = (e) => {
+                        const csvData = e.target.result;
+                        const allTextLines = csvData.trim().split(/\r\n|\n/);
+                        const jsonData = allTextLines.map(line => line.split(/[\t,]+/));
+                        processStudentData(jsonData);
+                    };
+                    reader.readAsText(file);
+                } else {
+                    alert("Unsupported file format. Please upload a CSV, XLS, or XLSX file.");
+                }
+            });
+
+            function processStudentData(data) {
+                if (data.length > 0) {
+                    const header = data[0];
+                    const headerMap = {
+                        'Student Number': 'id',
+                        'First Name': 'firstName',
+                        'Last Name': 'lastName',
+                        'Homeroom Code': 'classSection',
+                        'Grade': 'grade'
+                    };
+
+                    data.shift(); // Remove header
+                    const newStudents = data.map(values => {
+                        const student = {};
+                        values.forEach((value, index) => {
+                            const key = headerMap[header[index]];
+                            if (key) {
+                                student[key] = value.trim();
+                            }
+                        });
+                        return student;
+                    });
+
+                    const duplicateIds = [];
+                    newStudents.forEach(newStudent => {
+                        if (students.some(s => s.id === newStudent.id)) {
+                            duplicateIds.push(newStudent.id);
+                        } else {
+                            students.push(newStudent);
+                        }
+                    });
+
+                    if (duplicateIds.length > 0) {
+                        alert(`The following IDs are duplicates and were not added: ${duplicateIds.join(", ")}`);
+                    }
+
+                    saveStudentData();
+                    renderStudentList();
+                    alert("Student data uploaded and saved successfully.");
+                } else {
+                    alert("No data found in the file.");
+                }
+            }
+
+            let currentSortColumn = null;
+            let currentSortOrder = 'asc';
+
+            function renderStudentList() {
+                let filteredStudents = [...students];
+
+                const filterText = studentFilterInput.value.toLowerCase().trim();
+                if (filterText) {
+                    filteredStudents = filteredStudents.filter(student =>
+                        (student.id && student.id.toLowerCase().includes(filterText)) ||
+                        (student.firstName && student.firstName.toLowerCase().includes(filterText)) ||
+                        (student.lastName && student.lastName.toLowerCase().includes(filterText))
+                    );
+                }
+
+                if (currentSortColumn) {
+                    filteredStudents.sort((a, b) => {
+                        let valA = (a[currentSortColumn] || '').toLowerCase();
+                        let valB = (b[currentSortColumn] || '').toLowerCase();
+                        if (valA < valB) return currentSortOrder === 'asc' ? -1 : 1;
+                        if (valA > valB) return currentSortOrder === 'asc' ? 1 : -1;
+                        return 0;
+                    });
+                }
+
+                studentListBody.innerHTML = filteredStudents.map((student, index) => `
+                    <tr>
+                        <td>${student.id || ''}</td>
+                        <td>${student.firstName || ''}</td>
+                        <td>${student.lastName || ''}</td>
+                        <td>${student.grade || ''}</td>
+                        <td>${student.classSection || ''}</td>
+                        <td style="display: ${isEditing ? 'table-cell' : 'none'};"><button class="delete-button" data-id="${student.id}">Delete</button></td>
+                    </tr>
+                `).join("");
+
+                if (isEditing) {
+                    const deleteButtons = studentListBody.querySelectorAll(".delete-button");
+                    deleteButtons.forEach(button => {
+                        button.addEventListener("click", (e) => {
+                            const id = e.target.getAttribute("data-id");
+                            deleteStudent(id);
+                        });
+                    });
+                }
+            }
+
+            function deleteStudent(id) {
+                if (confirm("Are you sure you want to delete this student?")) {
+                    const index = students.findIndex(s => s.id === id);
+                    if (index !== -1) {
+                        students.splice(index, 1);
+                        saveStudentData();
+                        renderStudentList();
+                    }
+                }
+            }
+
+            editStudentListButton.addEventListener("click", () => {
+                isEditing = !isEditing;
+                if (isEditing) {
+                    renderStudentList();
+                    makeTableEditable(true);
+                    editStudentListButton.textContent = "Cancel";
+                    saveStudentListButton.style.display = "inline-block";
+                    clearStudentListButton.style.display = "inline-block";
+                    actionsHeader.style.display = "table-cell";
+                } else {
+                    makeTableEditable(false);
+                    editStudentListButton.textContent = "Edit";
+                    saveStudentListButton.style.display = "none";
+                    clearStudentListButton.style.display = "none";
+                    actionsHeader.style.display = "none";
+                    renderStudentList();
+                }
+            });
+
+            saveStudentListButton.addEventListener("click", () => {
+                const rows = studentListBody.querySelectorAll("tr");
+                const tempStudents = [];
+                let duplicateIdFound = false;
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll("td");
+                    const id = cells[0].textContent.trim();
+                    const firstName = cells[1].textContent.trim();
+                    const lastName = cells[2].textContent.trim();
+                    const grade = cells[3].textContent.trim();
+                    const classSection = cells[4].textContent.trim();
+                    if (id && firstName && lastName) {
+                        if (tempStudents.some(s => s.id === id)) {
+                            duplicateIdFound = true;
+                        }
+                        tempStudents.push({ id, firstName, lastName, grade, classSection });
+                    }
+                });
+
+                if (duplicateIdFound) {
+                    alert("Duplicate Student IDs found. Please ensure all IDs are unique.");
+                    return;
+                }
+
+                students.length = 0;
+                students.push(...tempStudents);
+                saveStudentData();
+                makeTableEditable(false);
+                isEditing = false;
+                editStudentListButton.textContent = "Edit";
+                saveStudentListButton.style.display = "none";
+                clearStudentListButton.style.display = "none";
+                actionsHeader.style.display = "none";
+                renderStudentList();
+                alert("Student list updated successfully.");
+            });
+
+            clearStudentListButton.addEventListener("click", () => {
+                if (confirm("Are you sure you want to clear the entire student list?")) {
+                    students.length = 0;
+                    saveStudentData();
+                    renderStudentList();
+                    alert("Student list has been cleared.");
+                }
+            });
+
+            function makeTableEditable(editable) {
+                const rows = studentListBody.querySelectorAll("tr");
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll("td");
+                    for (let i = 0; i < cells.length - 1; i++) {
+                        const cell = cells[i];
+                        if (editable) {
+                            cell.contentEditable = "true";
+                        } else {
+                            cell.contentEditable = "false";
+                        }
+                    }
+                });
+                if (editable) {
+                    studentTable.classList.add("editable");
+                } else {
+                    studentTable.classList.remove("editable");
+                }
+            }
+
+            studentFilterInput.addEventListener("input", () => {
+                renderStudentList();
+            });
+
+            studentTable.querySelectorAll("th[data-column]").forEach(th => {
+                th.addEventListener("click", () => {
+                    const column = th.getAttribute("data-column");
+                    if (currentSortColumn === column) {
+                        currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        currentSortColumn = column;
+                        currentSortOrder = 'asc';
+                    }
+                    renderStudentList();
+                });
+            });
+
+            settingsButton.addEventListener("click", () => {
+                settingsModal.style.display = "block";
+                overlay.style.display = "block";
+            });
+
+            historyButton.addEventListener("click", () => {
+                renderHistory();
+                historyModal.style.display = "block";
+                overlay.style.display = "block";
+            });
+
+            closeHistory.addEventListener("click", () => {
+                historyModal.style.display = "none";
+                overlay.style.display = "none";
+            });
+
+            toggleStudentList.addEventListener("click", () => {
+                const isVisible = studentList.style.display === "block";
+                studentList.style.display = isVisible ? "none" : "block";
+                toggleStudentList.textContent = isVisible ? "Show Student List" : "Hide Student List";
+                editStudentListButton.style.display = isVisible ? "none" : "inline-block";
+                if (isVisible) {
+                    isEditing = false;
+                    makeTableEditable(false);
+                    editStudentListButton.textContent = "Edit";
+                    saveStudentListButton.style.display = "none";
+                    clearStudentListButton.style.display = "none";
+                    actionsHeader.style.display = "none";
+                }
+            });
+
+            function displayWarningMessage(message, color) {
+                warningMessage.textContent = message;
+                warningMessage.style.color = color;
+                warningMessage.style.fontWeight = "bold";
+                warningMessage.style.display = "block";
+
+                setTimeout(() => {
+                    warningMessage.style.display = "none";
+                }, 15000);
+            }
+
+            function startTimer(student) {
+                const timerElement = document.getElementById(`timer-${student.id}`);
+                const startTime = student.timeOut;
+
+                function updateTimer() {
+                    const now = Date.now();
+                    const durationMs = now - startTime;
+                    const durationMinutes = Math.floor(durationMs / 60000);
+                    const durationSeconds = Math.floor((durationMs % 60000) / 1000);
+                    timerElement.textContent = `${String(durationMinutes).padStart(2, '0')}:${String(durationSeconds).padStart(2, '0')}`;
+                }
+
+                updateTimer();
+                student.timerInterval = setInterval(updateTimer, 1000);
+            }
+
+            goButton.addEventListener("click", () => {
+                const studentId = studentIdInput.value.trim();
+                const reason = reasonSelect.value;
+
+                if (!studentId) {
+                    displayWarningMessage("Please enter a valid Student ID.", "red");
+                    return;
+                }
+
+                if (!reason) {
+                    displayWarningMessage("Please select a reason.", "red");
+                    return;
+                }
+
+                const student = students.find(s => s.id === studentId);
+                if (!student) {
+                    displayWarningMessage(`Student ID ${studentId} not found in the database.`, "red");
+                    return;
+                }
+
+                if (currentlyOut.find(s => s.id === studentId)) {
+                    displayWarningMessage(`${student.firstName} ${student.lastName} is already checked out.`, "red");
+                    return;
+                }
+
+                if (reason === "Restroom" && hasExceededLimit(studentId)) {
+                    displayWarningMessage(`${student.firstName} ${student.lastName} has exceeded the limit for restroom visits.`, "red");
+                    return;
+                }
+
+                const now = Date.now();
+                const newStudent = {
+                    id: student.id,
+                    name: `${student.firstName} ${student.lastName}`,
+                    grade: student.grade,
+                    classSection: student.classSection,
+                    timeOut: now,
+                    date: new Date(now).toLocaleDateString(),
+                    reason: reason,
+                    timerInterval: null
+                };
+                currentlyOut.push(newStudent);
+
+                renderCurrentlyOut();
+                startTimer(newStudent);
+                displayWarningMessage(`Success! ${student.firstName} ${student.lastName} has checked out for ${reason}.`, "green");
+                studentIdInput.value = "";
+            });
+
+            backButton.addEventListener("click", () => {
+                const studentId = studentIdInput.value.trim();
+                if (!studentId) {
+                    displayWarningMessage("Please enter a valid Student ID.", "red");
+                    return;
+                }
+
+                const studentIndex = currentlyOut.findIndex(s => s.id === studentId);
+                if (studentIndex === -1) {
+                    displayWarningMessage(`No record found for Student ID ${studentId}.`, "red");
+                    return;
+                }
+
+                const student = currentlyOut[studentIndex];
+                const now = Date.now();
+                const durationMs = now - student.timeOut;
+                const durationMinutes = Math.floor(durationMs / 60000);
+                const durationSeconds = Math.floor((durationMs % 60000) / 1000);
+
+                const timeOutFormatted = new Date(student.timeOut).toLocaleTimeString();
+                const timeInFormatted = new Date(now).toLocaleTimeString();
+
+                history.push({
+                    id: student.id,
+                    name: student.name,
+                    grade: student.grade,
+                    classSection: student.classSection,
+                    date: student.date,
+                    timeOut: timeOutFormatted,
+                    timeIn: timeInFormatted,
+                    duration: `${durationMinutes} min ${durationSeconds} sec`,
+                    reason: student.reason,
+                    timeStamp: student.timeOut
+                });
+
+                clearInterval(student.timerInterval);
+                currentlyOut.splice(studentIndex, 1);
+                renderCurrentlyOut();
+                renderHistory();
+                displayWarningMessage(`${student.name} has checked back in. Duration: ${durationMinutes} min ${durationSeconds} sec.`, "green");
+                studentIdInput.value = "";
+
+                localStorage.setItem("history", JSON.stringify(history));
+            });
+
+            function renderCurrentlyOut() {
+                currentlyOutTableBody.innerHTML = currentlyOut
+                    .map(student => `
+                        <tr>
+                            <td>${student.date}</td>
+                            <td>${student.name}</td>
+                            <td>${student.grade || ''}</td>
+                            <td>${student.classSection}</td>
+                            <td>${new Date(student.timeOut).toLocaleTimeString()}</td>
+                            <td id="timer-${student.id}">00:00</td>
+                            <td>${student.reason}</td>
+                        </tr>
+                    `)
+                    .join("");
+            }
+
+            function renderHistory() {
+                const filteredHistory = applyHistoryFilters();
+                filteredHistory.sort((a, b) => {
+                    const dateA = new Date(`${a.date} ${a.timeOut}`);
+                    const dateB = new Date(`${b.date} ${b.timeOut}`);
+                    return dateB - dateA;
+                });
+
+                historyTableBody.innerHTML = filteredHistory
+                    .map(record => `
+                        <tr>
+                            <td>${record.date}</td>
+                            <td>${record.name}</td>
+                            <td>${record.grade || ''}</td>
+                            <td>${record.classSection}</td>
+                            <td>${record.timeOut}</td>
+                            <td>${record.timeIn}</td>
+                            <td>${record.duration}</td>
+                            <td>${record.reason}</td>
+                        </tr>
+                    `)
+                    .join("");
+            }
+
+            function applyHistoryFilters() {
+                let filtered = [...history];
+                const startDate = new Date(historyStartDate.value);
+                const endDate = new Date(historyEndDate.value);
+                endDate.setHours(23, 59, 59, 999);
+                const classSectionFilter = historyClassSection.value.trim().toLowerCase();
+                const gradeFilter = historyGrade.value.trim().toLowerCase();
+
+                if (historyStartDate.value) {
+                    filtered = filtered.filter(record => new Date(`${record.date}`) >= startDate);
+                }
+
+                if (historyEndDate.value) {
+                    filtered = filtered.filter(record => new Date(`${record.date}`) <= endDate);
+                }
+
+                if (classSectionFilter) {
+                    filtered = filtered.filter(record => record.classSection.toLowerCase() === classSectionFilter);
+                }
+
+                if (gradeFilter) {
+                    filtered = filtered.filter(record => (record.grade || '').toLowerCase() === gradeFilter);
+                }
+
+                return filtered;
+            }
+
+            applyFiltersButton.addEventListener("click", () => {
+                renderHistory();
+            });
+
+            toggleFiltersButton.addEventListener("click", () => {
+                const isVisible = filterControls.style.display === "block";
+                filterControls.style.display = isVisible ? "none" : "block";
+                toggleFiltersButton.textContent = isVisible ? "Filter" : "Hide Filters";
+            });
+
+            clearFiltersButton.addEventListener("click", () => {
+                historyStartDate.value = "";
+                historyEndDate.value = "";
+                historyClassSection.value = "";
+                historyGrade.value = "";
+                renderHistory();
+                filterControls.style.display = "none";
+                toggleFiltersButton.textContent = "Filter";
+            });
+
+            exportExcelButton.addEventListener("click", () => {
+                const now = new Date();
+                const filename = `Hallway_Tracker_Export_${now.getMonth() + 1}.${now.getDate()}.${now.getFullYear()}_${now.getHours()}.${now.getMinutes()}.csv`;
+                exportTableToCSV("history-table", filename);
+            });
+
+            function exportTableToCSV(tableID, filename = '') {
+                const tableSelect = document.getElementById(tableID);
+                const rows = tableSelect.querySelectorAll('tr');
+                const csv = [];
+                rows.forEach(row => {
+                    const cols = row.querySelectorAll('td, th');
+                    const rowData = [];
+                    cols.forEach(col => {
+                        let data = col.innerText.replace(/"/g, '""');
+                        rowData.push(`"${data}"`);
+                    });
+                    csv.push(rowData.join(','));
+                });
+
+                const csvString = csv.join('\n');
+                const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+                const downloadLink = document.createElement("a");
+                const url = URL.createObjectURL(blob);
+                downloadLink.href = url;
+                downloadLink.download = filename;
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+            }
+
+            copyDataButton.addEventListener("click", () => {
+                const table = document.getElementById("history-table");
+                const range = document.createRange();
+                range.selectNode(table);
+                window.getSelection().removeAllRanges();
+                window.getSelection().addRange(range);
+                try {
+                    document.execCommand('copy');
+                    alert('History data copied to clipboard. You can paste it into an Excel file.');
+                } catch (err) {
+                    alert('Failed to copy data.');
+                }
+                window.getSelection().removeAllRanges();
+            });
+
+            autoExportCheckbox.addEventListener("change", () => {
+                saveSettings();
+            });
+
+            function scheduleAutoExport() {
+                const autoExport = localStorage.getItem("autoExport") === "true";
+                if (autoExport) {
+                    const now = new Date();
+                    let nextExportTime = new Date();
+
+                    // For daily export at 4:00 PM
+                    nextExportTime.setHours(16, 0, 0, 0);
+                    if (now >= nextExportTime) {
+                        nextExportTime.setDate(nextExportTime.getDate() + 1);
+                    }
+
+                    const timeUntilExport = nextExportTime - now;
+                    setTimeout(() => {
+                        const filename = `Hallway_Tracker_Export_${nextExportTime.getMonth() + 1}.${nextExportTime.getDate()}.${nextExportTime.getFullYear()}_${nextExportTime.getHours()}.${nextExportTime.getMinutes()}.csv`;
+                        exportTableToCSV("history-table", filename);
+                        scheduleAutoExport();
+                    }, timeUntilExport);
+                }
+            }
+
+            // Schedule auto export when the page loads
+            scheduleAutoExport();
+
+            renderStudentList();
+        });
+    </script>
+</body>
+</html>
