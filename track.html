@@ -331,6 +331,11 @@
             gap: 5px;
         }
 
+        .history-buttons select {
+            padding: 5px;
+            font-size: 14px;
+        }
+
         .student-list-controls {
             display: flex;
             justify-content: space-between;
@@ -366,6 +371,17 @@
             position: absolute;
             top: 10px;
             right: 10px;
+        }
+
+        /* Align checkboxes next to labels */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            margin-left: 5px;
         }
     </style>
 </head>
@@ -448,8 +464,10 @@
         <div class="card">
             <h3>Limit Hallway Access</h3>
             <div class="card-content">
-                <label for="limit-go">Do you want to limit GO?</label>
-                <input type="checkbox" id="limit-go">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="limit-go">
+                    <label for="limit-go">Do you want to limit GO?</label>
+                </div>
             </div>
             <div id="limit-go-section" style="display: none;">
                 <div id="limit-period-section" class="card-content">
@@ -531,6 +549,24 @@ Last Name	First Name	Student Number	Grade	Homeroom Code
             </div>
         </div>
 
+        <!-- Auto Export Settings Card -->
+        <div class="card">
+            <h3>Auto Export Settings</h3>
+            <div class="card-content">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="auto-export">
+                    <label for="auto-export">Auto Export</label>
+                </div>
+                <div id="auto-export-settings" style="display: none;">
+                    <label for="export-period">Export Period:</label>
+                    <select id="export-period">
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- History Modal -->
@@ -539,10 +575,6 @@ Last Name	First Name	Student Number	Grade	Homeroom Code
         <button id="close-history" style="position: absolute; top: 10px; right: 10px;">Close</button>
         <div class="history-buttons">
             <button id="export-excel">Export to CSV</button>
-            <label style="display: flex; align-items: center;">
-                <input type="checkbox" id="auto-export" style="margin-right: 5px;">
-                Auto Export
-            </label>
             <button id="copy-data">Copy</button>
             <button id="toggle-filters">Filter</button>
         </div>
@@ -646,8 +678,14 @@ Last Name	First Name	Student Number	Grade	Homeroom Code
             const warningMessage = document.getElementById("warning-message");
 
             const autoExportCheckbox = document.getElementById("auto-export");
+            const autoExportSettings = document.getElementById("auto-export-settings");
+            const exportPeriodSelect = document.getElementById("export-period");
 
-            const students = JSON.parse(localStorage.getItem("students")) || [];
+            let students = JSON.parse(localStorage.getItem("students")) || [
+                { id: "8064861", firstName: "Camille", lastName: "Aguilera", grade: "06", classSection: "6F" },
+                { id: "8003524", firstName: "Mercurio", lastName: "Alvarenga", grade: "06", classSection: "6C" },
+                { id: "8002502", firstName: "Genisis", lastName: "Arroyos", grade: "06", classSection: "6F" }
+            ];
 
             const currentlyOut = [];
             const history = JSON.parse(localStorage.getItem("history")) || [];
@@ -666,6 +704,7 @@ Last Name	First Name	Student Number	Grade	Homeroom Code
                 const endDateValue = localStorage.getItem("endDate") || "";
 
                 const autoExport = localStorage.getItem("autoExport") === "true";
+                const exportPeriod = localStorage.getItem("exportPeriod") || "daily";
 
                 schoolNameInput.value = schoolName;
                 appTitleInput.value = appTitle;
@@ -680,6 +719,7 @@ Last Name	First Name	Student Number	Grade	Homeroom Code
                 endDateInput.value = endDateValue;
 
                 autoExportCheckbox.checked = autoExport;
+                exportPeriodSelect.value = exportPeriod;
 
                 schoolNameHeader.textContent = schoolName;
                 appTitleText.textContent = appTitle;
@@ -697,6 +737,8 @@ Last Name	First Name	Student Number	Grade	Homeroom Code
                     weeklyTextSection.style.display = "none";
                     dateRangeSection.style.display = "none";
                 }
+
+                autoExportSettings.style.display = autoExport ? "block" : "none";
             }
 
             function saveSettings() {
@@ -713,6 +755,7 @@ Last Name	First Name	Student Number	Grade	Homeroom Code
                 localStorage.setItem("endDate", endDateInput.value);
 
                 localStorage.setItem("autoExport", autoExportCheckbox.checked);
+                localStorage.setItem("exportPeriod", exportPeriodSelect.value);
 
                 loadSettings();
             }
@@ -836,7 +879,7 @@ Last Name	First Name	Student Number	Grade	Homeroom Code
                             }
                         });
                         return student;
-                    });
+                    }).filter(student => Object.keys(student).length > 0);
 
                     const duplicateIds = [];
                     newStudents.forEach(newStudent => {
@@ -909,7 +952,7 @@ Last Name	First Name	Student Number	Grade	Homeroom Code
                             }
                         });
                         return student;
-                    });
+                    }).filter(student => Object.keys(student).length > 0);
 
                     const duplicateIds = [];
                     newStudents.forEach(newStudent => {
@@ -1378,26 +1421,42 @@ Last Name	First Name	Student Number	Grade	Homeroom Code
             });
 
             autoExportCheckbox.addEventListener("change", () => {
+                autoExportSettings.style.display = autoExportCheckbox.checked ? "block" : "none";
+                saveSettings();
+            });
+
+            exportPeriodSelect.addEventListener("change", () => {
                 saveSettings();
             });
 
             function scheduleAutoExport() {
                 const autoExport = localStorage.getItem("autoExport") === "true";
-                if (autoExport) {
+                const exportPeriod = localStorage.getItem("exportPeriod");
+
+                if (autoExport && exportPeriod) {
                     const now = new Date();
                     let nextExportTime = new Date();
 
-                    // For daily export at 4:00 PM
-                    nextExportTime.setHours(16, 0, 0, 0);
-                    if (now >= nextExportTime) {
-                        nextExportTime.setDate(nextExportTime.getDate() + 1);
+                    if (exportPeriod === "daily") {
+                        nextExportTime.setHours(16, 0, 0, 0); // 4:00 PM today
+                        if (now >= nextExportTime) {
+                            nextExportTime.setDate(nextExportTime.getDate() + 1); // Next day
+                        }
+                    } else if (exportPeriod === "weekly") {
+                        nextExportTime.setHours(13, 0, 0, 0); // 1:00 PM
+                        const dayOfWeek = now.getDay();
+                        const daysUntilFriday = (5 - dayOfWeek + 7) % 7;
+                        nextExportTime.setDate(nextExportTime.getDate() + daysUntilFriday);
+                        if (now >= nextExportTime) {
+                            nextExportTime.setDate(nextExportTime.getDate() + 7); // Next week
+                        }
                     }
 
                     const timeUntilExport = nextExportTime - now;
                     setTimeout(() => {
                         const filename = `Hallway_Tracker_Export_${nextExportTime.getMonth() + 1}.${nextExportTime.getDate()}.${nextExportTime.getFullYear()}_${nextExportTime.getHours()}.${nextExportTime.getMinutes()}.csv`;
                         exportTableToCSV("history-table", filename);
-                        scheduleAutoExport();
+                        scheduleAutoExport(); // Reschedule for next time
                     }, timeUntilExport);
                 }
             }
