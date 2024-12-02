@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hallway Tracker User Manual</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            max-width: 800px;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+        }
+        ul, ol {
+            margin-left: 20px;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 4px;
+            font-family: Consolas, monospace;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            overflow: auto;
+        }
+        a {
+            color: #0066cc;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hallway Tracker User Manual</h1>
+
+    <p>Welcome to the <strong>Hallway Tracker</strong> app—a comprehensive system designed to streamline student check-ins and check-outs in educational institutions. This manual provides detailed instructions on how to use the app effectively to manage student movements, maintain records, and configure settings according to your school's policies.</p>
+
+    <hr>
+
+    <h2>Table of Contents</h2>
+    <ol>
+        <li><a href="#introduction">Introduction</a></li>
+        <li><a href="#getting-started">Getting Started</a>
+            <ul>
+                <li><a href="#accessing-the-app">Accessing the App</a></li>
+                <li><a href="#initial-setup">Initial Setup</a></li>
+            </ul>
+        </li>
+        <li><a href="#main-features">Main Features</a>
+            <ul>
+                <li><a href="#student-check-inout">Student Check-In/Out</a></li>
+                <li><a href="#currently-out-list">Currently Out List</a></li>
+                <li><a href="#settings">Settings</a></li>
+                <li><a href="#history-tracking">History Tracking</a></li>
+            </ul>
+        </li>
+        <li><a href="#detailed-usage">Detailed Usage</a>
+            <ul>
+                <li><a href="#using-the-student-check-inout-system">Using the Student Check-In/Out System</a></li>
+                <li><a href="#managing-the-student-list">Managing the Student List</a></li>
+                <li><a href="#limiting-hallway-access">Limiting Hallway Access</a></li>
+                <li><a href="#exporting-data">Exporting Data</a></li>
+                <li><a href="#auto-export-settings">Auto Export Settings</a></li>
+            </ul>
+        </li>
+        <li><a href="#navigation">Navigation</a></li>
+        <li><a href="#troubleshooting">Troubleshooting</a></li>
+        <li><a href="#faqs">FAQs</a></li>
+        <li><a href="#support">Support</a></li>
+    </ol>
+
+    <hr>
+
+    <h2 id="introduction">Introduction</h2>
+    <p>The Hallway Tracker app is a web-based application that allows teachers and administrators to monitor and record student movements in and out of classrooms. It provides real-time tracking, maintains a history of student activities, and offers customizable settings to fit your institution's policies.</p>
+
+    <hr>
+
+    <h2 id="getting-started">Getting Started</h2>
+
+    <h3 id="accessing-the-app">Accessing the App</h3>
+    <p>To use the Hallway Tracker app, navigate to the following URL:</p>
+    <p><code>https://classbellschedule.com/track</code></p>
+
+    <h3 id="initial-setup">Initial Setup</h3>
+    <ol>
+        <li><strong>Open the App</strong>: Visit the URL provided above using a modern web browser (Chrome, Firefox, Edge, etc.).</li>
+        <li><strong>Configure Settings</strong>: Click on the <strong>Settings</strong> button to open the settings modal.</li>
+        <li><strong>Enter School Details</strong>:
+            <ul>
+                <li><strong>School Name</strong>: Enter the name of your school.</li>
+                <li><strong>App Title</strong>: Customize the app title if desired.</li>
+                <li><strong>Teacher Name</strong>: Input your name or the supervising teacher's name.</li>
+                <li><strong>Room Number</strong>: Specify the room number where the app is being used.</li>
+            </ul>
+        </li>
+        <li><strong>Manage Student List</strong>: Upload or enter your student data (explained in detail later).</li>
+        <li><strong>Save Settings</strong>: Click the <strong>Close</strong> button to save your settings.</li>
+    </ol>
+
+    <hr>
+
+    <h2 id="main-features">Main Features</h2>
+
+    <h3 id="student-check-inout">Student Check-In/Out</h3>
+    <ul>
+        <li><strong>Student ID Input</strong>: Allows students to enter their ID numbers.</li>
+        <li><strong>Reason Selection</strong>: Provides a dropdown menu for selecting the reason for leaving (e.g., Restroom, Nurse).</li>
+        <li><strong>GO Button</strong>: Checks the student out and starts the timer.</li>
+        <li><strong>I'm Back Button</strong>: Checks the student back in and stops the timer.</li>
+    </ul>
+
+    <h3 id="currently-out-list">Currently Out List</h3>
+    <ul>
+        <li>Displays a real-time list of students who are currently out of the classroom.</li>
+        <li>Shows details such as Name, Grade, Class, Time Out, Duration, and Reason.</li>
+    </ul>
+
+    <h3 id="settings">Settings</h3>
+    <ul>
+        <li><strong>School Details</strong>: Customize the app with your school's information.</li>
+        <li><strong>Limit Hallway Access</strong>: Set limits on how often students can leave the classroom.</li>
+        <li><strong>Student List Management</strong>: Upload, edit, and manage the list of students.</li>
+        <li><strong>Auto Export Settings</strong>: Configure automatic data export options.</li>
+    </ul>
+
+    <h3 id="history-tracking">History Tracking</h3>
+    <ul>
+        <li><strong>History Modal</strong>: Access a detailed history of all student movements.</li>
+        <li><strong>Filtering Options</strong>: Filter history by date range, class section, and grade.</li>
+        <li><strong>Export and Copy</strong>: Export history data to CSV or copy it for use in other applications.</li>
+    </ul>
+
+    <hr>
+
+    <h2 id="detailed-usage">Detailed Usage</h2>
+
+    <h3 id="using-the-student-check-inout-system">Using the Student Check-In/Out System</h3>
+
+    <ol>
+        <li><strong>Student Enters ID</strong>:
+            <ul>
+                <li>The student inputs their Student ID into the <strong>Enter Student ID</strong> field.</li>
+            </ul>
+        </li>
+        <li><strong>Select Reason</strong>:
+            <ul>
+                <li>From the <strong>Reason</strong> dropdown, select the appropriate reason for leaving.</li>
+            </ul>
+        </li>
+        <li><strong>Click GO</strong>:
+            <ul>
+                <li>Press the <strong>GO</strong> button to check out.</li>
+                <li>The system will display a success message and start the timer.</li>
+                <li>The student will appear in the <strong>Currently Out</strong> list.</li>
+            </ul>
+        </li>
+        <li><strong>Returning to Class</strong>:
+            <ul>
+                <li>Upon returning, the student re-enters their Student ID.</li>
+                <li>Click the <strong>I'm Back</strong> button to check back in.</li>
+                <li>The system records the time and removes the student from the <strong>Currently Out</strong> list.</li>
+            </ul>
+        </li>
+    </ol>
+
+    <p><strong>Note</strong>: If a student has exceeded the allowed number of visits (based on settings), the system will display a warning message.</p>
+
+    <h3 id="managing-the-student-list">Managing the Student List</h3>
+
+    <h4>Viewing the Student List</h4>
+    <ol>
+        <li><strong>Open Settings</strong>: Click on the <strong>Settings</strong> button.</li>
+        <li><strong>Show Student List</strong>: In the <strong>Student List</strong> card, click <strong>Show Student List</strong>.</li>
+        <li><strong>Search and Filter</strong>: Use the <strong>Filter by Name or ID</strong> field to search for students.</li>
+    </ol>
+
+    <h4>Editing the Student List</h4>
+    <ol>
+        <li><strong>Enter Edit Mode</strong>: Click on the <strong>Edit</strong> button.</li>
+        <li><strong>Modify Entries</strong>:
+            <ul>
+                <li>Click on any cell to edit the information.</li>
+                <li><strong>Delete</strong>: Use the <strong>Delete</strong> button next to a student to remove them.</li>
+            </ul>
+        </li>
+        <li><strong>Save Changes</strong>: Click on the <strong>Save</strong> button to apply changes.</li>
+        <li><strong>Cancel Editing</strong>: Click on <strong>Cancel</strong> to exit without saving.</li>
+    </ol>
+
+    <h4>Clearing the Student List</h4>
+    <p>While in <strong>Edit</strong> mode, click the <strong>Clear List</strong> button to remove all students. Confirm the action when prompted.</p>
+
+    <h4>Adding Students</h4>
+
+    <h5>Option 1: Copy-Paste Data</h5>
+    <ol>
+        <li><strong>Open Settings</strong>: Click on the <strong>Settings</strong> button.</li>
+        <li><strong>Copy-Paste Option</strong>: In the <strong>Upload or Copy Student Data</strong> card, click <strong>Copy-Paste</strong>.</li>
+        <li><strong>Enter Data</strong>:
+            <ul>
+                <li>Paste your student data into the textarea provided.</li>
+                <li>Use the format:</li>
+            </ul>
+            <pre>Last Name    First Name    Student Number    Grade    Homeroom Code</pre>
+        </li>
+        <li><strong>Process Data</strong>: Click <strong>Process Data</strong> to import the students.</li>
+    </ol>
+
+    <h5>Option 2: Upload File</h5>
+    <ol>
+        <li><strong>Open Settings</strong>: Click on the <strong>Settings</strong> button.</li>
+        <li><strong>Upload Option</strong>: In the <strong>Upload or Copy Student Data</strong> card, click <strong>Upload File</strong>.</li>
+        <li><strong>Select File</strong>:
+            <ul>
+                <li>Click on <strong>Choose File</strong> and select a CSV, XLS, or XLSX file.</li>
+                <li>Ensure the file contains the correct headers.</li>
+            </ul>
+        </li>
+        <li><strong>Import Data</strong>:
+            <ul>
+                <li>The app will process the file and import the students.</li>
+                <li>Any duplicates will be reported.</li>
+            </ul>
+        </li>
+    </ol>
+
+    <p><strong>Note</strong>: Always ensure your data is correctly formatted to prevent import errors.</p>
+
+    <h3 id="limiting-hallway-access">Limiting Hallway Access</h3>
+
+    <ol>
+        <li><strong>Open Settings</strong>: Click on the <strong>Settings</strong> button.</li>
+        <li><strong>Enable Limiting</strong>:
+            <ul>
+                <li>In the <strong>Limit Hallway Access</strong> card, check the <strong>Do you want to limit GO?</strong> checkbox.</li>
+            </ul>
+        </li>
+        <li><strong>Set Limit Period</strong>:
+            <ul>
+                <li>Choose between <strong>Weekly</strong> or <strong>Date Range</strong>.</li>
+            </ul>
+        </li>
+        <li><strong>Configure Limits</strong>:
+            <ul>
+                <li><strong>Weekly</strong>:
+                    <ul>
+                        <li><strong>Max Visits</strong>: Enter the maximum number of visits allowed.</li>
+                        <li><strong>Week(s)</strong>: Specify over how many weeks this limit applies.</li>
+                    </ul>
+                </li>
+                <li><strong>Date Range</strong>:
+                    <ul>
+                        <li><strong>Start Date</strong> and <strong>End Date</strong>: Set the date range.</li>
+                        <li><strong>Max Visits</strong>: Enter the maximum number of visits for the period.</li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        <li><strong>Save Settings</strong>: Click <strong>Close</strong> to apply the changes.</li>
+    </ol>
+
+    <p><strong>Behavior</strong>:</p>
+    <p>When a student attempts to check out, the app checks their history. If they've exceeded the limit, a warning message is displayed, and they cannot check out.</p>
+
+    <h3 id="exporting-data">Exporting Data</h3>
+
+    <h4>Manual Export</h4>
+    <ol>
+        <li><strong>Open History</strong>: Click on the <strong>History</strong> button.</li>
+        <li><strong>Export Data</strong>: Click <strong>Export to CSV</strong>.</li>
+        <li><strong>Download File</strong>:
+            <ul>
+                <li>The app will generate a CSV file with the current history data.</li>
+                <li>Save the file when prompted.</li>
+            </ul>
+        </li>
+    </ol>
+
+    <h4>Copying Data</h4>
+    <ol>
+        <li><strong>Open History</strong>: Click on the <strong>History</strong> button.</li>
+        <li><strong>Copy Data</strong>: Click <strong>Copy</strong>.</li>
+        <li><strong>Paste Data</strong>:
+            <ul>
+                <li>The history data is now copied to your clipboard.</li>
+                <li>You can paste it into Excel or another application.</li>
+            </ul>
+        </li>
+    </ol>
+
+    <h3 id="auto-export-settings">Auto Export Settings</h3>
+
+    <ol>
+        <li><strong>Open Settings</strong>: Click on the <strong>Settings</strong> button.</li>
+        <li><strong>Enable Auto Export</strong>:
+            <ul>
+                <li>In the <strong>Auto Export Settings</strong> card, check the <strong>Auto Export</strong> checkbox.</li>
+            </ul>
+        </li>
+        <li><strong>Set Export Period</strong>:
+            <ul>
+                <li>Choose between <strong>Daily</strong> or <strong>Weekly</strong>.</li>
+            </ul>
+        </li>
+        <li><strong>Save Settings</strong>: Click <strong>Close</strong> to apply.</li>
+    </ol>
+
+    <p><strong>Behavior</strong>:</p>
+    <ul>
+        <li><strong>Daily Export</strong>: The app will automatically export history data at 4:00 PM daily.</li>
+        <li><strong>Weekly Export</strong>: The app will export data at 1:00 PM every Friday.</li>
+        <li>The exported file will be saved with a timestamped filename.</li>
+    </ul>
+
+    <p><strong>Note</strong>: Auto export requires the app to be open in a browser to function.</p>
+
+    <hr>
+
+    <h2 id="navigation">Navigation</h2>
+
+    <ul>
+        <li><strong>Home Button</strong>: Returns you to the main page (<code>https://classbellschedule.com</code>).</li>
+        <li><strong>Settings Button</strong>: Opens the settings modal for configurations.</li>
+        <li><strong>History Button</strong>: Opens the history modal to view past records.</li>
+        <li><strong>Filter Controls</strong>:
+            <ul>
+                <li>Accessed via the <strong>Filter</strong> button in the history modal.</li>
+                <li>Allows you to filter history data by date, class section, and grade.</li>
+            </ul>
+        </li>
+    </ul>
+
+    <hr>
+
+    <h2 id="troubleshooting">Troubleshooting</h2>
+
+    <ul>
+        <li><strong>Student Not Found</strong>: If a student ID is not recognized, ensure the student is added to the student list.</li>
+        <li><strong>Exceeded Visit Limit</strong>: If a student cannot check out due to exceeding limits, review the settings or reset limits as needed.</li>
+        <li><strong>Import Errors</strong>:
+            <ul>
+                <li>Ensure your data is correctly formatted.</li>
+                <li>Remove any empty rows or invalid entries before importing.</li>
+            </ul>
+        </li>
+        <li><strong>Auto Export Not Working</strong>:
+            <ul>
+                <li>Confirm that the auto export setting is enabled.</li>
+                <li>Ensure the browser remains open for the scheduled export time.</li>
+            </ul>
+        </li>
+    </ul>
+
+    <hr>
+
+    <h2 id="faqs">FAQs</h2>
+
+    <p><strong>Q1: How do I add new students after the initial setup?</strong></p>
+    <p>A: Go to <strong>Settings</strong> > <strong>Student List</strong> > <strong>Upload or Copy Student Data</strong> and follow the steps to add more students.</p>
+
+    <p><strong>Q2: Can I edit a student's information after they've been added?</strong></p>
+    <p>A: Yes. In the <strong>Student List</strong>, click <strong>Edit</strong>, make the necessary changes, and then click <strong>Save</strong>.</p>
+
+    <p><strong>Q3: What happens if I clear the student list?</strong></p>
+    <p>A: All student data will be removed. You'll need to re-import or re-enter students to use the check-in/out system.</p>
+
+    <p><strong>Q4: How is the duration calculated for student outings?</strong></p>
+    <p>A: The duration is calculated from the time the student clicks <strong>GO</strong> to the time they click <strong>I'm Back</strong>.</p>
+
+    <p><strong>Q5: Can I customize the reasons for leaving?</strong></p>
+    <p>A: Currently, the reasons are predefined. Customization may be available in future updates.</p>
+
+    <hr>
+
+    <h2 id="support">Support</h2>
+
+    <p>For further assistance, please contact the administrator or visit our support page:</p>
+    <p><a href="https://classbellschedule.com/support">https://classbellschedule.com/support</a></p>
+
+    <hr>
+
+    <p>Thank you for using the Hallway Tracker app. We hope it enhances the management of student movements and contributes to a safer, more organized school environment.</p>
+
+</body>
+</html>
