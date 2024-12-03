@@ -9,6 +9,14 @@
   gtag('js', new Date());
 
   gtag('config', 'G-M2QXES4LKK');
+
+  // Heartbeat script to track engagement
+  setInterval(() => {
+    gtag('event', 'heartbeat', {
+      'event_category': 'engagement',
+      'event_label': 'page_still_open',
+    });
+  }, 300000); // Every 5 minutes
 </script>
 
     
