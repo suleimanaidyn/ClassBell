@@ -1621,5 +1621,36 @@
     // Initialize default mode as Timer with 5 minutes
     switchMode();
 </script>
+<script>
+  // Function to set a cookie
+  function setCookie(name, value, days) {
+    const date = new Date();
+    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000); // Convert days to milliseconds
+    const expires = "expires=" + date.toUTCString();
+    document.cookie = name + "=" + value + ";" + expires + ";path=/";
+  }
+
+  // Function to get a cookie by name
+  function getCookie(name) {
+    const nameEQ = name + "=";
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      let cookie = cookies[i].trim();
+      if (cookie.indexOf(nameEQ) === 0) return cookie.substring(nameEQ.length, cookie.length);
+    }
+    return null;
+  }
+
+  // Test setting a cookie
+  setCookie("test_cookie", "active", 7); // Set a cookie that lasts 7 days
+
+  // Check if the cookie is set
+  if (getCookie("test_cookie")) {
+    console.log("Cookies are enabled and working!");
+  } else {
+    console.log("Cookies are not working. Check browser settings.");
+  }
+</script>
+
 </body>
 </html>
