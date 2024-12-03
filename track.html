@@ -1527,5 +1527,63 @@ Last Name	First Name	Student Number	Grade	Homeroom Code
             renderStudentList();
         });
     </script>
+    <script>
+  let wakeLock = null;
+
+  // Request wake lock
+  async function requestWakeLock() {
+    try {
+      if ('wakeLock' in navigator) {
+        wakeLock = await navigator.wakeLock.request('screen');
+        console.log('Wake Lock is active');
+      } else {
+        console.log('Wake Lock API is not supported in this browser');
+      }
+    } catch (err) {
+      console.error('Failed to activate Wake Lock:', err);
+    }
+  }
+
+  // Release wake lock on visibility change
+  document.addEventListener('visibilitychange', async () => {
+    if (wakeLock !== null && document.visibilityState === 'visible') {
+      await requestWakeLock();
+    }
+  });
+
+  // Activate wake lock when the page loads
+  window.addEventListener('load', () => {
+    requestWakeLock();
+  });
+</script>
+// Function to set a cookie available on all pages
+function setCookie(name, value, days) {
+  const date = new Date();
+  date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000); // Convert days to milliseconds
+  const expires = "expires=" + date.toUTCString();
+  document.cookie = `${name}=${value}; ${expires}; path=/`; // Universal cookie path
+}
+
+// Function to get a cookie by name
+function getCookie(name) {
+  const nameEQ = name + "=";
+  const cookies = document.cookie.split(';');
+  for (let i = 0; i < cookies.length; i++) {
+    let cookie = cookies[i].trim();
+    if (cookie.indexOf(nameEQ) === 0) return cookie.substring(nameEQ.length, cookie.length);
+  }
+  return null;
+}
+
+// Test setting a cookie
+setCookie("test_cookie", "active", 7); // Set a cookie valid for 7 days
+
+// Check if the cookie is accessible
+if (getCookie("test_cookie")) {
+  console.log("Cookies are enabled and accessible on all pages!");
+} else {
+  console.log("Cookies are not working or not accessible.");
+}
+
 </body>
 </html>
