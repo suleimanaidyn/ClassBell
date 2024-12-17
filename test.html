@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speech to Chat</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    #chatBox { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; }
+    .message { margin: 5px 0; }
+    .user { color: blue; }
+    .bot { color: green; }
+    button { margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Speech to Chat Example</h1>
+
+  <!-- Chat Interface -->
+  <div id="chatBox"></div>
+  <button id="startButton">Start Talking</button>
+  <button id="stopButton" disabled>Stop</button>
+
+  <script>
+    const apiToken = "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"; // Replace with your OpenAI API Key
+    let recognition;
+    const chatBox = document.getElementById('chatBox');
+
+    // Append message to the chat
+    function appendMessage(sender, message) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${sender}`;
+      messageDiv.textContent = `${sender === 'user' ? 'You' : 'Bot'}: ${message}`;
+      chatBox.appendChild(messageDiv);
+      chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll
+    }
+
+    // Send message to OpenAI API
+    async function sendToOpenAI(message) {
+      try {
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${apiToken}`
+          },
+          body: JSON.stringify({
+            model: "gpt-3.5-turbo",
+            messages: [{ role: "user", content: message }]
+          })
+        });
+
+        const data = await response.json();
+        const botMessage = data.choices[0]?.message?.content || "No response from server.";
+        appendMessage('bot', botMessage);
+      } catch (error) {
+        console.error("Error communicating with OpenAI:", error);
+        appendMessage('bot', "Error: Unable to fetch a response.");
+      }
+    }
+
+    // Start Speech Recognition
+    document.getElementById('startButton').onclick = () => {
+      recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = "en-US";
+      recognition.interimResults = false;
+
+      recognition.start();
+      document.getElementById('startButton').disabled = true;
+      document.getElementById('stopButton').disabled = false;
+
+      appendMessage('bot', "Listening...");
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        appendMessage('user', transcript); // Display user's message
+        sendToOpenAI(transcript);          // Send to OpenAI API
+      };
+
+      recognition.onerror = (event) => {
+        console.error("Speech Recognition Error:", event);
+        appendMessage('bot', "Error recognizing speech. Please try again.");
+      };
+    };
+
+    // Stop Speech Recognition
+    document.getElementById('stopButton').onclick = () => {
+      if (recognition) {
+        recognition.stop();
+        document.getElementById('startButton').disabled = false;
+        document.getElementById('stopButton').disabled = true;
+        appendMessage('bot', "Stopped listening.");
+      }
+    };
+  </script>
+</body>
+</html>
