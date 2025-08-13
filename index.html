@@ -29,13 +29,13 @@
     #header-container{display:grid; grid-template-columns:.3fr 1fr .3fr; justify-items:center; align-items:center; padding:6px 8px; background:var(--header-bg); color:var(--header-fg)}
     #date,#time{font-size:1.5em; font-weight:400}
     #school-name{font-size:1.5em; font-weight:400; padding:5px; text-align:center; width:80%; cursor:pointer}
-    #time{font-size:1.5em; font-weight:800}
     #day{font-size:1.1em; font-weight:400}
 
     /* Table base */
     table{width:100%; border-collapse:collapse; table-layout:fixed; background:#fff}
     th,td{border:1px solid var(--border); padding:8px; text-align:center}
-    th{background:#ff9800; color:#fff; font-weight:400}
+    /* Force gray headers everywhere (single + all views) */
+    #singleHeader thead th, #schedule thead th, #multiWrapper table thead th{background:#6B7280 !important; color:#fff !important; font-weight:400}
 
     /* One-line CURRENT progress strip row */
     .current-row td{ padding:0; background:#fff; }
@@ -104,6 +104,9 @@
     #singleHeader{margin-top:4px}
     .campus-note{margin-top:8px; font-style:normal; color:#333; background:transparent; text-align:left; padding:0; border-radius:0; font-weight:400}
     .campus-note a{ color:#0645AD; text-decoration:underline; }
+    td.editable{cursor:text}
+    td[contenteditable="true"]{outline:2px solid #5bb98a; background:#f6fffa}
+    #school-name[contenteditable="true"]{outline:2px dashed #5bb98a; background:rgba(91,185,138,.12)}
   </style>
 </head>
 <body>
@@ -126,6 +129,9 @@
         <button class="lvlbtn" data-view="g3" aria-pressed="false" title="L3 = 8th, 11th & 12th">L3</button>
         <button class="lvlbtn" data-view="all" aria-pressed="false" title="Show all grade groups side-by-side">All</button>
         <button id="cafBtn" class="lvlbtn" aria-pressed="false" title="Show only lunch times">Enable Cafeteria</button>
+      </div>
+      <div id="rightControls" style="display:flex; gap:6px; align-items:center; margin-left:auto">
+        <button id="hideBreaksBtn" class="lvlbtn" aria-pressed="false" title="Hide transitions that have already passed">Hide Passed Breaks</button>
       </div>
       <div id="viewTitle" class="view-title"></div>
     </div>
@@ -154,6 +160,14 @@
       <option value="g2">7th & 10th (L2)</option>
       <option value="g3">8th, 11th & 12th (L3)</option>
     </select>
+    <div style="margin-top:8px">
+      <label><strong>Visible Grade Groups</strong></label>
+      <div style="display:flex; gap:10px; margin-top:6px">
+        <label><input type="checkbox" id="enabled-g1"> L1</label>
+        <label><input type="checkbox" id="enabled-g2"> L2</label>
+        <label><input type="checkbox" id="enabled-g3"> L3</label>
+      </div>
+    </div>
     <button onclick="saveSettings()">Save</button>
     <button onclick="closeSettings()">Close</button>
   </div>
@@ -196,6 +210,14 @@
 
   <script>
     /* ---------- Utilities ---------- */
+    const OV_KEY = 'mb_overrides_v1';
+    function timeToHHMM(d){ const h=d.getHours(); const m=d.getMinutes(); return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0'); }
+    function parseInputTime(str){ if(!str) return null; const s=str.trim().toUpperCase(); const m=s.match(/^(\d{1,2}):(\d{2})(?:\s*(AM|PM))?$/i); if(!m) return null; let h=parseInt(m[1],10); const mi=parseInt(m[2],10); const ap=m[3]; if(mi>59||h>23) return null; if(ap==='AM' && h===12) h=0; if(ap==='PM' && h<12) h+=12; return {h, m:mi}; }
+    function loadOverrides(){ try{ return JSON.parse(localStorage.getItem(OV_KEY)||'{}'); }catch(_){ return {}; } }
+    function saveOverrides(obj){ localStorage.setItem(OV_KEY, JSON.stringify(obj)); }
+    function saveOverride(dayKey, group, idx, patch){ const o=loadOverrides(); if(!o[dayKey]) o[dayKey]={}; if(!o[dayKey][group]) o[dayKey][group]={}; const cur=o[dayKey][group][idx]||{}; o[dayKey][group][idx] = {...cur, ...patch}; saveOverrides(o); }
+    function getDayKey(){ return isFriday() ? 'FRI' : 'MT'; }
+    function applyOverrides(full, group, dayKey){ const o=loadOverrides(); const map=(o[dayKey]&&o[dayKey][group])||{}; Object.keys(map).forEach(k=>{ const i=parseInt(k,10); if(Number.isNaN(i) || !full[i]) return; const p=map[k]; if(p.label) full[i].label=p.label; if(p.start){ const [h,mm]=p.start.split(':').map(Number); full[i].start=fmt(h,mm);} if(p.end){ const [h2,m2]=p.end.split(':').map(Number); full[i].end=fmt(h2,m2);} }); return full; }
     function fmt(h,m){ const d=new Date(); d.setHours(h,m,0,0); return d; }
     function parseTime(range){ const [H,M]=range.split(':').map(x=>parseInt(x,10)); return [H,M]; }
     function makeBlock(label, startHM, endHM){ const [sh,sm]=parseTime(startHM); const [eh,em]=parseTime(endHM); return { label, start: fmt(sh,sm), end: fmt(eh,em) }; }
@@ -268,22 +290,35 @@
     let currentGroup = localStorage.getItem('gradeGroup') || 'g1';
     let selectedView = localStorage.getItem('selectedView') || currentGroup; // 'g1'|'g2'|'g3'|'all'
     let cafOnly = (localStorage.getItem('cafOnly') === '1');
+    let hidePastBreaks = (localStorage.getItem('hidePastBreaks') === '1');
+    let isEditing = false;
+
+    const GROUP_TITLES = { g1:'6th Grade & Freshman', g2:'7th Grade & Sophomore', g3:'8th Grade, Junior & Senior' };
+    function getEnabledGroups(){
+      let obj; try{ obj = JSON.parse(localStorage.getItem('enabledGroups')||'{}'); }catch(_){ obj = {}; }
+      const defaults = {g1:true,g2:true,g3:true}; obj = { ...defaults, ...obj };
+      const list = Object.keys(defaults).filter(k => !!obj[k]);
+      return list.length ? list : ['g1'];
+    }
+    function setEnabledGroups(obj){ localStorage.setItem('enabledGroups', JSON.stringify(obj)); }
+    function isGroupEnabled(id){ return getEnabledGroups().includes(id); }
 
     function isFriday(){ return new Date().getDay() === 5; }
     function getTodaySchedule(group){ return isFriday() ? scheduleFri() : scheduleMT(group); }
 
     /* ---------- Cafeteria mode helpers ---------- */
-    function getLunchWindowsForToday(){
-      const groups=['g1','g2','g3'];
-      const wins=[];
-      groups.forEach(g=>{
-        const sched = getTodaySchedule(g);
+    function getLunchWindowsForToday(groups){
+      const gs = Array.isArray(groups) ? groups : getEnabledGroups();
+      const wins=[]; const dayKey=getDayKey();
+      gs.forEach(g=>{
+        let sched = getTodaySchedule(g); sched = applyOverrides(sched, g, dayKey);
         sched.forEach(b=>{ if(/Lunch/i.test(b.label)) wins.push({start:b.start, end:b.end, group:g, label:b.label}); });
       });
-      return wins; // array of time windows across all groups
+      return wins;
     }
     function overlapsLunch(block, windows){ return windows.some(w=> block.start < w.end && block.end > w.start ); }
     function filterByLunchWindows(blocks, windows){ return blocks.filter(b=> !/^Transition$/i.test(b.label) && overlapsLunch(b, windows)); }
+    function applyHidePastBreaks(blocks, nowVal){ const now = nowVal || new Date(); return hidePastBreaks ? blocks.filter(b=> !( /^Transition$/i.test(b.label) && b.end < now)) : blocks; }
 
     /* ---------- Header strip palette ---------- */
     function groupColor(group){ return group==='g1' ? '#1b6ef3' : (group==='g2' ? '#2e8b57' : '#6f42c1'); }
@@ -334,11 +369,9 @@
       strip.appendChild(fill); strip.appendChild(label); td.appendChild(strip); row.appendChild(td); return row;
     }
 
-    function renderRows(blocks, tbody, ctx){
-      const full = ctx || blocks;
+    function renderRows(blocks, tbody, full, groupId){
       const now=new Date();
-      const visible = blocks.filter(b=>!/^(Transition)$/i.test(b.label)); // hide transition rows
-      visible.forEach(b=>{
+      blocks.forEach(b=>{
         const isLunch = /Lunch/i.test(b.label);
         const isOngoing = now>=b.start && now<b.end;
         const isCompleted = now>=b.end;
@@ -350,40 +383,62 @@
         const remainingText = isOngoing ? (showSec ? `${rMin} min ${rSec.toString().padStart(2,'0')} sec` : `${rMin} min`) : (isCompleted ? 'Completed' : 'Upcoming');
         const tr=document.createElement('tr');
         tr.classList.add('data-row');
+        tr.dataset.index = String(full.indexOf(b));
+        tr.dataset.group = groupId || '';
         if(isLunch) tr.classList.add('lunch');
         if(isOngoing) tr.classList.add('upcoming');
         if(isCompleted) tr.classList.add('completed');
         tr.innerHTML = `
-          <td>${b.label}</td>
-          <td>${parseHM(b.start)}</td>
-          <td>${parseHM(b.end)}</td>
+          <td class="editable" title="Double-click to edit block name">${b.label}</td>
+          <td class="editable" title="Double-click to edit start time">${parseHM(b.start)}</td>
+          <td class="editable" title="Double-click to edit end time">${parseHM(b.end)}</td>
           <td>${remainingText}</td>`;
         tbody.appendChild(tr);
       });
     }
 
     function updateSchedule(){
+      if(isEditing) return; // pause live re-render while inline editing is active
       const singleHeader = document.getElementById('singleHeader');
       const table = document.getElementById('schedule');
       const multi = document.getElementById('multiWrapper');
       const vt = document.getElementById('viewTitle');
+
+      // Enabled groups and view safety
+      const enabled = getEnabledGroups();
+      if(['g1','g2','g3'].includes(selectedView) && !enabled.includes(selectedView)){
+        selectedView = enabled[0] || 'all'; localStorage.setItem('selectedView', selectedView);
+      }
+      if(['g1','g2','g3'].includes(currentGroup) && !enabled.includes(currentGroup)){
+        currentGroup = enabled[0] || 'g1'; localStorage.setItem('gradeGroup', currentGroup);
+      }
+
       // Dynamic page header per view
-      if(selectedView==='g1'){ vt.textContent='6th Grade & Freshman Bell Schedule'; vt.style.display='block'; }
-      else if(selectedView==='g2'){ vt.textContent='7th Grade & Sophomore Bell Schedule'; vt.style.display='block'; }
-      else if(selectedView==='g3'){ vt.textContent='8th Grade, Junior & Senior Bell Schedule'; vt.style.display='block'; }
+      if(selectedView==='g1'){ vt.textContent=GROUP_TITLES.g1 + ' Bell Schedule'; vt.style.display='block'; }
+      else if(selectedView==='g2'){ vt.textContent=GROUP_TITLES.g2 + ' Bell Schedule'; vt.style.display='block'; }
+      else if(selectedView==='g3'){ vt.textContent=GROUP_TITLES.g3 + ' Bell Schedule'; vt.style.display='block'; }
       else { vt.textContent=''; vt.style.display='none'; }
 
-      // Level button states
-      document.querySelectorAll('.lvlbtn').forEach(btn=>{
-        if(btn.id==='cafBtn') return;
-        btn.setAttribute('aria-pressed', btn.dataset.view===selectedView);
+      // Level button states & visibility
+      document.querySelectorAll('.lvlbtn[data-view]').forEach(btn=>{
+        const id = btn.getAttribute('data-view');
+        if(['g1','g2','g3'].includes(id)){
+          btn.style.display = enabled.includes(id) ? '' : 'none';
+          btn.setAttribute('aria-pressed', id===selectedView);
+        } else if(id==='all'){
+          btn.style.display = enabled.length>=1 ? '' : 'none';
+          btn.setAttribute('aria-pressed', selectedView==='all');
+        }
       });
       // Cafeteria toggle state
       const cafBtn = document.getElementById('cafBtn');
       cafBtn.setAttribute('aria-pressed', cafOnly);
       cafBtn.textContent = cafOnly ? 'Disable Cafeteria' : 'Enable Cafeteria';
+      const hbBtn = document.getElementById('hideBreaksBtn');
+      hbBtn.setAttribute('aria-pressed', hidePastBreaks);
+      hbBtn.textContent = hidePastBreaks ? 'Show Passed Breaks' : 'Hide Passed Breaks';
 
-      const lunchWindows = cafOnly ? getLunchWindowsForToday() : null;
+      const lunchWindows = cafOnly ? getLunchWindowsForToday(enabled) : null;
       const filterBlocks = (arr)=> cafOnly ? filterByLunchWindows(arr, lunchWindows) : arr;
 
       if(selectedView==='all'){
@@ -392,22 +447,18 @@
         multi.style.display='grid';
         multi.style.gridTemplateColumns='repeat(3, minmax(260px, 1fr))';
         multi.innerHTML='';
-        const groups=[
-          {id:'g1', title:'6th Grade & Freshman'},
-          {id:'g2', title:'7th Grade & Sophomore'},
-          {id:'g3', title:'8th Grade, Junior & Senior'}
-        ];
+        const groups = getEnabledGroups().map(id=>({id, title: GROUP_TITLES[id]}));
         groups.forEach(g=>{
           const card=document.createElement('div'); card.className='card'; card.setAttribute('data-group', g.id);
           const hdr=document.createElement('div'); hdr.className='card-header'; hdr.textContent=g.title;
           const tbl=document.createElement('table');
           tbl.innerHTML = `<thead><tr><th>Block</th><th>Start</th><th>End</th><th>Remaining</th></tr></thead>`;
           const tb=document.createElement('tbody');
-          const full = getTodaySchedule(g.id);
+          let full = getTodaySchedule(g.id); full = applyOverrides(full, g.id, getDayKey());
           // Insert current strip row first
           tb.appendChild(buildCurrentRow(full, g.id, 4));
-          const visible = filterBlocks(full);
-          renderRows(visible, tb, full);
+          const visible = applyHidePastBreaks(filterBlocks(full));
+          renderRows(visible, tb, full, g.id);
           tbl.appendChild(tb); card.appendChild(hdr); card.appendChild(tbl); multi.appendChild(card);
         });
       } else {
@@ -416,11 +467,11 @@
         multi.style.display='none';
         const tbody=table.querySelector('tbody');
         tbody.innerHTML='';
-        const full = getTodaySchedule(selectedView);
+        let full = getTodaySchedule(selectedView); full = applyOverrides(full, selectedView, getDayKey());
         // Insert current strip row first
         tbody.appendChild(buildCurrentRow(full, selectedView, 4));
-        const visible = filterBlocks(full);
-        renderRows(visible, tbody, full);
+        const visible = applyHidePastBreaks(filterBlocks(full));
+        renderRows(visible, tbody, full, selectedView);
       }
     }
 
@@ -431,10 +482,69 @@
       if(btn.id==='cafBtn'){
         cafOnly = !cafOnly; localStorage.setItem('cafOnly', cafOnly ? '1' : '0'); updateSchedule(); return;
       }
-      selectedView = btn.dataset.view; localStorage.setItem('selectedView', selectedView);
-      if(selectedView!=='all'){ currentGroup = selectedView; localStorage.setItem('gradeGroup', currentGroup); }
-      updateSchedule();
+      if(btn.id==='hideBreaksBtn'){
+        hidePastBreaks = !hidePastBreaks; localStorage.setItem('hidePastBreaks', hidePastBreaks ? '1' : '0'); updateSchedule(); return;
+      }
+      if(btn.dataset.view){
+        const id = btn.dataset.view;
+        if(['g1','g2','g3'].includes(id) && !isGroupEnabled(id)) return; // ignore disabled group buttons
+        selectedView = id; localStorage.setItem('selectedView', selectedView);
+        if(selectedView!=='all' && ['g1','g2','g3'].includes(selectedView)){
+          currentGroup = selectedView; localStorage.setItem('gradeGroup', currentGroup);
+        }
+        updateSchedule();
+      }
     });
+
+    // Double-click to edit school name, block label, and times (inline, no prompts)
+    function selectAll(el){ const r=document.createRange(); r.selectNodeContents(el); const s=window.getSelection(); s.removeAllRanges(); s.addRange(r); }
+    function commitCellEdit(td){
+      const tr = td.closest('tr'); if(!tr) return;
+      const idx = parseInt(tr.dataset.index,10); if(Number.isNaN(idx)) return;
+      const groupId = tr.dataset.group || (selectedView==='all' ? 'g1' : selectedView);
+      const dayKey = getDayKey();
+      let full = applyOverrides(getTodaySchedule(groupId), groupId, dayKey);
+      const blk = full[idx]; if(!blk) return;
+      const col = td.cellIndex;
+      const raw = td.textContent.trim();
+      if(col===0){ // label
+        if(raw){ saveOverride(dayKey, groupId, idx, {label:raw}); }
+      } else if(col===1 || col===2){
+        const t = parseInputTime(raw);
+        if(!t){ alert('Use H:MM or H:MM AM/PM'); td.textContent = col===1?parseHM(blk.start):parseHM(blk.end); return; }
+        const newD = fmt(t.h, t.m);
+        if(col===1 && newD>=blk.end){ alert('Start must be before end.'); td.textContent=parseHM(blk.start); return; }
+        if(col===2 && newD<=blk.start){ alert('End must be after start.'); td.textContent=parseHM(blk.end); return; }
+        const patch={}; patch[col===1?'start':'end']=timeToHHMM(newD);
+        saveOverride(dayKey, groupId, idx, patch);
+      }
+      isEditing=false; td.removeAttribute('contenteditable'); updateSchedule();
+    }
+
+    document.addEventListener('dblclick', (e)=>{
+      // School name inline edit
+      if(e.target.closest('#school-name')){
+        const sn=document.getElementById('school-name');
+        isEditing=true; sn.setAttribute('contenteditable','true'); sn.focus(); selectAll(sn);
+        const onBlur=()=>{ const val=sn.textContent.trim(); if(val){ localStorage.setItem('schoolName', val); } sn.removeAttribute('contenteditable'); isEditing=false; sn.removeEventListener('blur', onBlur); };
+        sn.addEventListener('blur', onBlur, {once:true});
+        return;
+      }
+      const td = e.target.closest('td.editable'); if(!td) return; const tr=td.closest('tr'); if(!tr || !tr.classList.contains('data-row')) return;
+      isEditing=true; td.setAttribute('contenteditable','true'); td.focus(); selectAll(td);
+    });
+
+    // Commit edits on Enter/Escape/blur
+    document.addEventListener('keydown', (e)=>{
+      const ed = e.target.closest('td[contenteditable="true"], #school-name[contenteditable="true"]');
+      if(!ed) return;
+      if(e.key==='Enter'){ e.preventDefault(); if(ed.id==='school-name'){ ed.blur(); } else { commitCellEdit(ed); } }
+      if(e.key==='Escape'){ e.preventDefault(); isEditing=false; ed.removeAttribute('contenteditable'); updateSchedule(); }
+    });
+    document.addEventListener('blur', (e)=>{
+      const td = e.target.closest('td[contenteditable="true"]');
+      if(!td) return; commitCellEdit(td);
+    }, true);
 
     /* ---------- Date/Time in header ---------- */
     function displayDateTime(){
@@ -453,14 +563,30 @@
     function openSettings(){
       document.getElementById('school-name-input').value = localStorage.getItem('schoolName') || '';
       document.getElementById('group-select').value = currentGroup;
+      const enabled = getEnabledGroups();
+      document.getElementById('enabled-g1').checked = enabled.includes('g1');
+      document.getElementById('enabled-g2').checked = enabled.includes('g2');
+      document.getElementById('enabled-g3').checked = enabled.includes('g3');
       document.getElementById('settings-panel').style.display='block';
     }
     function closeSettings(){ document.getElementById('settings-panel').style.display='none'; }
     function saveSettings(){
       const name=document.getElementById('school-name-input').value.trim();
       if(name){ localStorage.setItem('schoolName', name); document.getElementById('school-name').textContent = name; }
+      // default group
       currentGroup = document.getElementById('group-select').value; localStorage.setItem('gradeGroup', currentGroup);
-      if(selectedView!=='all'){ selectedView=currentGroup; localStorage.setItem('selectedView', selectedView); }
+      // enabled groups
+      const eg={ g1: !!document.getElementById('enabled-g1').checked, g2: !!document.getElementById('enabled-g2').checked, g3: !!document.getElementById('enabled-g3').checked };
+      if(!eg.g1 && !eg.g2 && !eg.g3){ eg.g1=true; } // ensure at least one
+      setEnabledGroups(eg);
+      // fix selected view if disabled
+      const enabledList = getEnabledGroups();
+      if(selectedView!=='all' && !enabledList.includes(selectedView)){
+        selectedView = enabledList[0] || 'all'; localStorage.setItem('selectedView', selectedView);
+      }
+      if(currentGroup && !enabledList.includes(currentGroup)){
+        currentGroup = enabledList[0] || 'g1'; localStorage.setItem('gradeGroup', currentGroup);
+      }
       closeSettings(); updateSchedule();
     }
 
@@ -514,15 +640,57 @@
         // Friday count
         const fr=scheduleFri(); console.assert(fr.length===17, 'Friday length should be 17');
         // Cafeteria filter: no transitions & all overlap some lunch window (using MT windows)
-        const wins=[...scheduleMT('g1'),...scheduleMT('g2'),...scheduleMT('g3')].filter(b=>/Lunch/i.test(b.label)).map(b=>({start:b.start,end:b.end}));
+        const wins=[...scheduleMT('g1'),...scheduleMT('g2'),...scheduleMT('g3')]
+          .filter(b=>/Lunch/i.test(b.label))
+          .map(b=>({start:b.start,end:b.end}));
         const cafG1 = filterByLunchWindows(scheduleMT('g1'), wins);
         console.assert(cafG1.every(b=>!/Transition/i.test(b.label)), 'Cafeteria filtered rows should exclude transitions');
         console.assert(cafG1.every(b=>overlapsLunch(b,wins)), 'Cafeteria filtered rows should overlap lunch windows');
-        // Current row builder sanity
+        // current row builder sanity
         const now=new Date();
         const testBlock={label:'Test Period', start:new Date(now.getTime()-30000), end:new Date(now.getTime()+30000)};
         const tr=buildCurrentRow([testBlock],'g1',4);
         console.assert(tr.classList.contains('current-row'), 'Current row should have class current-row');
+        // time parsing helpers
+        const p1=parseInputTime('7:45 AM'); console.assert(p1 && p1.h===7 && p1.m===45, 'parse 7:45 AM');
+        const p2=parseInputTime('12:00 AM'); console.assert(p2 && p2.h===0 && p2.m===0, 'parse 12:00 AM');
+        const p3=parseInputTime('12:00 PM'); console.assert(p3 && p3.h===12 && p3.m===0, 'parse 12:00 PM');
+        console.assert(timeToHHMM(fmt(7,5))==='07:05','HH:MM formatter');
+        // invalid time parsing
+        console.assert(parseInputTime('25:00')===null, 'invalid hour rejected');
+        console.assert(parseInputTime('09:77')===null, 'invalid minute rejected');
+        // overrides round-trip (non-destructive)
+        const prev = loadOverrides();
+        try {
+          const tmp = { ...prev };
+          tmp.MT = tmp.MT || {}; tmp.MT.gX = { 0: { label: 'X Block', start: '07:00', end: '07:30' } };
+          localStorage.setItem(OV_KEY, JSON.stringify(tmp));
+          const base=[makeBlock('Base','07:10','07:20')];
+          const applied = applyOverrides(base.slice(), 'gX', 'MT');
+          console.assert(applied[0].label==='X Block', 'override label applied');
+          console.assert(applied[0].start.getHours()===7 && applied[0].start.getMinutes()===0, 'override start applied');
+        } finally {
+          localStorage.setItem(OV_KEY, JSON.stringify(prev));
+        }
+        // hide-past-breaks filter test
+        const prevHB = hidePastBreaks; hidePastBreaks = true;
+        try{
+          const now2=new Date();
+          const pastT={label:'Transition', start:new Date(now2.getTime()-600000), end:new Date(now2.getTime()-300000)};
+          const futureT={label:'Transition', start:new Date(now2.getTime()+60000), end:new Date(now2.getTime()+120000)};
+          const period={label:'1st Period', start:new Date(now2.getTime()-60000), end:new Date(now2.getTime()+600000)};
+          const out=applyHidePastBreaks([pastT,futureT,period], now2);
+          console.assert(!out.includes(pastT), 'past transition removed');
+          console.assert(out.includes(futureT), 'future transition kept');
+          console.assert(out.includes(period), 'period kept');
+        } finally { hidePastBreaks = prevHB; }
+        // enabled groups affect cafeteria windows
+        const prevEG = localStorage.getItem('enabledGroups');
+        try{
+          setEnabledGroups({g1:true,g2:false,g3:false});
+          const w = getLunchWindowsForToday();
+          console.assert(w.length>0 && w.every(x=>x.group==='g1'), 'Lunch windows limited to enabled groups');
+        } finally { if(prevEG){ localStorage.setItem('enabledGroups', prevEG); } else { localStorage.removeItem('enabledGroups'); } }
       }catch(e){ console.warn('Self-tests encountered an error:', e); }
     }
 
