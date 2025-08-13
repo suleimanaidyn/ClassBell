@@ -1,132 +1,214 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>User Manual</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            line-height: 1.6;
-        }
-        h1 {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-        h2 {
-            font-size: 20px;
-            margin-top: 20px;
-            margin-bottom: 10px;
-        }
-        h3 {
-            font-size: 18px;
-            margin-top: 15px;
-            margin-bottom: 10px;
-        }
-        p {
-            margin-bottom: 10px;
-        }
-        ul, ol {
-            margin-bottom: 10px;
-            padding-left: 20px;
-        }
-        pre {
-            background-color: #f4f4f4;
-            padding: 10px;
-            border-radius: 5px;
-            overflow-x: auto;
-        }
-        button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-            background-color: #007bff;
-            color: white;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Class Schedule Management Tool — User Manual (Updated Aug 13, 2025)</title>
+  <style>
+    :root{
+      --ink:#0f172a; --muted:#475569; --accent:#0b63f3; --bg:#ffffff; --soft:#f1f5f9; --border:#e2e8f0;
+    }
+    html,body{margin:0; padding:0; background:var(--bg); color:var(--ink); font:16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji"}
+    .container{max-width:960px; margin:0 auto; padding:24px}
+    header{padding:24px 0 8px}
+    h1{font-size:28px; margin:0 0 8px}
+    .updated{color:var(--muted); font-size:14px}
+    nav.toc{background:var(--soft); border:1px solid var(--border); padding:12px 16px; border-radius:8px; margin:16px 0 24px}
+    nav.toc a{color:var(--accent); text-decoration:none}
+    nav.toc ol{margin:8px 0 0 20px}
+    h2{margin-top:28px; font-size:22px}
+    h3{margin-top:18px; font-size:18px}
+    p{margin:12px 0}
+    ul{margin:8px 0 12px 20px}
+    code{background:#f8fafc; border:1px solid var(--border); padding:1px 5px; border-radius:4px}
+    .note{background:#f0f9ff; border:1px solid #bae6fd; padding:12px; border-radius:8px;}
+    .small{font-size:14px; color:var(--muted)}
+    footer{border-top:1px solid var(--border); margin-top:32px; padding-top:16px; font-size:14px; color:var(--muted)}
+  </style>
 </head>
 <body>
-    <h1>Class Schedule Management Tool - User Manual</h1>
-    <h2>Overview</h2>
-    <p>The Class Schedule Management Tool allows you to manage multiple schedules for your school, assigning specific schedules to different days of the week. This tool is designed to dynamically update and display the appropriate schedule based on the current day, ensuring that your class periods and break times are accurately reflected.</p>
-    
-    <h2>Features</h2>
-    <ul>
-        <li><strong>Multiple Schedules:</strong> Set up two distinct schedules (Default and Alternative) to cater to different needs, such as a regular weekday schedule and a special Friday schedule.</li>
-        <li><strong>Day Assignments:</strong> Assign specific days of the week to each schedule, ensuring that only one schedule is active per day.</li>
-        <li><strong>Dynamic Updates:</strong> Automatically displays the correct schedule based on the current day of the week.</li>
-        <li><strong>Editable Schedules:</strong> Easily edit schedules directly within the settings panel.</li>
-        <li><strong>Real-time Display:</strong> Updates remaining time for ongoing periods and indicates upcoming periods.</li>
-        <li><strong>Break Popups:</strong> Displays a popup during break periods with a countdown timer.</li>
-        <li><strong>Customizable Colors:</strong> Customize the background and text colors for the header and date-time display.</li>
-        <li><strong>Share Function:</strong> Share the tool on social media platforms.</li>
-    </ul>
-    
-    <h2>Getting Started</h2>
-    <ol>
-        <li><strong>Accessing the Tool:</strong> Open the tool in your web browser. You will see the main schedule display along with a date and time header.</li>
-        <li><strong>Opening the Settings Panel:</strong> To configure the schedules, click the gear icon (⚙) located at the bottom-right corner of the screen. This will open the Settings Panel.</li>
-    </ol>
-    
-    <h2>Configuring Schedules</h2>
-    <h3>1. Editing Schedules</h3>
-    <p>In the Settings Panel, you'll find two sections:</p>
-    <ul>
-        <li><strong>Schedule 1 (Default):</strong> Use this for your regular schedule.</li>
-        <li><strong>Schedule 2 (Alternative):</strong> Use this for a different schedule, such as for Fridays.</li>
-    </ul>
-    <p><strong>Edit the schedule times:</strong> Each schedule section contains a text area where you can enter periods, start times, and end times in the following format:</p>
-    <pre>
-Period 1, 7:45 AM, 8:33 AM
-Break, 8:33 AM, 8:37 AM
-Period 2, 8:37 AM, 9:25 AM
-    </pre>
-    <p><strong>Saving Changes:</strong> After editing the schedules, make sure to click the <em>Save</em> button at the bottom of the Settings Panel to apply the changes.</p>
-    
-    <h3>2. Assigning Days to Schedules</h3>
-    <p>Below each schedule, there are checkboxes labeled with days of the week (Mon, Tue, Wed, Thu, Fri, Sat, Sun).</p>
-    <p><strong>Assigning a day:</strong></p>
-    <ul>
-        <li>To assign a day to <strong>Schedule 1 (Default)</strong>, check the appropriate day checkbox under Schedule 1.</li>
-        <li>To assign a day to <strong>Schedule 2 (Alternative)</strong>, check the appropriate day checkbox under Schedule 2.</li>
-    </ul>
-    <p><strong>Mutual Exclusivity:</strong> Each day can only be assigned to one schedule at a time. If you select a day for Schedule 1, it will automatically deselect the same day in Schedule 2, and vice versa.</p>
-    
-    <h2>Viewing and Using the Schedule</h2>
-    <h3>1. Viewing the Active Schedule</h3>
-    <p>The schedule displayed on the main screen will automatically update based on the current day of the week and the assigned schedule for that day.</p>
-    <p>Periods will be shown with the following information:</p>
-    <ul>
-        <li>Period Number</li>
-        <li>Start Time</li>
-        <li>End Time</li>
-        <li>Remaining Time (for ongoing periods) or indicators for completed or upcoming periods.</li>
-    </ul>
-    
-    <h3>2. Real-Time Updates</h3>
-    <p>The schedule refreshes every minute to provide the latest updates on ongoing and upcoming periods. Break periods will trigger a special popup to indicate the ongoing break and countdown the remaining time.</p>
-    
-    <h2>Customizing Colors</h2>
-    <p>You can customize the background and text colors for the header and date-time display. Click on the school name in the header to open the color customization panel. After selecting your desired colors, click the <em>Save</em> button to apply the changes.</p>
-    
-    <h2>Sharing the Tool</h2>
-    <p>You can share the tool on social media platforms using the share buttons located at the bottom of the screen.</p>
-    
-    <h2>Troubleshooting</h2>
-    <ul>
-        <li><strong>Schedule Not Displaying Correctly:</strong> Ensure that you have assigned the correct days to each schedule in the Settings Panel. Make sure to save your changes after editing schedules or day assignments.</li>
-        <li><strong>Changes Not Saving:</strong> Check that your browser’s local storage is enabled, as the tool uses local storage to save settings.</li>
-    </ul>
-    
-    <h2>Contact and Support</h2>
-    <p>For further assistance, please contact the support team at <a href="mailto:saydin19@gmail.com">saydin19@gmail.com</a>.</p>
-    
-    <button onclick="window.close()">Close</button>
+  <div class="container">
+    <header>
+      <h1>Class Schedule Management Tool — User Manual</h1>
+      <div class="updated">Updated: August 13, 2025</div>
+    </header>
+
+    <nav class="toc" aria-label="Table of contents">
+      <strong>Contents</strong>
+      <ol>
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#concepts">Key Concepts</a></li>
+        <li><a href="#ui">What You See</a></li>
+        <li><a href="#views">Views & Modes</a></li>
+        <li><a href="#editing">Editing & Customization</a></li>
+        <li><a href="#settings">Settings Panel</a></li>
+        <li><a href="#start">Getting Started</a></li>
+        <li><a href="#sharing">Sharing</a></li>
+        <li><a href="#troubleshooting">Troubleshooting</a></li>
+        <li><a href="#privacy">Privacy & Storage</a></li>
+        <li><a href="#contact">Contact & Custom Campus Links</a></li>
+      </ol>
+    </nav>
+
+    <section id="overview">
+      <h2>Overview</h2>
+      <p>
+        The Class Schedule Management Tool displays and manages your school’s bell schedules with
+        grade‑group views (<strong>L1/L2/L3</strong>), an <strong>All</strong> (admin) view, and a focused <strong>Cafeteria mode</strong>.
+        It automatically switches between <strong>Mon–Thu</strong> and <strong>Friday</strong> schedules, highlights the current block,
+        and shows remaining time. You can edit labels and times directly on the page.
+      </p>
+    </section>
+
+    <section id="concepts">
+      <h2>Key Concepts</h2>
+      <ul>
+        <li><strong>Grade Groups</strong>
+          <ul>
+            <li><strong>L1</strong>: 6th Grade &amp; 9th (Freshman)</li>
+            <li><strong>L2</strong>: 7th Grade &amp; 10th (Sophomore)</li>
+            <li><strong>L3</strong>: 8th Grade, 11th (Junior) &amp; 12th (Senior)</li>
+          </ul>
+        </li>
+        <li><strong>Day Sets</strong>: The tool switches between <em>Mon–Thu</em> and <em>Friday</em> automatically.</li>
+        <li><strong>Block Types</strong>:
+          <ul>
+            <li><em>Period</em> (class)</li>
+            <li><em>Transition</em> (short breaks; can be hidden once passed)</li>
+            <li><em>Lunch</em> (<strong>L1 Lunch / L2 Lunch / L3 Lunch</strong>) — highlighted and used by Cafeteria mode</li>
+          </ul>
+        </li>
+      </ul>
+    </section>
+
+    <section id="ui">
+      <h2>What You See</h2>
+      <ul>
+        <li><strong>Header</strong>: Day/Date/Time and the School Name (double‑click to rename).</li>
+        <li><strong>Top Bar</strong>:
+          <ul>
+            <li>View buttons: <strong>L1</strong>, <strong>L2</strong>, <strong>L3</strong>, <strong>All</strong> (shows all groups side‑by‑side)</li>
+            <li><strong>Enable/Disable Cafeteria</strong>: toggle lunch‑only view</li>
+            <li><strong>Hide Passed Breaks</strong>: hide transition rows that have already ended</li>
+          </ul>
+        </li>
+        <li><strong>View Title</strong>: shows the active group (e.g., “6th Grade &amp; Freshman Bell Schedule”).</li>
+        <li><strong>Table Header</strong>: <em>Block • Start • End • Remaining</em> (uniform grey header in all modes).</li>
+        <li><strong>Current Progress Strip</strong>: a single thick progress bar under the header indicating the current block and time remaining. Colors:
+          <ul>
+            <li>Periods: group‑colored</li>
+            <li>Transitions: <span style="color:#b91c1c">red</span></li>
+            <li>Lunch: <span style="color:#065f46">dark green</span></li>
+          </ul>
+        </li>
+        <li><strong>Rows</strong>: Each block with its times and remaining time. Lunch rows are emphasized; the currently active row has a subtle background.</li>
+        <li><strong>Campus Note</strong> (under the table): contact info for custom campus links.</li>
+      </ul>
+    </section>
+
+    <section id="views">
+      <h2>Views &amp; Modes</h2>
+      <h3>L1 / L2 / L3 (Single‑Group Views)</h3>
+      <p>Shows the schedule for the selected grade group only.</p>
+      <h3>All (Admin) View</h3>
+      <p>Shows L1, L2, and L3 in separate cards at once for quick monitoring.</p>
+      <h3>Cafeteria Mode</h3>
+      <ul>
+        <li>When enabled, the page shows only lunch windows and any class periods that occur during those windows.</li>
+        <li>This mode respects the groups you’ve enabled in Settings. If L3 is disabled, lunch windows and rows from L3 will not appear.</li>
+      </ul>
+      <h3>Hide Passed Breaks</h3>
+      <p>When enabled, transitions (short breaks) that already ended are hidden from the table.</p>
+    </section>
+
+    <section id="editing">
+      <h2>Editing &amp; Customization</h2>
+      <h3>Inline Editing (no dialogs)</h3>
+      <ul>
+        <li><strong>Double‑click</strong> to edit:
+          <ul>
+            <li>School Name in the header</li>
+            <li>Block name</li>
+            <li>Start time</li>
+            <li>End time</li>
+          </ul>
+        </li>
+        <li><strong>Validation</strong>:
+          <ul>
+            <li>Time formats: <code>H:MM</code> or <code>H:MM AM/PM</code> (e.g., <code>7:45 AM</code>, <code>13:25</code>)</li>
+            <li>Start must be before End; End must be after Start.</li>
+          </ul>
+        </li>
+        <li><strong>Saving</strong>: Changes are stored automatically (browser localStorage) and persist across reloads.</li>
+        <li><strong>Per‑Day &amp; Per‑Group</strong>: Edits apply to the current day set (Mon–Thu or Friday) and the current grade group.</li>
+      </ul>
+      <h3>Appearance</h3>
+      <ul>
+        <li><strong>Header Colors</strong>: Click the school name to open the color picker; set header background and text colors.</li>
+        <li><strong>Light Mode Only</strong>: Dark mode is disabled to maximize visibility on projectors.</li>
+      </ul>
+    </section>
+
+    <section id="settings">
+      <h2>Settings Panel</h2>
+      <p>Open via the ⚙ button.</p>
+      <ul>
+        <li><strong>School Name</strong>: Set the name shown in the header.</li>
+        <li><strong>Default Grade Group</strong>: Choose which group opens by default.</li>
+        <li><strong>Visible Grade Groups</strong>: Check or uncheck L1 / L2 / L3 to control which groups appear (applies to top buttons, All view, and Cafeteria mode). At least one must be enabled.</li>
+        <li><strong>Save</strong>: Persists choices in localStorage.</li>
+      </ul>
+    </section>
+
+    <section id="start">
+      <h2>Getting Started</h2>
+      <ol>
+        <li>Open the page in your browser. The correct schedule (Mon–Thu vs Friday) is chosen for you.</li>
+        <li>Pick <strong>L1/L2/L3</strong> or <strong>All</strong> from the top bar.</li>
+        <li>(Optional) Click <strong>Enable Cafeteria</strong> to focus on lunch windows + overlapping classes.</li>
+        <li>(Optional) Toggle <strong>Hide Passed Breaks</strong> to clean up earlier transitions.</li>
+        <li>Double‑click any <strong>Block</strong>, <strong>Start</strong>, <strong>End</strong>, or the <strong>School Name</strong> to edit in place.</li>
+        <li>Use <strong>⚙ Settings</strong> to control default group and which grade groups are visible.</li>
+      </ol>
+    </section>
+
+    <section id="sharing">
+      <h2>Sharing</h2>
+      <p>Use the Share buttons at the bottom of the page.</p>
+    </section>
+
+    <section id="troubleshooting">
+      <h2>Troubleshooting</h2>
+      <ul>
+        <li><strong>My changes didn’t stick</strong>: Ensure your browser allows <em>localStorage</em> and you clicked away (blur) or pressed <kbd>Enter</kbd> after editing.</li>
+        <li><strong>Times rejected</strong>: Use <code>H:MM</code> (e.g., <code>7:45</code>) or add AM/PM.</li>
+        <li><strong>Nothing shows in Cafeteria mode</strong>: Make sure lunch rows exist for the enabled groups and that the current time is within or overlapping those lunches.</li>
+        <li><strong>Buttons missing (e.g., L3)</strong>: Check <em>Settings → Visible Grade Groups</em>.</li>
+        <li><strong>Wrong day’s schedule</strong>: The app uses your device date; verify system date and time zone.</li>
+        <li><strong>Projector contrast</strong>: You can adjust header colors and rely on the <em>Current Progress Strip</em> under the header.</li>
+      </ul>
+    </section>
+
+    <section id="privacy">
+      <h2>Privacy &amp; Storage</h2>
+      <ul>
+        <li>Uses browser <em>localStorage</em> only. No server‑side storage.</li>
+        <li>A minimal analytics heartbeat event is sent for engagement stats (Google tag).</li>
+      </ul>
+    </section>
+
+    <section id="contact">
+      <h2>Contact &amp; Custom Campus Links</h2>
+      <div class="note">
+        For other campuses: If you want a <strong>pre‑defined bell schedule</strong> with your school name and a <strong>special link</strong>, email your bell schedule to
+        <a href="mailto:saydin19@gmail.com">saydin19@gmail.com</a>.
+      </div>
+      <p class="small">Questions or issues? Email <a href="mailto:saydin19@gmail.com">saydin19@gmail.com</a>.</p>
+    </section>
+
+    <footer>
+      &copy; 2025 Class Schedule Management Tool. All rights reserved.
+    </footer>
+  </div>
 </body>
 </html>
