@@ -1,1666 +1,547 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-M2QXES4LKK"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light" />
+  <title>MyClassBell</title>
+  <link rel="icon" href="MyAppIcon.png" type="image/png" />
 
-  gtag('config', 'G-M2QXES4LKK');
+  <!-- Google tag (gtag.js) & heartbeat -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-M2QXES4LKK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);} // eslint-disable-line
+    gtag('js', new Date());
+    gtag('config', 'G-M2QXES4LKK');
+    setInterval(() => { gtag('event', 'heartbeat', { event_category: 'engagement', event_label: 'page_still_open' }); }, 300000);
+  </script>
 
-  // Heartbeat script to track engagement
-  setInterval(() => {
-    gtag('event', 'heartbeat', {
-      'event_category': 'engagement',
-      'event_label': 'page_still_open',
-    });
-  }, 300000); // Every 5 minutes
-</script>
+  <style>
+    :root{ --header-bg:#000; --header-fg:#fff; --border:#eceff3; --bar-border:#cfd7e3; --accent:#007bff; color-scheme: only light; }
+    *{box-sizing:border-box}
+    body{font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Apple Color Emoji','Segoe UI Emoji'; line-height:1.4; font-size:16px; margin:20px; background:#fff; color:#111}
 
-    
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="MyAppIcon.png" type="image/png">
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                margin: 20px;
-            }
-            #header-container {
-                display: grid;
-                grid-template-columns: 0.3fr 1fr 0.3fr; /* 3 equal cells */
-                justify-items: center;
-                align-items: center;
-                padding: 1px;
-                background-color: #000000; /* Default black background */
-                color: #ffffff; /* Default white text color */
-                
-            }
-            #date, #time {
-                padding: 1px;
-                text-align: center;
-                width: 100%;
-               
-                color: #ffffff; /* White text */
-                
-               
-            }
-            #school-name {
-                font-size: 1.5em;
-                font-weight: Light;
-                padding: 5px;
-                text-align: center;
-                width: 80%;
-                cursor: pointer;
-            }
-            #time {
-                font-size: 1.5em;
-                font-weight: bold;
-            }
-            #day {
-                font-size: 1.2em;
-                font-weight: Bold;
-            }
-            .separator {
-                margin: 0 5px;
-                font-weight: normal;
-            }
-            #custom-color-box {
-                display: none;
-                position: fixed;
-                top: 10%;
-                left: 50%;
-                transform: translate(-50%, 0);
-                background-color: white;
-                border: 1px solid #ddd;
-                padding: 20px;
-                z-index: 2000;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-                width: 300px;
-            }
-            #custom-color-box input {
-                margin: 10px 0;
-                width: 100%;
-                padding: 5px;
-            }
-            /* Floating Button */
-            #floatingButton {
-                position: fixed;
-                bottom: 20px;
-                left: 20px;
-                background-color: #007bff;
-                color: white;
-                border: none;
-                border-radius: 50%;
-                width: 40px; /* Adjusted size to match settings button */
-                height: 40px; /* Adjusted size to match settings button */
-                font-size: 20px;
-                cursor: pointer;
-                z-index: 1000;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            #floatingButton::before {
-                content: '\23F1'; /* Unicode for clock symbol */
-            }
+    /* Sticky header container */
+    #sticky-container{position:sticky; top:0; z-index:1000; background:#fff; border-bottom:1px solid var(--border)}
 
-            /* Timer Popup */
-            .popup {
-                display: none;
-                padding: 20px;
-                width: 400px;
-                border-radius: 10px;
-                background-color: transparent; /* Completely transparent background */
-                text-align: center;
-                box-shadow: none;
-                position: fixed;
-                bottom: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                z-index: 1000;
-                cursor: default; /* Not movable */
-            }
-            /* Timer Display */
-            #timerDisplay {
-                font-size: 48px;
-                color: white;
-                background-color: rgba(0, 0, 0, 0.5); /* Add a small transparent black background */
-                padding: 5px; /* Add some padding for better visibility */
-                border-radius: 5px; /* Optional: Add rounded corners */
-            }
-            /* Time Options Container */
-            .time-options-container {
-                background-color: rgba(0, 0, 0, 0.5); /* 50% transparent background */
-                padding: 10px;
-                border-radius: 10px; /* Optional: Add rounded corners */
-                margin-bottom: 10px; /* Add some space below */
-                display: flex;
-                align-items: center; /* Center align the buttons vertically */
-                height: 25px; /* Adjust height to match or slightly exceed button height */
-                transition: transform 0.5s ease, opacity 0.5s ease; /* Smooth transition */
-            }
-            /* Time Options */
-            .time-options {
-                display: flex;
-                justify-content: space-between;
-                width: 100%;
-                transition: transform 0.5s ease, opacity 0.5s ease; /* Smooth transition */
-            }
-            /* Hidden class for time options */
-            .hidden {
-                transform: translateY(100px); /* Move down */
-                opacity: 0; /* Make it invisible */
-                transition: transform 0.5s ease, opacity 0.5s ease; /* Smooth transition */
-            }
-            /* Visible class for time options */
-            .visible {
-                transform: translateY(0);
-                opacity: 1;
-                transition: transform 0.5s ease, opacity 0.5s ease;
-            }
-            /* Time Option */
-            .timeOption {
-                padding: 10px 15px;
-                border-radius: 5px;
-                color: white;
-                font-weight: bold;
-                cursor: pointer;
-                position: relative;
-                margin-top: 5px; /* Move buttons 5px down */
-                height: 20px; /* Set a fixed height */
-                line-height: 20px; /* Center text vertically */
-                
-            }
-            /* Custom Minutes Input */
-            #customMinutesInput {
-                padding: 10px 15px; /* Match padding with .timeOption */
-                border-radius: 5px; /* Match border radius with .timeOption */
-                border: none;
-                background-color: #66b3ff;
-                color: white;
-                font-weight: bold;
-                width: auto; /* Keep width as auto */
-                height: 20px; /* Set a fixed height to match .timeOption */
-                text-align: center;
-                font-size: 14px;
-                position: relative;
-                margin-top: 5px; /* Move buttons 5px down */
-                line-height: 20px; /* Center text vertically */
-            }
-            /* Progress Bar Animation */
-            @keyframes wave {
-                0% { background-position: 0% 50%; }
-                50% { background-position: 100% 50%; }
-                100% { background-position: 0% 50%; }
-            }
-            #progressBar {
-                height: 100%;
-                width: 100%;
-                background: linear-gradient(270deg, #ff4d4d, #ff9933, #ffff66, #66ff66, #66b3ff);
-                background-size: 1000% 1000%;
-                animation: wave 10s ease infinite;
-            }
-            /* Progress Bar Container */
-            #progressBarContainer {
-                width: 100%;
-                height: 50px; /* Increase the height of the progress bar */
-                background-color: #ddd;
-                border-radius: 5px;
-                overflow: hidden;
-                margin: 20px 0;
-                position: relative;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
+    /* Header */
+    #header-container{display:grid; grid-template-columns:.3fr 1fr .3fr; justify-items:center; align-items:center; padding:6px 8px; background:var(--header-bg); color:var(--header-fg)}
+    #date,#time{font-size:1.5em; font-weight:400}
+    #school-name{font-size:1.5em; font-weight:400; padding:5px; text-align:center; width:80%; cursor:pointer}
+    #time{font-size:1.5em; font-weight:800}
+    #day{font-size:1.1em; font-weight:400}
 
-            /* Progress Bar */
-            #progressBar {
-                height: 100%;
-                width: 0; /* Start with 0 width */
-                background: linear-gradient(to right, lightgreen, lightcoral); /* Gradient color */
-                background-size: 1000% 1000%;
-                animation: wave 10s ease infinite;
-                transition: width 0.5s ease; /* Smooth transition for width */
-                position: absolute;
-                top: 0;
-                left: 0;
-            }
-        </style>
-    </head>
+    /* Table base */
+    table{width:100%; border-collapse:collapse; table-layout:fixed; background:#fff}
+    th,td{border:1px solid var(--border); padding:8px; text-align:center}
+    th{background:#ff9800; color:#fff; font-weight:400}
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyClassBell</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        #sticky-container {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background-color: white;
-            border-bottom: 1px solid #ddd;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed; /* Ensures columns take equal width */
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-            position: relative;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .completed {
-            color: gray;
-        }
-        .upcoming {
-            font-weight: bold;
-            color: green;
-        }
-        .progress-bar {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 0;
-            background: linear-gradient(to right, #e0e0ff, #b3ffb3);
-            z-index: -1;
-        }
-        .break-popup-row {
-            display: none;
-        }
-        #break-popup {
-            width: 100%;
-            height: 40px;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            align-items: center;
-            padding: 5px;
-        }
-        #break-time-text {
-            width: 100%;
-            text-align: center;
-            font-size: 0.8em;
-            color: white;
-            background-color: #C00000;
-            padding: 2px;
-            border-radius: 5px;
-        }
-        #break-progress {
-            width: 100%;
-            height: 20px;
-            position: relative;
-            display: flex;
-            border-radius: 5px;
-            background-color: white;
-        }
-        #break-progress-bar {
-            height: 100%;
-            background-color: #ffbf00;
-            transition: width 0.5s linear;
-        }
-        #break-cursor {
-            position: absolute;
-            top: 0;
-            height: 100%;
-            width: 2px;
-            background-color: black;
-            transition: left 0.5s linear;
-        }
-        #digital-countdown {
-            position: absolute;
-            width: 100%;
-            text-align: center;
-            font-size: 1.5em;
-            color: black;
-            z-index: 1;
-            line-height: 20px;
-        }
-        #settings-panel {
-            display: none;
-            position: fixed;
-            top: 10%;
-            left: 50%;
-            transform: translate(-50%, 0);
-            background-color: white;
-            border: 1px solid #ddd;
-            padding: 20px;
-            z-index: 2000;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            max-height: 80%;
-            overflow-y: auto;
-            width: 300px;
-        }
-        #settings-panel input, #settings-panel textarea, #settings-panel select {
-            margin: 5px 0;
-            width: calc(100% - 10px);
-            padding: 8px;
-            box-sizing: border-box;
-        }
-        .schedule-settings {
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        .schedule-settings h4 {
-            margin: 0 0 5px 0;
-        }
-        .day-checkboxes {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 5px;
-        }
-        #settings-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .footer .timer-section a {
-            background-color: #ff9800; /* Orange background */
-            color: white; /* White text color */
-            padding: 5px 10px; /* Padding around text */
-            border-radius: 5px; /* Rounded corners */
-            text-decoration: none; /* No underline */
-            font-family: Arial, sans-serif; /* Arial font */
-            font-weight: normal; /* Normal font weight */
-            margin-right: 10px;
-        }
-        .footer .timer-section a:hover {
-            background-color: #e68a00; /* Darker orange on hover */
-        }
-        #whats-new {
-            font-family: 'Open Sans', sans-serif;
-            font-size: 12px; /* Adjust this size to be smaller than the current text in the table */
-            font-style: italic; /* Make the text italic */
-        }
-        #whats-new h3 {
-            font-size: 16px; /* Adjust this size for the heading */
-            font-style: italic; /* Make the heading italic */
-        }
-        #whats-new ul {
-            list-style-type: disc;
-            padding-left: 20px;
-        }
-        #whats-new li {
-            margin-bottom: 10px;
-        }
-        #whats-new-content {
-            display: none; /* Hide the content initially */
-        }
-        .toggle-arrow {
-            margin-left: 5px;
-        }
-        .popup {
-            display: none;
-            padding: 20px;
-            width: 400px;
-            border-radius: 10px;
-            background-color: transparent; /* Completely transparent background */
-            text-align: center;
-            box-shadow: none;
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            cursor: default; /* Not movable */
-        }
-        .timer-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        #timerDisplay {
-            font-size: 48px;
-            color: white;
-            background-color: rgba(0, 0, 0, 0.5); /* Add a small transparent black background */
-            padding: 5px; /* Add some padding for better visibility */
-            border-radius: 5px; /* Optional: Add rounded corners */
-        }
-        #pausedText {
-            display: none;
-            font-size: 14px;
-            color: white;
-            background-color: red;
-            padding: 2px 8px;
-            border-radius: 3px;
-            position: absolute;
-            top: 5px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1;
-        }
-        .time-options {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            position: relative;
-            opacity: 1;
-            transition: transform 0.5s ease, opacity 0.5s ease;
-        }
-        .timeOption {
-            padding: 10px 15px;
-            border-radius: 5px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            position: relative;
-            margin-top: 5px; /* Move buttons 5px down */
-        }
-        .timeOption[data-minutes="1"] { background-color: #ff4d4d; }
-        .timeOption[data-minutes="2"] { background-color: #ff9933; }
-        .timeOption[data-minutes="5"] { background-color: #ffff66; color: #333; }
-        .timeOption[data-minutes="10"] { background-color: #66ff66; color: #333; }
-        #customMinutesInput {
-            padding: 10px 15px;
-            border-radius: 5px;
-            border: none;
-            background-color: #66b3ff;
-            color: white;
-            font-weight: bold;
-            width: 50px;
-            text-align: center;
-            font-size: 14px;
-            position: relative;
-        }
-        #progressBarContainer {
-            width: 100%;
-            height: 50px;
-            background-color: #ddd;
-            border-radius: 5px;
-            overflow: hidden;
-            margin: 20px 0;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        #progressBar {
-            height: 100%;
-            width: 100%;
-            background: linear-gradient(270deg, #ff4d4d, #ff9933, #ffff66, #66ff66, #66b3ff);
-            background-size: 1000% 1000%;
-            animation: wave 10s ease infinite;
-        }
-        .mode-toggle {
-            display: flex;
-            align-items: center;
-            z-index: 1;
-            color: purple;
-        }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-            margin: 0 10px;
-        }
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background-color: #2196F3;
-        }
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-        #startPauseButton, #resetButton {
-            font-size: 20px;
-            padding: 10px 20px;
-            border-radius: 5px;
-            position: relative;
-            border: none;
-            cursor: pointer;
-        }
-        #startPauseButton {
-            margin-right: 10px;
-            background-color: #4caf50;
-            color: white;
-            transition: background-color 0.3s ease;
-        }
-        #startPauseButton.pause {
-            background-color: #f0ad4e;
-        }
-        #startPauseButton:hover {
-            background-color: #45a049;
-        }
-        #startPauseButton.pause:hover {
-            background-color: #ec971f;
-        }
-        #resetButton {
-            margin-left: 10px;
-            background-color: #f44336;
-            color: white;
-            transition: background-color 0.3s ease;
-        }
-        #resetButton:hover {
-            background-color: #e53935;
-        }
-        .hidden {
-            transform: translateY(100px);
-            opacity: 0;
-            transition: transform 0.5s ease, opacity 0.5s ease;
-        }
-        .visible {
-            transform: translateY(0);
-            opacity: 1;
-            transition: transform 0.5s ease, opacity 0.5s ease;
-        }
-        #timeUpText {
-            display: none;
-            font-size: 24px;
-            color: black;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 2;
-        }
+    /* One-line CURRENT progress strip row */
+    .current-row td{ padding:0; background:#fff; }
+    .current-strip{ height:40px; background:#f7f9fc; position:relative; overflow:hidden; border:1px solid var(--bar-border); border-radius:8px; box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 1px 1px rgba(0,0,0,.04) }
+    .current-fill{ position:absolute; left:0; top:0; bottom:0; width:var(--fill,0%); background: linear-gradient(90deg, var(--c1,#e9f1ff), var(--c2,#f7fbff)); background-size:200% 100%; animation: stripWave 8s linear infinite; transition:width .5s ease }
+    .current-label{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-weight:400; color:#000; font-size:16px; letter-spacing:.3px; padding:0 8px }
 
-    </style>
+    /* Row visuals */
+    #schedule tr.data-row, #multiWrapper table tr.data-row { position: relative; }
+    #schedule tr.data-row::before, #multiWrapper table tr.data-row::before { content:none; }
+    #schedule tr.data-row::after, #multiWrapper table tr.data-row::after{ content:none; }
+    #schedule td, #multiWrapper table td { position:relative; z-index:2; background:transparent; }
+
+    /* Completed (passed) classes smaller */
+    tr.completed { opacity:.55; font-size:.85em; }
+
+    /* Lunch highlighting */
+    tr.lunch td { background:#FFF6D6 !important; color:#0B6B2B; font-weight:800; }
+    tr.lunch{ }
+    /* Current period row highlight (neutral blue); lunch keeps its own bg */
+    tr.upcoming td { background:#DAECFF !important; }
+    tr.lunch.upcoming td { background:#B7E3C4 !important; color:#0B6B2B !important; }
+    tr.upcoming td:first-child { box-shadow: inset 4px 0 0 #1b6ef3; }
+
+    /* Levelbar */
+    #levelbar{display:flex; gap:8px; align-items:center; justify-content:space-between; padding:8px 6px; border-bottom:1px solid var(--border); background:#fff; position:sticky; top:0; z-index:1001; flex-wrap:wrap}
+    .lvlbtn{background:#f4f4f4; color:#000; border:1px solid var(--border); border-radius:6px; padding:6px 10px; cursor:pointer}
+    .lvlbtn[aria-pressed="true"]{background:var(--accent); color:#fff}
+
+    /* All-view: distinctive card colors */
+    #multiWrapper{display:none; gap:12px; margin-top:8px; background:#fff;}
+    .card{border:1px solid var(--border); border-radius:8px; overflow:hidden; background:#fff !important}
+    .card-header{font-weight:400; padding:8px 10px; text-align:center}
+    [data-group="g1"] > .card-header{ background:#2F6ADF; color:#fff; }
+    [data-group="g2"] > .card-header{ background:#1F8552; color:#fff; }
+    [data-group="g3"] > .card-header{ background:#5A3DBF; color:#fff; }
+
+    /* Settings panel */
+    #settings-panel{display:none; position:fixed; top:10%; left:50%; transform:translate(-50%,0); background:#fff; border:1px solid #ddd; padding:20px; z-index:2000; box-shadow:0 2px 10px rgba(0,0,0,.1); max-height:80%; overflow:auto; width:340px}
+    #settings-panel input, #settings-panel select{margin:6px 0; width:100%; padding:8px}
+
+    /* Color custom */
+    #custom-color-box{display:none; position:fixed; top:10%; left:50%; transform:translate(-50%,0); background:#fff; border:1px solid #ddd; padding:20px; z-index:2000; box-shadow:0 2px 10px rgba(0,0,0,.1); width:300px}
+    #custom-color-box input{margin:10px 0; width:100%; padding:5px}
+
+    /* What's new */
+    #whats-new{font-family:'Open Sans', sans-serif; font-size:12px; font-style:italic}
+    #whats-new h3{font-size:16px; font-style:italic; cursor:pointer}
+    #whats-new-content{display:none}
+    .toggle-arrow{margin-left:5px}
+
+    .footer{width:100%; border-top:1px solid var(--border); padding:5px 20px; display:flex; align-items:center; gap:12px; font-size:.95rem; flex-wrap:wrap}
+    .footer a{text-decoration:none; border-radius:5px; padding:5px 10px; color:#fff}
+    .readme-link{background:#1b6ef3}
+    .track-link{background:#2e8b57}
+    .timer-link{background:#ff9800}
+    .share .twitter{background:#000}
+    .share .facebook{background:#3B5998}
+    .share .linkedin{background:#0A66C2}
+
+    @keyframes stripWave { 0% { background-position:0% 0; } 100% { background-position:200% 0; } }
+
+    /* Ensure light mode even if OS prefers dark */
+    @media (prefers-color-scheme: dark){ body, #sticky-container, table, th, td { background:#fff !important; color:#000 !important; } }
+    .view-title{font-size:1.1rem; font-weight:400; background:#0B2E6F; color:#fff; text-align:center; padding:8px 10px; border-radius:8px; flex:1 0 100%; margin:8px 0 0 0;}
+    #singleHeader{margin-top:4px}
+    .campus-note{margin-top:8px; font-style:normal; color:#333; background:transparent; text-align:left; padding:0; border-radius:0; font-weight:400}
+    .campus-note a{ color:#0645AD; text-decoration:underline; }
+  </style>
 </head>
 <body>
-    <div id="sticky-container">
-        <div id="header-container">
-        <div id="date">
-            <span id="day"></span>
-            
-            <span id="full-date"></span>
-        </div>
-        <div id="school-name">HSA El Paso</div>
-        <div id="time"></div>
-        
-        
-        </div>
-        <div class="break-popup-row">
-            <div id="break-popup">
-                <div id="break-time-text">Break Time</div>
-                <div id="break-progress">
-                    <div id="break-progress-bar"></div>
-                    <div id="break-cursor"></div>
-                    <div id="digital-countdown"></div>
-                </div>
-            </div>
-        </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Period</th>
-                    <th>Start Time</th>
-                    <th>End Time</th>
-                    <th>Remaining Time</th>
-                </tr>
-            </thead>
-        </table>
+  <div id="sticky-container">
+    <div id="header-container" role="banner" aria-label="Header with date, school name, and time">
+      <div id="date" aria-live="polite">
+        <span id="day"></span>
+        <span class="separator" aria-hidden="true"> </span>
+        <span id="full-date"></span>
+      </div>
+      <div id="school-name" tabindex="0" title="Click to change header colors">HSA El Paso</div>
+      <div id="time" aria-live="polite"></div>
     </div>
 
-    <table id="schedule">
-        <tbody>
-        </tbody>
+    <!-- Top Level Toggle: L1/L2/L3 + All(Admin) + Cafeteria -->
+    <div id="levelbar">
+      <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap">
+        <button class="lvlbtn" data-view="g1" aria-pressed="false" title="L1 = 6th & 9th">L1</button>
+        <button class="lvlbtn" data-view="g2" aria-pressed="false" title="L2 = 7th & 10th">L2</button>
+        <button class="lvlbtn" data-view="g3" aria-pressed="false" title="L3 = 8th, 11th & 12th">L3</button>
+        <button class="lvlbtn" data-view="all" aria-pressed="false" title="Show all grade groups side-by-side">All</button>
+        <button id="cafBtn" class="lvlbtn" aria-pressed="false" title="Show only lunch times">Enable Cafeteria</button>
+      </div>
+      <div id="viewTitle" class="view-title"></div>
+    </div>
+
+    <!-- Single-view table header (hidden in All view) -->
+    <table id="singleHeader"><thead><tr><th>Block</th><th>Start</th><th>End</th><th>Remaining</th></tr></thead>
     </table>
-
-    <div id="settings-panel">
-        <h3>Settings</h3>
-        <input type="text" id="school-name-input" placeholder="Enter school name">
-
-        <div class="schedule-settings">
-            <h4>Schedule 1 (Default)</h4>
-            <textarea id="default-schedule-input" rows="8" placeholder="Enter default schedule..."></textarea>
-            <div class="day-checkboxes">
-                <label><input type="checkbox" id="default-mon" onclick="toggleDay('default', 'mon')"> Mon</label>
-                <label><input type="checkbox" id="default-tue" onclick="toggleDay('default', 'tue')"> Tue</label>
-                <label><input type="checkbox" id="default-wed" onclick="toggleDay('default', 'wed')"> Wed</label>
-                <label><input type="checkbox" id="default-thu" onclick="toggleDay('default', 'thu')"> Thu</label>
-                <label><input type="checkbox" id="default-fri" onclick="toggleDay('default', 'fri')"> Fri</label>
-                <label><input type="checkbox" id="default-sat" onclick="toggleDay('default', 'sat')"> Sat</label>
-                <label><input type="checkbox" id="default-sun" onclick="toggleDay('default', 'sun')"> Sun</label>
-            </div>
-        </div>
-
-        <div class="schedule-settings">
-            <h4>Schedule 2 (Alternative)</h4>
-            <textarea id="alternative-schedule-input" rows="8" placeholder="Enter alternative schedule..."></textarea>
-            <div class="day-checkboxes">
-                <label><input type="checkbox" id="alt-mon" onclick="toggleDay('alt', 'mon')"> Mon</label>
-                <label><input type="checkbox" id="alt-tue" onclick="toggleDay('alt', 'tue')"> Tue</label>
-                <label><input type="checkbox" id="alt-wed" onclick="toggleDay('alt', 'wed')"> Wed</label>
-                <label><input type="checkbox" id="alt-thu" onclick="toggleDay('alt', 'thu')"> Thu</label>
-                <label><input type="checkbox" id="alt-fri" onclick="toggleDay('alt', 'fri')"> Fri</label>
-                <label><input type="checkbox" id="alt-sat" onclick="toggleDay('alt', 'sat')"> Sat</label>
-                <label><input type="checkbox" id="alt-sun" onclick="toggleDay('alt', 'sun')"> Sun</label>
-            </div>
-        </div>
-
-        <button onclick="saveSettings()">Save</button>
-        <button onclick="closeSettings()">Close</button>
-    </div>
-
-    <button id="settings-button" onclick="openSettings()">⚙</button>
-
-    <script>
-        let defaultSchedule = [
-            { period: "1", startTime: "7:45 AM", endTime: "8:33 AM" },
-            { period: "Break", startTime: "8:33 AM", endTime: "8:37 AM" },
-            { period: "2", startTime: "8:37 AM", endTime: "9:25 AM" },
-            { period: "Break", startTime: "9:25 AM", endTime: "9:29 AM" },
-            { period: "3", startTime: "9:29 AM", endTime: "10:17 AM" },
-            { period: "Break", startTime: "10:17 AM", endTime: "10:21 AM" },
-            { period: "4", startTime: "10:21 AM", endTime: "11:09 AM" },
-            { period: "Break", startTime: "11:09 AM", endTime: "11:13 AM" },
-            { period: "5", startTime: "11:13 AM", endTime: "12:01 PM" },
-            { period: "Break", startTime: "12:01 PM", endTime: "12:05 PM" },
-            { period: "6", startTime: "12:05 PM", endTime: "12:53 PM" },
-            { period: "Break", startTime: "12:53 PM", endTime: "12:57 PM" },
-            { period: "7", startTime: "12:57 PM", endTime: "1:45 PM" },
-            { period: "Break", startTime: "1:45 PM", endTime: "1:49 PM" },
-            { period: "8", startTime: "1:49 PM", endTime: "2:37 PM" },
-            { period: "Break", startTime: "2:37 PM", endTime: "2:41 PM" },
-            { period: "9", startTime: "2:41 PM", endTime: "3:29 PM" },
-            { period: "Break", startTime: "3:29 PM", endTime: "3:30 PM" },
-            { period: "10", startTime: "3:30 PM", endTime: "4:30 PM" }
-        ];
-
-        let alternativeSchedule = [
-            { period: "1", startTime: "7:45 AM", endTime: "8:18 AM" },
-            { period: "Break", startTime: "8:18 AM", endTime: "8:22 AM" },
-            { period: "2", startTime: "8:22 AM", endTime: "8:51 AM" },
-            { period: "Break", startTime: "8:51 AM", endTime: "8:55 AM" },
-            { period: "3", startTime: "8:55 AM", endTime: "9:28 AM" },
-            { period: "Break", startTime: "9:28 AM", endTime: "9:32 AM" },
-            { period: "4", startTime: "9:32 AM", endTime: "10:01 AM" },
-            { period: "Break", startTime: "10:01 AM", endTime: "10:05 AM" },
-            { period: "5", startTime: "10:05 AM", endTime: "10:38 AM" },
-            { period: "Break", startTime: "10:38 AM", endTime: "10:42 AM" },
-            { period: "6", startTime: "10:42 AM", endTime: "11:15 AM" },
-            { period: "Break", startTime: "11:15 AM", endTime: "11:19 AM" },
-            { period: "7", startTime: "11:19 AM", endTime: "11:52 AM" },
-            { period: "Break", startTime: "11:52 AM", endTime: "11:56 AM" },
-            { period: "8", startTime: "11:56 AM", endTime: "12:29 PM" },
-            { period: "Break", startTime: "12:29 PM", endTime: "12:33 PM" },
-            { period: "9", startTime: "12:33 PM", endTime: "1:02 PM" }
-        ];
-
-        let currentSchedule = defaultSchedule;
-
-        function parseTime(timeString) {
-            const [time, modifier] = timeString.split(' ');
-            const [hours, minutes] = time.split(':');
-            let hour = parseInt(hours, 10);
-
-            if (modifier === 'PM' && hour !== 12) {
-                hour += 12;
-            } else if (modifier === 'AM' && hour === 12) {
-                hour = 0;
-            }
-
-            const currentDate = new Date();
-            return new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), hour, parseInt(minutes, 10), 0, 0);
-        }
-
-        function updateSchedule() {
-            const currentTime = new Date();
-            const scheduleTable = document.getElementById('schedule');
-            const tbody = scheduleTable.querySelector('tbody');
-            tbody.innerHTML = '';
-
-            const currentDay = currentTime.getDay(); // 0 (Sunday) - 6 (Saturday)
-            const defaultDays = JSON.parse(localStorage.getItem('defaultDays')) || [];
-            const alternativeDays = JSON.parse(localStorage.getItem('alternativeDays')) || [];
-
-            if (alternativeDays.includes(currentDay)) {
-                currentSchedule = alternativeSchedule;
-            } else if (defaultDays.includes(currentDay)) {
-                currentSchedule = defaultSchedule;
-            } else {
-                currentSchedule = defaultSchedule; // Fallback to default
-            }
-
-            const filteredData = currentSchedule.filter(period => {
-                const endTime = new Date(parseTime(period.endTime));
-                return !period.period.includes('Break') || currentTime < endTime;
-            });
-
-            filteredData.forEach(period => {
-                const startTime = new Date(parseTime(period.startTime));
-                const endTime = new Date(parseTime(period.endTime));
-                const totalTime = endTime - startTime;
-                const remainingTime = endTime - currentTime;
-                const elapsedTime = currentTime - startTime;
-                const isOngoing = currentTime >= startTime && currentTime < endTime;
-                const isCompleted = currentTime >= endTime;
-                const remainingSeconds = Math.floor((endTime - currentTime) / 1000);
-                const seconds = remainingSeconds % 60;
-                const minutes = Math.floor(remainingSeconds / 60);
-
-                // Display seconds only if remaining time is less than or equal to 3 minutes
-                const remainingText = remainingTime <= 3 * 60 * 1000
-                    ? `${minutes} min ${seconds < 10 ? '0' : ''}${seconds} sec`
-                    : `${minutes} min`;
-
-                const row = document.createElement('tr');
-                const progressBar = document.createElement('div');
-                progressBar.classList.add('progress-bar');
-
-                if (isOngoing) {
-                    const progress = Math.min(elapsedTime / totalTime, 1) * 100;
-                    progressBar.style.width = `${progress}%`;
-                } else if (isCompleted) {
-                    progressBar.style.width = '100%';
-                }
-
-                row.innerHTML = `
-                    <td>${period.period}</td>
-                    <td>${period.startTime}</td>
-                    <td>${period.endTime}</td>
-                    <td>${isOngoing ? remainingText : isCompleted ? 'Completed' : 'Upcoming'}</td>
-                `;
-                row.querySelector('td:last-child').appendChild(progressBar);
-
-                if (isOngoing) {
-                    row.classList.add('upcoming');
-                } else if (isCompleted) {
-                    row.classList.add('completed');
-                }
-
-                tbody.appendChild(row);
-            });
-
-            checkForBreaks();
-        }
-
-        function startScheduleUpdate() {
-            updateSchedule();
-            setInterval(updateSchedule, 1000); // Update every second
-        }
-
-        document.addEventListener('DOMContentLoaded', startScheduleUpdate);
-
-        function checkForBreaks() {
-            const currentTime = new Date();
-
-            const currentBreak = currentSchedule.find(period => {
-                if (!period.period.includes('Break')) return false;
-                const startTime = new Date(parseTime(period.startTime));
-                const endTime = new Date(parseTime(period.endTime));
-                return currentTime >= startTime && currentTime < endTime;
-            });
-
-            if (currentBreak) {
-                showBreakPopup(currentBreak);
-            } else {
-                hideBreakPopup();
-            }
-        }
-
-        function showBreakPopup(breakPeriod) {
-            const startTime = new Date(parseTime(breakPeriod.startTime));
-            const endTime = new Date(parseTime(breakPeriod.endTime));
-            const remainingTime = endTime - new Date();
-            const remainingSeconds = Math.floor(remainingTime / 1000);
-
-            const popup = document.getElementById('break-popup');
-            popup.parentElement.style.display = 'block';
-
-            updateDigitalCountdown(remainingSeconds, endTime - startTime);
-        }
-
-        function hideBreakPopup() {
-            const popup = document.getElementById('break-popup');
-            popup.parentElement.style.display = 'none';
-        }
-
-        function updateDigitalCountdown(remainingSeconds, totalDuration) {
-            const seconds = remainingSeconds % 60;
-            const minutes = Math.floor(remainingSeconds / 60);
-
-            const digitalCountdown = document.getElementById('digital-countdown');
-            const progressBar = document.getElementById('break-progress-bar');
-            const cursor = document.getElementById('break-cursor');
-            const progressPercentage = ((totalDuration - remainingSeconds * 1000) / totalDuration) * 100;
-
-            digitalCountdown.textContent = `${minutes} min ${seconds < 10 ? '0' : ''}${seconds} sec`;
-
-            progressBar.style.width = `${progressPercentage}%`;
-            cursor.style.left = `${progressPercentage}%`;
-        }
-
-        function displayDateTime() {
-            const now = new Date();
-            const dayElement = document.getElementById('day');
-            const dateElement = document.getElementById('full-date');
-            const timeElement = document.getElementById('time');
-
-            if (dayElement && dateElement && timeElement) {
-                // Day and Date formatting
-                const dayOptions = { weekday: 'long' }; // Only day part in bold
-                const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-
-                dayElement.textContent = now.toLocaleDateString('en-US', dayOptions);
-                dateElement.textContent = now.toLocaleDateString('en-US', dateOptions);
-
-                // Time formatting
-                const timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
-                timeElement.textContent = now.toLocaleTimeString('en-US', timeOptions);
-            }
-        }
-
-        // Call displayDateTime initially and set interval
-        displayDateTime();
-        setInterval(displayDateTime, 1000);
-
-        function openSettings() {
-            populateSettings();
-            document.getElementById('settings-panel').style.display = 'block';
-        }
-
-        function closeSettings() {
-            document.getElementById('settings-panel').style.display = 'none';
-        }
-
-        function populateSettings() {
-            document.getElementById('school-name-input').value = localStorage.getItem('schoolName') || '';
-            document.getElementById('default-schedule-input').value = defaultSchedule.map(period => `${period.period}, ${period.startTime}, ${period.endTime}`).join('\n');
-            document.getElementById('alternative-schedule-input').value = alternativeSchedule.map(period => `${period.period}, ${period.startTime}, ${period.endTime}`).join('\n');
-            
-            // Load the day assignments from localStorage
-            const defaultDays = JSON.parse(localStorage.getItem('defaultDays')) || [];
-            const alternativeDays = JSON.parse(localStorage.getItem('alternativeDays')) || [];
-            
-            // Check the appropriate checkboxes based on saved data
-            document.getElementById('default-mon').checked = defaultDays.includes(1);
-            document.getElementById('default-tue').checked = defaultDays.includes(2);
-            document.getElementById('default-wed').checked = defaultDays.includes(3);
-            document.getElementById('default-thu').checked = defaultDays.includes(4);
-            document.getElementById('default-fri').checked = defaultDays.includes(5);
-            document.getElementById('default-sat').checked = defaultDays.includes(6);
-            document.getElementById('default-sun').checked = defaultDays.includes(0);
-            
-            document.getElementById('alt-mon').checked = alternativeDays.includes(1);
-            document.getElementById('alt-tue').checked = alternativeDays.includes(2);
-            document.getElementById('alt-wed').checked = alternativeDays.includes(3);
-            document.getElementById('alt-thu').checked = alternativeDays.includes(4);
-            document.getElementById('alt-fri').checked = alternativeDays.includes(5);
-            document.getElementById('alt-sat').checked = alternativeDays.includes(6);
-            document.getElementById('alt-sun').checked = alternativeDays.includes(0);
-        }
-
-        function toggleDay(schedule, day) {
-            const dayMap = {
-                'mon': 1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, 'sat': 6, 'sun': 0
-            };
-            const dayNum = dayMap[day];
-
-            // Ensure mutual exclusivity of days between schedules
-            if (schedule === 'default') {
-                document.getElementById(`alt-${day}`).checked = false;
-            } else {
-                document.getElementById(`default-${day}`).checked = false;
-            }
-        }
-
-        function saveSettings() {
-            const schoolName = document.getElementById('school-name-input').value;
-            localStorage.setItem('schoolName', schoolName);
-
-            defaultSchedule = document.getElementById('default-schedule-input').value.split('\n').map(line => {
-                const [period, startTime, endTime] = line.split(',').map(item => item.trim());
-                return { period: period.replace('Period ', ''), startTime, endTime };
-            });
-
-            alternativeSchedule = document.getElementById('alternative-schedule-input').value.split('\n').map(line => {
-                const [period, startTime, endTime] = line.split(',').map(item => item.trim());
-                return { period: period.replace('Period ', ''), startTime, endTime };
-            });
-
-            // Save the schedules to localStorage
-            localStorage.setItem('defaultSchedule', JSON.stringify(defaultSchedule));
-            localStorage.setItem('alternativeSchedule', JSON.stringify(alternativeSchedule));
-
-            // Save the day assignments to localStorage
-            const defaultDays = [];
-            const alternativeDays = [];
-            
-            if (document.getElementById('default-mon').checked) defaultDays.push(1);
-            if (document.getElementById('default-tue').checked) defaultDays.push(2);
-            if (document.getElementById('default-wed').checked) defaultDays.push(3);
-            if (document.getElementById('default-thu').checked) defaultDays.push(4);
-            if (document.getElementById('default-fri').checked) defaultDays.push(5);
-            if (document.getElementById('default-sat').checked) defaultDays.push(6);
-            if (document.getElementById('default-sun').checked) defaultDays.push(0);
-            
-            if (document.getElementById('alt-mon').checked) alternativeDays.push(1);
-            if (document.getElementById('alt-tue').checked) alternativeDays.push(2);
-            if (document.getElementById('alt-wed').checked) alternativeDays.push(3);
-            if (document.getElementById('alt-thu').checked) alternativeDays.push(4);
-            if (document.getElementById('alt-fri').checked) alternativeDays.push(5);
-            if (document.getElementById('alt-sat').checked) alternativeDays.push(6);
-            if (document.getElementById('alt-sun').checked) alternativeDays.push(0);
-
-            localStorage.setItem('defaultDays', JSON.stringify(defaultDays));
-            localStorage.setItem('alternativeDays', JSON.stringify(alternativeDays));
-
-            closeSettings();
-            updateSchedule();
-        }
-
-        function applySettings() {
-            const savedSchoolName = localStorage.getItem('schoolName');
-            if (savedSchoolName) {
-                document.getElementById('school-name').textContent = savedSchoolName;
-            }
-
-            // Load the schedules from localStorage
-            const savedDefaultSchedule = localStorage.getItem('defaultSchedule');
-            const savedAlternativeSchedule = localStorage.getItem('alternativeSchedule');
-            if (savedDefaultSchedule) {
-                defaultSchedule = JSON.parse(savedDefaultSchedule);
-            }
-            if (savedAlternativeSchedule) {
-                alternativeSchedule = JSON.parse(savedAlternativeSchedule);
-            }
-
-            // Load the day assignments from localStorage
-            const defaultDays = JSON.parse(localStorage.getItem('defaultDays')) || [];
-            const alternativeDays = JSON.parse(localStorage.getItem('alternativeDays')) || [];
-            
-            // Check the appropriate checkboxes based on saved data
-            document.getElementById('default-mon').checked = defaultDays.includes(1);
-            document.getElementById('default-tue').checked = defaultDays.includes(2);
-            document.getElementById('default-wed').checked = defaultDays.includes(3);
-            document.getElementById('default-thu').checked = defaultDays.includes(4);
-            document.getElementById('default-fri').checked = defaultDays.includes(5);
-            document.getElementById('default-sat').checked = defaultDays.includes(6);
-            document.getElementById('default-sun').checked = defaultDays.includes(0);
-            
-            document.getElementById('alt-mon').checked = alternativeDays.includes(1);
-            document.getElementById('alt-tue').checked = alternativeDays.includes(2);
-            document.getElementById('alt-wed').checked = alternativeDays.includes(3);
-            document.getElementById('alt-thu').checked = alternativeDays.includes(4);
-            document.getElementById('alt-fri').checked = alternativeDays.includes(5);
-            document.getElementById('alt-sat').checked = alternativeDays.includes(6);
-            document.getElementById('alt-sun').checked = alternativeDays.includes(0);
-        }
-
-        applySettings();
-        updateSchedule();
-        setInterval(displayDateTime, 1000);
-        setInterval(checkForBreaks, 1000);
-
-        // Add this function to your existing JavaScript
-        function toggleWhatsNew() {
-            const content = document.getElementById('whats-new-content');
-            const arrow = document.querySelector('.toggle-arrow');
-            if (content.style.display === 'none') {
-                content.style.display = 'block';
-                arrow.innerHTML = '&#9650;'; // Up arrow
-            } else {
-                content.style.display = 'none';
-                arrow.innerHTML = '&#9660;'; // Down arrow
-            }
-        }
-        
-        function hideTimeOptions() {
-            const timeOptionsContainer = document.querySelector('.time-options-container');
-            timeOptionsContainer.classList.add('hidden'); // Add hidden class
-            setTimeout(() => timeOptionsContainer.style.display = 'none', 500); // Hide minute options after transition
-        }
-
-        function showTimeOptions() {
-            const timeOptionsContainer = document.querySelector('.time-options-container');
-            timeOptionsContainer.style.display = 'flex';
-            setTimeout(() => timeOptionsContainer.classList.remove('hidden'), 0); // Show minute options
-        }
-    </script>
-
-
-<!-- Read Me Link (opens in a new tab) -->
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Footer Layout</title>
-        <style>
-            .footer {
-                width: 100%;
-                border-top: 2px solid #ddd; /* Adding a top border line */
-                padding: 5px 20px; /* Added padding for better alignment */
-                display: flex;
-                align-items: center;
-                font-size: 0.8rem;
-                justify-content: flex-start; /* Aligns content to the left */
-            }
-            .footer > div, .footer > span {
-                display: flex;
-                align-items: center;
-                text-align: left;
-            }
-            .readme-section a {
-                background-color: blue; /* Blue background */
-                color: white; /* White text color */
-                padding: 5px 10px; /* Padding around text */
-                border-radius: 5px; /* Rounded corners */
-                text-decoration: none; /* No underline */
-                font-family: Arial, sans-serif; /* Arial font */
-                font-weight: normal; /* Bold font weight */
-                margin-right: 10px;
-            }
-
-
-                      .tracker-section a {
-                background-color: Yellow; /* Blue background */
-                color: white; /* White text color */
-                padding: 5px 10px; /* Padding around text */
-                border-radius: 5px; /* Rounded corners */
-                text-decoration: none; /* No underline */
-                font-family: Arial, sans-serif; /* Arial font */
-                font-weight: normal; /* Bold font weight */
-                margin-right: 10px;
-            }
-
-            .share-buttons a {
-                padding: 5px 10px; /* Padding around text */
-                border-radius: 5px; /* Rounded corners */
-                color: white; /* Text color */
-                text-decoration: none; /* No underline */
-                margin: 0 5px; /* Space between buttons */
-            }
-            .share-buttons .twitter {
-                background-color: #000000; /* Black background for Twitter button */
-            }
-            .share-buttons .facebook {
-                background-color: #3B5998; /* Facebook color */
-            }
-            .share-buttons .linkedin {
-                background-color: #0A66C2; /* LinkedIn color */
-            }
-            .footer .timer-section a {
-                background-color: #ff9800; /* Orange background */
-                color: white; /* White text color */
-                padding: 5px 10px; /* Padding around text */
-                border-radius: 5px; /* Rounded corners */
-                text-decoration: none; /* No underline */
-                font-family: Arial, sans-serif; /* Arial font */
-                font-weight: normal; /* Normal font weight */
-                margin-right: 10px;
-            }
-            .footer .timer-section a:hover {
-                background-color: #e68a00; /* Darker orange on hover */
-            }
-        </style>
-        <!-- Font Awesome for Icons (only if you need other icons) -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    </head>
-    <body>
-        <div class="footer">
-            <div class="readme-section">
-                <a href="readme.html" target="_blank">ReadMe</a>
-            </div>
-          <div class="track-section">
-    <a href="track.html" target="_blank" 
-       style="background-color: green; 
-              color: white; 
-              padding: 5px 10px; 
-              border-radius: 5px; 
-              text-decoration: none; 
-              font-family: Arial, sans-serif; 
-              font-weight: normal; 
-              margin-right: 10px; 
-              transition: background-color 0.3s ease;" 
-       onmouseover="this.style.backgroundColor='darkgreen';" 
-       onmouseout="this.style.backgroundColor='green';">
-       Hallway Track
-    </a>
-</div>
-
-            <div class="timer-section">
-                <a href="timer.html" target="_blank" class="timer-button">Timer</a>
-            </div>
-            <div class="empty-section">
-                <!-- Intentionally left blank -->
-            </div>
-            <div class="share-buttons">
-                <span>Share: </span>
-                <a href="https://twitter.com/intent/tweet?text=Explore%20this%20incredible%20free%20Bell%20Schedule%20Tool%20designed%20exclusively%20for%20educators!&url=https://classbellschedule.com" target="_blank" class="twitter">
-                    <i class="fab fa-twitter"></i> Twitter
-                </a>
-                <a href="https://www.facebook.com/sharer/sharer.php?u=https://classbellschedule.com" target="_blank" class="facebook">
-                    <i class="fab fa-facebook"></i> Facebook
-                </a>
-                <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://classbellschedule.com&title=Explore%20this%20incredible%20free%20Bell%20Schedule%20Tool%20designed%20exclusively%20for%20educators!" target="_blank" class="linkedin">
-                    <i class="fab fa-linkedin"></i> LinkedIn
-                </a>
-            </div>
-        </div>
-    </body>
-    </html>
-    
-    
-        
-    </body>
-    
-    <!-- New header design -->
-    
-    
-    <body>
-        <!-- Custom Color Box -->
-        <div id="custom-color-box">
-            <h3>Color Custom</h3>
-            <label for="bg-color">Pick School Name and Header Background Color:</label>
-            <input type="color" id="bg-color" value="#000000"> <!-- Default black background -->
-    
-            <label for="text-color">Pick Text Color (Time, Date, School Name):</label>
-            <input type="color" id="text-color" value="#ffffff"> <!-- Default white text color -->
-    
-            <button onclick="saveColorCustom()">Save</button>
-            <button onclick="closeColorCustom()">Close</button>
-        </div>
-    
-        <script>
-            function openColorCustom() {
-                document.getElementById('custom-color-box').style.display = 'block';
-            }
-    
-            function closeColorCustom() {
-                document.getElementById('custom-color-box').style.display = 'none';
-            }
-    
-            function saveColorCustom() {
-                const bgColor = document.getElementById('bg-color').value;
-                const textColor = document.getElementById('text-color').value;
-    
-                const headerContainer = document.getElementById('header-container');
-                const schoolName = document.getElementById('school-name');
-                const date = document.getElementById('date');
-                const time = document.getElementById('time');
-    
-                // Apply the same color to the school name, date, and time
-                headerContainer.style.backgroundColor = bgColor;
-                schoolName.style.color = textColor;
-                date.style.color = textColor;
-                time.style.color = textColor;
-    
-                // Save colors to localStorage
-                localStorage.setItem('headerBgColor', bgColor);
-                localStorage.setItem('textColor', textColor);
-    
-                closeColorCustom();
-            }
-    
-            // Display date and time with custom formatting
-            function displayDateTime() {
-                const now = new Date();
-                const dayElement = document.getElementById('day');
-                const dateElement = document.getElementById('full-date');
-                const timeElement = document.getElementById('time');
-    
-                // Day and Date formatting
-                const dayOptions = { weekday: 'long' }; // Only day part in bold
-                const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-    
-                dayElement.textContent = now.toLocaleDateString('en-US', dayOptions);
-                dateElement.textContent = now.toLocaleDateString('en-US', dateOptions);
-    
-                // Time formatting
-                const timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
-                timeElement.textContent = now.toLocaleTimeString('en-US', timeOptions);
-            }
-    
-            // Event listener to open color custom on school name click
-            document.getElementById('school-name').addEventListener('click', openColorCustom);
-    
-            // Load saved colors on page load
-            function loadColorCustom() {
-                const savedBgColor = localStorage.getItem('headerBgColor') || '#000000';
-                const savedTextColor = localStorage.getItem('textColor') || '#ffffff';
-    
-                const headerContainer = document.getElementById('header-container');
-                const schoolName = document.getElementById('school-name');
-                const date = document.getElementById('date');
-                const time = document.getElementById('time');
-    
-                headerContainer.style.backgroundColor = savedBgColor;
-                schoolName.style.color = savedTextColor;
-                date.style.color = savedTextColor;
-                time.style.color = savedTextColor;
-    
-                document.getElementById('bg-color').value = savedBgColor;
-                document.getElementById('text-color').value = savedTextColor;
-    
-            }
-    
-            loadColorCustom();
-            setInterval(displayDateTime, 1000);
-            displayDateTime(); // Initialize on page load
-        </script>
-   
-   <style>
-    #whats-new {
-        font-family: 'Open Sans', sans-serif;
-        font-size: 12px; /* Adjust this size to be smaller than the current text in the table */
-        font-style: italic; /* Make the text italic */
-    }
-
-    #whats-new h3 {
-        font-size: 16px; /* Adjust this size for the heading */
-        font-style: italic; /* Make the heading italic */
-    }
-
-    #whats-new ul {
-        list-style-type: disc;
-        padding-left: 20px;
-    }
-
-    #whats-new li {
-        margin-bottom: 10px;
-    }
-</style>
-
-    
-    </body>
-    
-
-    
-    
-    </html>
-
-<!-- Add this for the "What's New" section -->
-<div id="whats-new">
+  </div>
+
+  <!-- Single body OR multi-wrapper will render here -->
+  <table id="schedule" aria-label="Schedule table (single view)"><tbody></tbody></table>
+  <div id="multiWrapper"></div>
+
+  <!-- Campus note moved under the table(s) -->
+  <div id="campus-note-below" class="campus-note">
+    For other campuses: If you want a pre-defined bell schedule with your school name and a special link, email your bell schedule to <a href="mailto:saydin19@gmail.com">saydin19@gmail.com</a>.
+  </div>
+
+  <!-- Settings (simplified) -->
+  <div id="settings-panel">
+    <h3>Settings</h3>
+    <input type="text" id="school-name-input" placeholder="Enter school name" />
+    <label for="group-select"><strong>Default Grade Group</strong></label>
+    <select id="group-select">
+      <option value="g1">6th & 9th (L1)</option>
+      <option value="g2">7th & 10th (L2)</option>
+      <option value="g3">8th, 11th & 12th (L3)</option>
+    </select>
+    <button onclick="saveSettings()">Save</button>
+    <button onclick="closeSettings()">Close</button>
+  </div>
+
+  <button id="settings-button" style="position:fixed; bottom:20px; right:20px; padding:10px; background:#007bff; color:#fff; border:none; border-radius:50%; cursor:pointer; font-size:16px" onclick="openSettings()">⚙</button>
+
+  <!-- What's New -->
+  <div id="whats-new" style="margin-top:14px">
     <h3 onclick="toggleWhatsNew()">What's New <span class="toggle-arrow">&#9660;</span></h3>
     <div id="whats-new-content">
-        <ul>
-            <li>Added Timer Pop-up and Page 11/3/2024</li>
-            <li>Fixed issue with saving custom schedules. 10/27/2024</li>
-            <li>You can now change the school name and schedule in the settings, accessible via the gear icon on the right end of the page.</li>
-            <li>Introduced a new header design.</li>
-            <li>Added optional background and text color customization for the header and date-time display.</li>
-            <li>Implemented a share function.</li>
-            <li>During the last 3 minutes of class, the remaining time will display seconds.</li>
-        </ul>
+      <ul>
+        <li>Added a thin CURRENT progress strip under each table header (color by block type). (2025‑08‑13)</li>
+        <li>Class=group color, Transition=red, Lunch=dark green. (2025‑08‑13)</li>
+      </ul>
     </div>
-</div>
+  </div>
 
-<!-- Timer Popup -->
-<div id="timerPopup" class="popup">
-    <div class="time-options-container">
-        <div class="time-options" id="timeOptions">
-            <div class="timeOption" data-minutes="1">01</div>
-            <div class="timeOption" data-minutes="2">02</div>
-            <div class="timeOption" data-minutes="5">05</div>
-            <div class="timeOption" data-minutes="10">10</div>
-            <input type="text" id="customMinutesInput" placeholder="Custom (MM:SS or :SS)">
-        </div>
-    </div>
-    <div class="timer-container">
-        <button id="startPauseButton">Start</button>
-        <div id="timerDisplay">00:00:00</div>
-        <button id="resetButton">Reset</button>
-    </div>
-    <div id="progressBarContainer">
-        <div id="pausedText">Paused</div>
-        <div id="progressBar"></div>
-        <div id="timeUpText">Time is up!</div>
-        <div class="mode-toggle" id="modeToggle">
-            <span>Timer</span>
-            <label class="switch">
-                <input type="checkbox" id="modeSwitch">
-                <span class="slider"></span>
-            </label>
-            <span>Stopwatch</span>
-        </div>
-    </div>
-    <audio id="countdownSound" src="https://www.soundjay.com/buttons/button-35.mp3" preload="auto"></audio>
-    <audio id="endSound" src="https://www.soundjay.com/buttons/beep-09.mp3" preload="auto"></audio>
-</div>
+  <!-- Footer -->
+  <div class="footer">
+    <a class="readme-link" href="readme.html" target="_blank">ReadMe</a>
+    <a class="track-link" href="track.html" target="_blank">Hallway Track</a>
+    <a class="timer-link" href="timer.html" target="_blank">Timer</a>
+    <span class="share">Share: 
+      <a class="twitter" href="https://twitter.com/intent/tweet?text=Explore%20this%20incredible%20free%20Bell%20Schedule%20Tool%20designed%20exclusively%20for%20educators!&url=https://classbellschedule.com" target="_blank">Twitter</a>
+      <a class="facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://classbellschedule.com" target="_blank">Facebook</a>
+      <a class="linkedin" href="https://www.linkedin.com/shareArticle?mini=true&url=https://classbellschedule.com&title=Explore%20this%20incredible%20free%20Bell%20Schedule%20Tool%20designed%20exclusively%20for%20educators!" target="_blank">LinkedIn</a>
+    </span>
+  </div>
 
-<!-- Floating Button -->
-<button id="floatingButton" onclick="toggleTimerPopup()"></button>
+  <!-- Color Custom Popup -->
+  <div id="custom-color-box">
+    <h3>Color Custom</h3>
+    <label for="bg-color">Header Background</label>
+    <input type="color" id="bg-color" value="#000000">
+    <label for="text-color">Header Text</label>
+    <input type="color" id="text-color" value="#ffffff">
+    <button onclick="saveColorCustom()">Save</button>
+    <button onclick="closeColorCustom()">Close</button>
+  </div>
 
-<script>
-    const timerDisplay = document.getElementById('timerDisplay');
-    const pausedText = document.getElementById('pausedText');
-    const timeOptions = document.getElementById('timeOptions');
-    const customMinutesInput = document.getElementById('customMinutesInput');
-    const startPauseButton = document.getElementById('startPauseButton');
-    const resetButton = document.getElementById('resetButton');
-    const progressBar = document.getElementById('progressBar');
-    const modeSwitch = document.getElementById('modeSwitch');
-    const modeToggle = document.getElementById('modeToggle');
-    const timeUpText = document.getElementById('timeUpText');
-    const countdownSound = document.getElementById('countdownSound');
-    const endSound = document.getElementById('endSound');
-    const timerPopup = document.getElementById('timerPopup');
-    const floatingButton = document.getElementById('floatingButton');
+  <script>
+    /* ---------- Utilities ---------- */
+    function fmt(h,m){ const d=new Date(); d.setHours(h,m,0,0); return d; }
+    function parseTime(range){ const [H,M]=range.split(':').map(x=>parseInt(x,10)); return [H,M]; }
+    function makeBlock(label, startHM, endHM){ const [sh,sm]=parseTime(startHM); const [eh,em]=parseTime(endHM); return { label, start: fmt(sh,sm), end: fmt(eh,em) }; }
 
-    let timerInterval = null;
-    let timeLeft;
-    let totalTime = 300; // Default to 5 minutes
-    let isPaused = false;
-    let isStopwatch = false;
-    let lastTimestamp = null;
-    let lastSecond = null;
+    /* ---------- Canonical Schedules (Mon–Thu, Friday) ---------- */
+    function scheduleMT(group){
+      const S=[];
+      S.push(makeBlock('Breakfast','07:15','07:40'));
+      S.push(makeBlock('Transition','07:40','07:45'));
+      S.push(makeBlock('1st Period','07:45','08:42'));
+      S.push(makeBlock('Transition','08:42','08:46'));
+      S.push(makeBlock('2nd Period','08:46','09:43'));
+      S.push(makeBlock('Transition','09:43','09:47'));
+      S.push(makeBlock('3rd Period','09:47','10:44'));
+      S.push(makeBlock('Transition','10:44','10:48'));
 
-    // Event Listeners
-    modeSwitch.addEventListener('change', switchMode);
-
-    document.querySelectorAll('.timeOption').forEach(button => {
-        button.addEventListener('click', () => {
-            const minutes = parseInt(button.getAttribute('data-minutes'));
-            resetTimer(); // Reset timer before setting a new time
-            setTimer(minutes * 60);
-        });
-    });
-
-    customMinutesInput.addEventListener('change', () => {
-        setCustomTimer();
-    });
-
-    customMinutesInput.addEventListener('click', () => {
-        setCustomTimer();
-    });
-
-    function setCustomTimer() {
-        const input = customMinutesInput.value.trim();
-        let seconds = 0;
-
-        if (input.includes(':')) {
-            const parts = input.split(':');
-            if (parts.length === 2) {
-                const minutes = parseInt(parts[0]) || 0;
-                seconds = parseInt(parts[1]) || 0;
-                seconds += minutes * 60;
-            }
-        } else {
-            seconds = parseInt(input) * 60 || 0;
-        }
-
-        if (!isNaN(seconds) && seconds > 0) {
-            resetTimer(); // Reset timer before setting a new custom time
-            setTimer(seconds);
-        }
-    }
-
-    startPauseButton.addEventListener('click', () => {
-        if (isPaused) {
-            resumeTimer();
-        } else if (timerInterval) {
-            pauseTimer();
-        } else {
-            startTimer();
-        }
-    });
-
-    resetButton.addEventListener('click', resetTimer);
-
-    // Functions
-    function setTimer(seconds) {
-        cancelAnimationFrame(timerInterval);
-        isStopwatch = false;
-        totalTime = seconds;
-        timeLeft = totalTime;
-        updateDisplay();
-        updateProgressBar();
-        timeUpText.style.display = 'none'; // Hide "Time is up" text
-    }
-
-    function startTimer() {
-        if (timerInterval) return; // Prevent multiple intervals
-        isPaused = false;
-        pausedText.style.display = 'none';
-        startPauseButton.textContent = 'Pause';
-        startPauseButton.classList.add('pause'); // Change button color to pause
-        hideTimeOptions(); // Hide minute options
-        modeToggle.classList.add('hidden'); // Add hidden class
-        lastTimestamp = performance.now();
-        timerInterval = requestAnimationFrame(updateTimer);
-    }
-
-    function updateTimer(timestamp) {
-        if (!isPaused) {
-            const elapsed = (timestamp - lastTimestamp) / 1000;
-            lastTimestamp = timestamp;
-            if (isStopwatch) {
-                timeLeft += elapsed;
-            } else {
-                timeLeft -= elapsed;
-                const currentSecond = Math.ceil(timeLeft);
-                if (timeLeft <= 11 && timeLeft > 0 && currentSecond !== lastSecond) {
-                    countdownSound.play(); // Play countdown sound for last 11 seconds
-                    lastSecond = currentSecond;
-                }
-                if (timeLeft <= 0) {
-                    timeLeft = 0;
-                    cancelAnimationFrame(timerInterval);
-                    timerInterval = null;
-                    timeUpText.style.display = 'block'; // Show "Time is up" text
-                    endSound.play(); // Play end sound
-                }
-            }
-            updateDisplay();
-            updateProgressBar();
-        }
-        if (timerInterval) {
-            timerInterval = requestAnimationFrame(updateTimer);
-        }
-    }
-
-    function resumeTimer() {
-        isPaused = false;
-        pausedText.style.display = 'none';
-        startPauseButton.textContent = 'Pause';
-        startPauseButton.classList.add('pause'); // Change button color to pause
-        lastTimestamp = performance.now();
-        timerInterval = requestAnimationFrame(updateTimer);
-    }
-
-    function pauseTimer() {
-        isPaused = true;
-        pausedText.style.display = 'block';
-        startPauseButton.textContent = 'Start';
-        startPauseButton.classList.remove('pause'); // Change button color back to start
-        cancelAnimationFrame(timerInterval);
-    }
-
-    function resetTimer() {
-        cancelAnimationFrame(timerInterval);
-        timerInterval = null; // Ensure the timerInterval is reset
-        timeLeft = isStopwatch ? 0 : totalTime;
-        updateDisplay();
-        updateProgressBar();
-        pausedText.style.display = 'none';
-        startPauseButton.textContent = 'Start';
-        startPauseButton.classList.remove('pause'); // Change button color back to start
-        isPaused = false; // Ensure isPaused is reset
-        timeUpText.style.display = 'none'; // Hide "Time is up" text
-        modeToggle.classList.remove('hidden'); // Show mode toggle on reset
-        if (!isStopwatch) {
-            showTimeOptions(); // Show minute options only if in Timer mode
-        }
-    }
-
-    function switchMode() {
-        cancelAnimationFrame(timerInterval);
-        timerInterval = null; // Ensure interval is cleared on mode switch
-        isPaused = false;
-        pausedText.style.display = 'none';
-        startPauseButton.textContent = 'Start';
-        startPauseButton.classList.remove('pause'); // Change button color back to start
-        if (modeSwitch.checked) {
-            isStopwatch = true;
-            hideTimeOptions(); // Hide minute options immediately in Stopwatch mode
-            timeLeft = 0; // Reset time for stopwatch
-            updateDisplay();
-        } else {
-            isStopwatch = false;
-            setTimer(5 * 60); // Default timer to 5 minutes in Timer mode
-            showTimeOptions(); // Show minute options in Timer mode
-        }
-        resetTimer(); // Reset timer on mode switch
-        updateProgressBar();
-    }
-
-    function hideTimeOptions() {
-        const timeOptionsContainer = document.querySelector('.time-options-container');
-        timeOptionsContainer.classList.add('hidden'); // Add hidden class
-        setTimeout(() => timeOptionsContainer.style.display = 'none', 500); // Hide minute options after transition
-    }
-
-    function showTimeOptions() {
-        const timeOptionsContainer = document.querySelector('.time-options-container');
-        timeOptionsContainer.style.display = 'flex';
-        setTimeout(() => timeOptionsContainer.classList.remove('hidden'), 0); // Show minute options
-    }
-
-    function updateDisplay() {
-        let minutes, seconds, milliseconds;
-        if (isStopwatch) {
-            minutes = Math.floor(timeLeft / 60);
-            seconds = Math.floor(timeLeft % 60);
-            milliseconds = Math.floor((timeLeft * 100) % 100);
-            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}:${milliseconds.toString().padStart(2, '0')}`;
-        } else {
-            minutes = Math.floor(timeLeft / 60);
-            seconds = Math.floor(timeLeft % 60);
-            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        }
-    }
-
-    function updateProgressBar() {
-        let progress;
-        if (isStopwatch) {
-            progress = timeLeft / totalTime;
-            progressBar.style.width = '100%';
-            progressBar.style.background = `linear-gradient(270deg, #ff4d4d, #ff9933, #ffff66, #66ff66, #66b3ff)`;
-            progressBar.style.backgroundSize = '1000% 1000%';
-            progressBar.style.animation = 'wave 10s ease infinite';
-        } else {
-            progress = 1 - timeLeft / totalTime;
-            progressBar.style.width = `${progress * 100}%`;
-            progressBar.style.background = `linear-gradient(to right, lightgreen, lightcoral)`;
-            progressBar.style.animation = 'none';
-        }
-    }
-
-    function toggleTimerPopup() {
-        if (timerPopup.style.display === 'none' || timerPopup.style.display === '') {
-            timerPopup.style.display = 'block';
-        } else {
-            timerPopup.style.display = 'none';
-        }
-    }
-
-    // Remove the draggable functionality
-    timerPopup.onmousedown = null;
-    timerPopup.ondragstart = null;
-
-    // Initialize default mode as Timer with 5 minutes
-    switchMode();
-</script>
- <script>
-  let wakeLock = null;
-
-  // Request wake lock
-  async function requestWakeLock() {
-    try {
-      if ('wakeLock' in navigator) {
-        wakeLock = await navigator.wakeLock.request('screen');
-        console.log('Wake Lock is active');
+      if(group==='g1'){
+        S.push(makeBlock('L1 Lunch','10:48','11:23'));
+        S.push(makeBlock('Transition','11:23','11:27'));
+        S.push(makeBlock('5th Period','11:27','12:24'));
+        S.push(makeBlock('Transition','12:24','12:28'));
+        S.push(makeBlock('6th Period','12:28','13:25'));
+        S.push(makeBlock('Transition','13:25','13:29'));
+      } else if(group==='g2'){
+        S.push(makeBlock('4th Period','10:48','11:45'));
+        S.push(makeBlock('Transition','11:45','11:49'));
+        S.push(makeBlock('L2 Lunch','11:49','12:24'));
+        S.push(makeBlock('Transition','12:24','12:28'));
+        S.push(makeBlock('6th Period','12:28','13:25'));
+        S.push(makeBlock('Transition','13:25','13:29'));
       } else {
-        console.log('Wake Lock API is not supported in this browser');
+        S.push(makeBlock('4th Period','10:48','11:45'));
+        S.push(makeBlock('Transition','11:45','11:49'));
+        S.push(makeBlock('5th Period','11:49','12:46'));
+        S.push(makeBlock('Transition','12:46','12:50'));
+        S.push(makeBlock('L3 Lunch','12:50','13:25'));
+        S.push(makeBlock('Transition','13:25','13:29'));
       }
-    } catch (err) {
-      console.error('Failed to activate Wake Lock:', err);
+
+      S.push(makeBlock('7th Period','13:29','14:26'));
+      S.push(makeBlock('Transition','14:26','14:30'));
+      S.push(makeBlock('8th Period','14:30','15:27'));
+      return S;
     }
-  }
 
-  // Release wake lock on visibility change
-  document.addEventListener('visibilitychange', async () => {
-    if (wakeLock !== null && document.visibilityState === 'visible') {
-      await requestWakeLock();
+    function scheduleFri(){
+      const S=[];
+      S.push(makeBlock('Breakfast','07:15','07:40'));
+      S.push(makeBlock('Transition','07:40','07:45'));
+      S.push(makeBlock('1st Period','07:45','08:22'));
+      S.push(makeBlock('Transition','08:22','08:26'));
+      S.push(makeBlock('2nd Period','08:26','09:03'));
+      S.push(makeBlock('Transition','09:03','09:07'));
+      S.push(makeBlock('3rd Period','09:07','09:44'));
+      S.push(makeBlock('Transition','09:44','09:48'));
+      S.push(makeBlock('4th Period','09:48','10:25'));
+      S.push(makeBlock('Transition','10:25','10:29'));
+      // Lunch waves
+      S.push(makeBlock('L1 Lunch','10:29','11:06'));
+      S.push(makeBlock('Transition','11:06','11:10'));
+      S.push(makeBlock('L2 Lunch','11:10','11:47'));
+      S.push(makeBlock('Transition','11:47','11:51'));
+      S.push(makeBlock('L3 Lunch','11:51','12:28'));
+      S.push(makeBlock('Transition','12:28','12:32'));
+      S.push(makeBlock('8th Period','12:32','13:09'));
+      return S;
     }
-  });
 
-  // Activate wake lock when the page loads
-  window.addEventListener('load', () => {
-    requestWakeLock();
-  });
-</script>
-<script>
-// Function to set a cookie available on all pages
-function setCookie(name, value, days) {
-  const date = new Date();
-  date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000); // Convert days to milliseconds
-  const expires = "expires=" + date.toUTCString();
-  document.cookie = `${name}=${value}; ${expires}; path=/`; // Universal cookie path
-}
+    /* ---------- App State ---------- */
+    let currentGroup = localStorage.getItem('gradeGroup') || 'g1';
+    let selectedView = localStorage.getItem('selectedView') || currentGroup; // 'g1'|'g2'|'g3'|'all'
+    let cafOnly = (localStorage.getItem('cafOnly') === '1');
 
-// Function to get a cookie by name
-function getCookie(name) {
-  const nameEQ = name + "=";
-  const cookies = document.cookie.split(';');
-  for (let i = 0; i < cookies.length; i++) {
-    let cookie = cookies[i].trim();
-    if (cookie.indexOf(nameEQ) === 0) return cookie.substring(nameEQ.length, cookie.length);
-  }
-  return null;
-}
+    function isFriday(){ return new Date().getDay() === 5; }
+    function getTodaySchedule(group){ return isFriday() ? scheduleFri() : scheduleMT(group); }
 
-// Test setting a cookie
-setCookie("test_cookie", "active", 7); // Set a cookie valid for 7 days
+    /* ---------- Cafeteria mode helpers ---------- */
+    function getLunchWindowsForToday(){
+      const groups=['g1','g2','g3'];
+      const wins=[];
+      groups.forEach(g=>{
+        const sched = getTodaySchedule(g);
+        sched.forEach(b=>{ if(/Lunch/i.test(b.label)) wins.push({start:b.start, end:b.end, group:g, label:b.label}); });
+      });
+      return wins; // array of time windows across all groups
+    }
+    function overlapsLunch(block, windows){ return windows.some(w=> block.start < w.end && block.end > w.start ); }
+    function filterByLunchWindows(blocks, windows){ return blocks.filter(b=> !/^Transition$/i.test(b.label) && overlapsLunch(b, windows)); }
 
-// Check if the cookie is accessible
-if (getCookie("test_cookie")) {
-  console.log("Cookies are enabled and accessible on all pages!");
-} else {
-  console.log("Cookies are not working or not accessible.");
-}
-</script>
+    /* ---------- Header strip palette ---------- */
+    function groupColor(group){ return group==='g1' ? '#1b6ef3' : (group==='g2' ? '#2e8b57' : '#6f42c1'); }
+    function getStripPalette(group,label){
+      // Slightly darker palettes for better contrast under black text
+      if(/Transition/i.test(label)) return ['#ff2d2d','#ff6b6b'];
+      if(/Lunch/i.test(label)) return ['#b9e4c3','#d6f2db'];
+      if(group==='g1') return ['#bcd4ff','#d5e6ff'];
+      if(group==='g2') return ['#cdeed8','#e2f6e8'];
+      return ['#cec3ff','#e2d9ff'];
+    }
+
+    /* ---------- Rendering helpers ---------- */
+    function parseHM(dt){ return dt.toLocaleTimeString('en-US',{hour:'2-digit', minute:'2-digit'}).replace(/^0/,''); }
+    function findCurrent(full){
+      const now = new Date();
+      for(let i=0;i<full.length;i++){
+        const b=full[i];
+        if(now>=b.start && now<b.end) return { idx:i, b };
+      }
+      return null;
+    }
+    function buildCurrentRow(full, group, colCount){
+      const row=document.createElement('tr'); row.className='current-row';
+      const td=document.createElement('td'); td.colSpan=colCount;
+      const strip=document.createElement('div'); strip.className='current-strip';
+      const fill=document.createElement('div'); fill.className='current-fill';
+      const label=document.createElement('div'); label.className='current-label';
+      const now=new Date();
+      const cur=findCurrent(full);
+      if(cur){
+        const total=cur.b.end - cur.b.start; const elapsed=now - cur.b.start; const pct=Math.max(0, Math.min(1, elapsed/total))*100;
+        const rem = cur.b.end - now; const m=Math.floor(rem/60000); const s=Math.floor((rem%60000)/1000); const showSec = rem <= 180000;
+        const rText = showSec ? `${m}:${s.toString().padStart(2,'0')}` : `${m} min`;
+        fill.style.setProperty('--fill', pct+'%');
+        const pal = getStripPalette(group, cur.b.label);
+        fill.style.setProperty('--c1', pal[0]);
+        fill.style.setProperty('--c2', pal[1]);
+        label.textContent = `${cur.b.label} — ${rText} left`;
+      } else {
+        const next = full.find(b=> now < b.start);
+        fill.style.setProperty('--fill','0%');
+        const pal = getStripPalette(group, '');
+        fill.style.setProperty('--c1', pal[0]);
+        fill.style.setProperty('--c2', pal[1]);
+        label.textContent = next ? `Next: ${next.label} at ${parseHM(next.start)}` : 'Schedule complete';
+      }
+      strip.appendChild(fill); strip.appendChild(label); td.appendChild(strip); row.appendChild(td); return row;
+    }
+
+    function renderRows(blocks, tbody, ctx){
+      const full = ctx || blocks;
+      const now=new Date();
+      const visible = blocks.filter(b=>!/^(Transition)$/i.test(b.label)); // hide transition rows
+      visible.forEach(b=>{
+        const isLunch = /Lunch/i.test(b.label);
+        const isOngoing = now>=b.start && now<b.end;
+        const isCompleted = now>=b.end;
+        const remaining = Math.max(0, b.end - now);
+        const remainingSec = Math.floor(remaining/1000);
+        const rMin = Math.floor(remainingSec/60);
+        const rSec = remainingSec % 60;
+        const showSec = remaining <= 180000;
+        const remainingText = isOngoing ? (showSec ? `${rMin} min ${rSec.toString().padStart(2,'0')} sec` : `${rMin} min`) : (isCompleted ? 'Completed' : 'Upcoming');
+        const tr=document.createElement('tr');
+        tr.classList.add('data-row');
+        if(isLunch) tr.classList.add('lunch');
+        if(isOngoing) tr.classList.add('upcoming');
+        if(isCompleted) tr.classList.add('completed');
+        tr.innerHTML = `
+          <td>${b.label}</td>
+          <td>${parseHM(b.start)}</td>
+          <td>${parseHM(b.end)}</td>
+          <td>${remainingText}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function updateSchedule(){
+      const singleHeader = document.getElementById('singleHeader');
+      const table = document.getElementById('schedule');
+      const multi = document.getElementById('multiWrapper');
+      const vt = document.getElementById('viewTitle');
+      // Dynamic page header per view
+      if(selectedView==='g1'){ vt.textContent='6th Grade & Freshman Bell Schedule'; vt.style.display='block'; }
+      else if(selectedView==='g2'){ vt.textContent='7th Grade & Sophomore Bell Schedule'; vt.style.display='block'; }
+      else if(selectedView==='g3'){ vt.textContent='8th Grade, Junior & Senior Bell Schedule'; vt.style.display='block'; }
+      else { vt.textContent=''; vt.style.display='none'; }
+
+      // Level button states
+      document.querySelectorAll('.lvlbtn').forEach(btn=>{
+        if(btn.id==='cafBtn') return;
+        btn.setAttribute('aria-pressed', btn.dataset.view===selectedView);
+      });
+      // Cafeteria toggle state
+      const cafBtn = document.getElementById('cafBtn');
+      cafBtn.setAttribute('aria-pressed', cafOnly);
+      cafBtn.textContent = cafOnly ? 'Disable Cafeteria' : 'Enable Cafeteria';
+
+      const lunchWindows = cafOnly ? getLunchWindowsForToday() : null;
+      const filterBlocks = (arr)=> cafOnly ? filterByLunchWindows(arr, lunchWindows) : arr;
+
+      if(selectedView==='all'){
+        singleHeader.style.display='none';
+        table.style.display='none';
+        multi.style.display='grid';
+        multi.style.gridTemplateColumns='repeat(3, minmax(260px, 1fr))';
+        multi.innerHTML='';
+        const groups=[
+          {id:'g1', title:'6th Grade & Freshman'},
+          {id:'g2', title:'7th Grade & Sophomore'},
+          {id:'g3', title:'8th Grade, Junior & Senior'}
+        ];
+        groups.forEach(g=>{
+          const card=document.createElement('div'); card.className='card'; card.setAttribute('data-group', g.id);
+          const hdr=document.createElement('div'); hdr.className='card-header'; hdr.textContent=g.title;
+          const tbl=document.createElement('table');
+          tbl.innerHTML = `<thead><tr><th>Block</th><th>Start</th><th>End</th><th>Remaining</th></tr></thead>`;
+          const tb=document.createElement('tbody');
+          const full = getTodaySchedule(g.id);
+          // Insert current strip row first
+          tb.appendChild(buildCurrentRow(full, g.id, 4));
+          const visible = filterBlocks(full);
+          renderRows(visible, tb, full);
+          tbl.appendChild(tb); card.appendChild(hdr); card.appendChild(tbl); multi.appendChild(card);
+        });
+      } else {
+        singleHeader.style.display='table';
+        table.style.display='table';
+        multi.style.display='none';
+        const tbody=table.querySelector('tbody');
+        tbody.innerHTML='';
+        const full = getTodaySchedule(selectedView);
+        // Insert current strip row first
+        tbody.appendChild(buildCurrentRow(full, selectedView, 4));
+        const visible = filterBlocks(full);
+        renderRows(visible, tbody, full);
+      }
+    }
+
+    // Interactions
+    document.addEventListener('click', (e)=>{
+      const btn = e.target.closest('.lvlbtn');
+      if(!btn) return;
+      if(btn.id==='cafBtn'){
+        cafOnly = !cafOnly; localStorage.setItem('cafOnly', cafOnly ? '1' : '0'); updateSchedule(); return;
+      }
+      selectedView = btn.dataset.view; localStorage.setItem('selectedView', selectedView);
+      if(selectedView!=='all'){ currentGroup = selectedView; localStorage.setItem('gradeGroup', currentGroup); }
+      updateSchedule();
+    });
+
+    /* ---------- Date/Time in header ---------- */
+    function displayDateTime(){
+      const now=new Date();
+      const dayEl=document.getElementById('day');
+      const dateEl=document.getElementById('full-date');
+      const timeEl=document.getElementById('time');
+      if(dayEl&&dateEl&&timeEl){
+        dayEl.textContent = now.toLocaleDateString('en-US',{weekday:'long'});
+        dateEl.textContent = now.toLocaleDateString('en-US',{year:'numeric', month:'long', day:'numeric'});
+        timeEl.textContent = now.toLocaleTimeString('en-US',{hour:'numeric', minute:'numeric', second:'numeric'});
+      }
+    }
+
+    /* ---------- Settings ---------- */
+    function openSettings(){
+      document.getElementById('school-name-input').value = localStorage.getItem('schoolName') || '';
+      document.getElementById('group-select').value = currentGroup;
+      document.getElementById('settings-panel').style.display='block';
+    }
+    function closeSettings(){ document.getElementById('settings-panel').style.display='none'; }
+    function saveSettings(){
+      const name=document.getElementById('school-name-input').value.trim();
+      if(name){ localStorage.setItem('schoolName', name); document.getElementById('school-name').textContent = name; }
+      currentGroup = document.getElementById('group-select').value; localStorage.setItem('gradeGroup', currentGroup);
+      if(selectedView!=='all'){ selectedView=currentGroup; localStorage.setItem('selectedView', selectedView); }
+      closeSettings(); updateSchedule();
+    }
+
+    /* ---------- Color Custom ---------- */
+    function openColorCustom(){ document.getElementById('custom-color-box').style.display='block'; }
+    function closeColorCustom(){ document.getElementById('custom-color-box').style.display='none'; }
+    function saveColorCustom(){
+      const bg=document.getElementById('bg-color').value; const fg=document.getElementById('text-color').value;
+      const header=document.getElementById('header-container');
+      header.style.backgroundColor = bg; document.getElementById('school-name').style.color = fg; document.getElementById('date').style.color = fg; document.getElementById('time').style.color = fg;
+      localStorage.setItem('headerBgColor', bg); localStorage.setItem('textColor', fg);
+      closeColorCustom();
+    }
+    document.getElementById('school-name').addEventListener('click', openColorCustom);
+    function loadColorCustom(){
+      const bg=localStorage.getItem('headerBgColor')||'#000000';
+      const fg=localStorage.getItem('textColor')||'#ffffff';
+      const header=document.getElementById('header-container');
+      header.style.backgroundColor = bg; document.getElementById('school-name').style.color = fg; document.getElementById('date').style.color = fg; document.getElementById('time').style.color = fg;
+      document.getElementById('bg-color').value = bg; document.getElementById('text-color').value = fg;
+    }
+
+    /* ---------- What's New toggle ---------- */
+    function toggleWhatsNew(){ const content=document.getElementById('whats-new-content'); const arrow=document.querySelector('.toggle-arrow'); if(content.style.display==='none'){ content.style.display='block'; arrow.innerHTML='&#9650;'; } else { content.style.display='none'; arrow.innerHTML='&#9660;'; } }
+
+    /* ---------- Wake Lock ---------- */
+    let wakeLock=null; async function requestWakeLock(){ try{ if('wakeLock' in navigator){ wakeLock = await navigator.wakeLock.request('screen'); } }catch(e){ console.warn('WakeLock failed', e); } }
+    document.addEventListener('visibilitychange', async()=>{ if(wakeLock!==null && document.visibilityState==='visible'){ await requestWakeLock(); } });
+
+    /* ---------- What's New helper (FIXED STRUCTURE) ---------- */
+    function appendWhatsNew(){
+      const ul=document.querySelector('#whats-new-content ul'); if(!ul) return;
+      const now=new Date();
+      const ds=now.toLocaleDateString('en-US', {year:'numeric', month:'2-digit', day:'2-digit'});
+      if(!ul.querySelector('li[data-key="hdr-cafe"]')){
+        const li=document.createElement('li');
+        li.setAttribute('data-key','hdr-cafe');
+        li.textContent = `Added group-specific page header and cafeteria mode filter. (${ds})`;
+        ul.prepend(li);
+      }
+    }
+
+    /* ---------- Lightweight runtime tests ---------- */
+    function runTests(){
+      try{
+        // schedule sizes (Mon-Thu) — each group has 17 blocks
+        const mt1=scheduleMT('g1'); const mt2=scheduleMT('g2'); const mt3=scheduleMT('g3');
+        console.assert(mt1.length===17, 'g1 MT length should be 17');
+        console.assert(mt2.length===17, 'g2 MT length should be 17');
+        console.assert(mt3.length===17, 'g3 MT length should be 17');
+        // Friday count
+        const fr=scheduleFri(); console.assert(fr.length===17, 'Friday length should be 17');
+        // Cafeteria filter: no transitions & all overlap some lunch window (using MT windows)
+        const wins=[...scheduleMT('g1'),...scheduleMT('g2'),...scheduleMT('g3')].filter(b=>/Lunch/i.test(b.label)).map(b=>({start:b.start,end:b.end}));
+        const cafG1 = filterByLunchWindows(scheduleMT('g1'), wins);
+        console.assert(cafG1.every(b=>!/Transition/i.test(b.label)), 'Cafeteria filtered rows should exclude transitions');
+        console.assert(cafG1.every(b=>overlapsLunch(b,wins)), 'Cafeteria filtered rows should overlap lunch windows');
+        // Current row builder sanity
+        const now=new Date();
+        const testBlock={label:'Test Period', start:new Date(now.getTime()-30000), end:new Date(now.getTime()+30000)};
+        const tr=buildCurrentRow([testBlock],'g1',4);
+        console.assert(tr.classList.contains('current-row'), 'Current row should have class current-row');
+      }catch(e){ console.warn('Self-tests encountered an error:', e); }
+    }
+
+    /* ---------- Boot ---------- */
+    (function init(){
+      const savedName = localStorage.getItem('schoolName'); if(savedName) document.getElementById('school-name').textContent = savedName;
+      loadColorCustom();
+      displayDateTime(); setInterval(displayDateTime, 1000);
+      updateSchedule(); setInterval(updateSchedule, 1000); appendWhatsNew();
+      requestWakeLock();
+      runTests();
+    })();
+  </script>
+
+  <!-- Simple cookie check (kept) -->
+  <script>
+    function setCookie(name, value, days){ const d=new Date(); d.setTime(d.getTime()+days*24*60*60*1000); document.cookie = `${name}=${value}; expires=${d.toUTCString()}; path=/`; }
+    function getCookie(name){ const nameEQ=name+"="; return document.cookie.split(';').map(c=>c.trim()).find(c=>c.indexOf(nameEQ)===0)?.substring(nameEQ.length)||null; }
+    setCookie('test_cookie','active',7); if(getCookie('test_cookie')) console.log('Cookies OK');
+  </script>
 </body>
 </html>
