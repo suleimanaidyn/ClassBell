@@ -7,66 +7,55 @@
   <title>MyClassBell</title>
   <link rel="icon" href="MyAppIcon.png" type="image/png" />
 
-  <!-- Google tag (gtag.js) & heartbeat -->
+  <!-- Google tag (gtag.js) & heartbeat (optional, safe to remove) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-M2QXES4LKK"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);} // eslint-disable-line
-    gtag('js', new Date());
-    gtag('config', 'G-M2QXES4LKK');
-    setInterval(() => { gtag('event', 'heartbeat', { event_category: 'engagement', event_label: 'page_still_open' }); }, 300000);
+    gtag('js', new Date()); gtag('config', 'G-M2QXES4LKK');
+    setInterval(()=>gtag('event','heartbeat',{event_category:'engagement',event_label:'page_still_open'}),300000);
   </script>
 
   <style>
-    :root{ --header-bg:#000; --header-fg:#fff; --border:#eceff3; --bar-border:#cfd7e3; --accent:#007bff; color-scheme: only light; }
+    :root{ --header-bg:#0b2e6f; --header-fg:#ffffff; --border:#eceff3; --bar-border:#cfd7e3; --accent:#007bff; color-scheme: only light; }
     *{box-sizing:border-box}
-    body{font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Apple Color Emoji','Segoe UI Emoji'; line-height:1.4; font-size:16px; margin:20px; background:#fff; color:#111}
+    body{font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Apple Color Emoji','Segoe UI Emoji'; line-height:1.4; font-size:16px; margin:0; background:#fff; color:#111}
 
     /* Sticky header container */
     #sticky-container{position:sticky; top:0; z-index:1000; background:#fff; border-bottom:1px solid var(--border)}
 
     /* Header */
-    #header-container{display:grid; grid-template-columns:.3fr 1fr .3fr; justify-items:center; align-items:center; padding:6px 8px; background:var(--header-bg); color:var(--header-fg)}
-    #date,#time{font-size:1.5em; font-weight:400}
-    #school-name{font-size:1.5em; font-weight:400; padding:5px; text-align:center; width:80%; cursor:pointer}
-    #day{font-size:1.1em; font-weight:400}
+    #header-container{display:grid; grid-template-columns:.35fr 1fr .35fr; justify-items:center; align-items:center; padding:8px 10px; background:var(--header-bg); color:var(--header-fg)}
+    #date,#time{font-size:1.1rem; font-weight:400}
+    #school-name{font-size:1.2rem; font-weight:400; padding:4px 8px; text-align:center; width:90%; border-radius:6px; cursor:pointer}
 
-    /* Table base */
+    /* Top controls */
+    #levelbar{display:flex; gap:8px; align-items:center; justify-content:space-between; padding:8px 10px; border-bottom:1px solid var(--border); background:#fff; position:sticky; top:48px; z-index:1001; flex-wrap:wrap}
+    .lvlbtn{background:#f4f4f4; color:#000; border:1px solid var(--border); border-radius:6px; padding:6px 10px; cursor:pointer}
+    .lvlbtn[aria-pressed="true"]{background:var(--accent); color:#fff}
+
+    .view-title{font-size:1.05rem; font-weight:400; background:#0B2E6F; color:#fff; text-align:center; padding:8px 10px; border-radius:8px; flex:1 0 100%; margin:6px 0 0 0;}
+
+    /* Single-table fixed header row */
     table{width:100%; border-collapse:collapse; table-layout:fixed; background:#fff}
     th,td{border:1px solid var(--border); padding:8px; text-align:center}
-    /* Force gray headers everywhere (single + all views) */
     #singleHeader thead th, #schedule thead th, #multiWrapper table thead th{background:#6B7280 !important; color:#fff !important; font-weight:400}
 
-    /* One-line CURRENT progress strip row */
+    /* Current one-line progress bar under headers */
     .current-row td{ padding:0; background:#fff; }
     .current-strip{ height:40px; background:#f7f9fc; position:relative; overflow:hidden; border:1px solid var(--bar-border); border-radius:8px; box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 1px 1px rgba(0,0,0,.04) }
     .current-fill{ position:absolute; left:0; top:0; bottom:0; width:var(--fill,0%); background: linear-gradient(90deg, var(--c1,#e9f1ff), var(--c2,#f7fbff)); background-size:200% 100%; animation: stripWave 8s linear infinite; transition:width .5s ease }
     .current-label{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-weight:400; color:#000; font-size:16px; letter-spacing:.3px; padding:0 8px }
 
-    /* Row visuals */
-    #schedule tr.data-row, #multiWrapper table tr.data-row { position: relative; }
-    #schedule tr.data-row::before, #multiWrapper table tr.data-row::before { content:none; }
-    #schedule tr.data-row::after, #multiWrapper table tr.data-row::after{ content:none; }
-    #schedule td, #multiWrapper table td { position:relative; z-index:2; background:transparent; }
-
-    /* Completed (passed) classes smaller */
+    /* Data rows */
     tr.completed { opacity:.55; font-size:.85em; }
-
-    /* Lunch highlighting */
     tr.lunch td { background:#FFF6D6 !important; color:#0B6B2B; font-weight:800; }
-    tr.lunch{ }
-    /* Current period row highlight (neutral blue); lunch keeps its own bg */
     tr.upcoming td { background:#DAECFF !important; }
     tr.lunch.upcoming td { background:#B7E3C4 !important; color:#0B6B2B !important; }
     tr.upcoming td:first-child { box-shadow: inset 4px 0 0 #1b6ef3; }
 
-    /* Levelbar */
-    #levelbar{display:flex; gap:8px; align-items:center; justify-content:space-between; padding:8px 6px; border-bottom:1px solid var(--border); background:#fff; position:sticky; top:0; z-index:1001; flex-wrap:wrap}
-    .lvlbtn{background:#f4f4f4; color:#000; border:1px solid var(--border); border-radius:6px; padding:6px 10px; cursor:pointer}
-    .lvlbtn[aria-pressed="true"]{background:var(--accent); color:#fff}
-
-    /* All-view: distinctive card colors */
-    #multiWrapper{display:none; gap:12px; margin-top:8px; background:#fff;}
+    /* Multi (All) view cards */
+    #multiWrapper{display:none; gap:12px; margin:10px; background:#fff;}
     .card{border:1px solid var(--border); border-radius:8px; overflow:hidden; background:#fff !important}
     .card-header{font-weight:400; padding:8px 10px; text-align:center}
     [data-group="g1"] > .card-header{ background:#2F6ADF; color:#fff; }
@@ -77,36 +66,25 @@
     #settings-panel{display:none; position:fixed; top:10%; left:50%; transform:translate(-50%,0); background:#fff; border:1px solid #ddd; padding:20px; z-index:2000; box-shadow:0 2px 10px rgba(0,0,0,.1); max-height:80%; overflow:auto; width:340px}
     #settings-panel input, #settings-panel select{margin:6px 0; width:100%; padding:8px}
 
-    /* Color custom */
+    /* Color popup */
     #custom-color-box{display:none; position:fixed; top:10%; left:50%; transform:translate(-50%,0); background:#fff; border:1px solid #ddd; padding:20px; z-index:2000; box-shadow:0 2px 10px rgba(0,0,0,.1); width:300px}
     #custom-color-box input{margin:10px 0; width:100%; padding:5px}
 
-    /* What's new */
-    #whats-new{font-family:'Open Sans', sans-serif; font-size:12px; font-style:italic}
-    #whats-new h3{font-size:16px; font-style:italic; cursor:pointer}
-    #whats-new-content{display:none}
-    .toggle-arrow{margin-left:5px}
-
-    .footer{width:100%; border-top:1px solid var(--border); padding:5px 20px; display:flex; align-items:center; gap:12px; font-size:.95rem; flex-wrap:wrap}
-    .footer a{text-decoration:none; border-radius:5px; padding:5px 10px; color:#fff}
-    .readme-link{background:#1b6ef3}
-    .track-link{background:#2e8b57}
-    .timer-link{background:#ff9800}
-    .share .twitter{background:#000}
-    .share .facebook{background:#3B5998}
-    .share .linkedin{background:#0A66C2}
-
-    @keyframes stripWave { 0% { background-position:0% 0; } 100% { background-position:200% 0; } }
-
-    /* Ensure light mode even if OS prefers dark */
-    @media (prefers-color-scheme: dark){ body, #sticky-container, table, th, td { background:#fff !important; color:#000 !important; } }
-    .view-title{font-size:1.1rem; font-weight:400; background:#0B2E6F; color:#fff; text-align:center; padding:8px 10px; border-radius:8px; flex:1 0 100%; margin:8px 0 0 0;}
-    #singleHeader{margin-top:4px}
-    .campus-note{margin-top:8px; font-style:normal; color:#333; background:transparent; text-align:left; padding:0; border-radius:0; font-weight:400}
+    /* Below-note */
+    .campus-note{margin:10px; font-style:normal; color:#333; background:transparent; text-align:left; padding:0; border-radius:0; font-weight:400}
     .campus-note a{ color:#0645AD; text-decoration:underline; }
+
     td.editable{cursor:text}
     td[contenteditable="true"]{outline:2px solid #5bb98a; background:#f6fffa}
     #school-name[contenteditable="true"]{outline:2px dashed #5bb98a; background:rgba(91,185,138,.12)}
+
+    /* header edit */
+    .editable-header[contenteditable="true"]{
+      outline:2px dashed #5bb98a; background:rgba(91,185,138,.12);
+    }
+
+    @keyframes stripWave { 0% { background-position:0% 0; } 100% { background-position:200% 0; } }
+    @media (prefers-color-scheme: dark){ body, #sticky-container, table, th, td { background:#fff !important; color:#000 !important; } }
   </style>
 </head>
 <body>
@@ -117,11 +95,11 @@
         <span class="separator" aria-hidden="true"> </span>
         <span id="full-date"></span>
       </div>
-      <div id="school-name" tabindex="0" title="Click to change header colors">HSA El Paso</div>
+      <div id="school-name" tabindex="0" title="Click to change header colors">Harmony Science Academy</div>
       <div id="time" aria-live="polite"></div>
     </div>
 
-    <!-- Top Level Toggle: L1/L2/L3 + All(Admin) + Cafeteria -->
+    <!-- Top controls -->
     <div id="levelbar">
       <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap">
         <button class="lvlbtn" data-view="g1" aria-pressed="false" title="L1 = 6th & 9th">L1</button>
@@ -136,21 +114,21 @@
       <div id="viewTitle" class="view-title"></div>
     </div>
 
-    <!-- Single-view table header (hidden in All view) -->
-    <table id="singleHeader"><thead><tr><th>Block</th><th>Start</th><th>End</th><th>Remaining</th></tr></thead>
-    </table>
+    <!-- Single-view fixed table header -->
+    <table id="singleHeader"><thead><tr><th>Block</th><th>Start</th><th>End</th><th>Remaining</th></tr></thead></table>
   </div>
 
-  <!-- Single body OR multi-wrapper will render here -->
+  <!-- Single body OR multi-wrapper -->
   <table id="schedule" aria-label="Schedule table (single view)"><tbody></tbody></table>
   <div id="multiWrapper"></div>
 
-  <!-- Campus note moved under the table(s) -->
+  <!-- Note under tables -->
   <div id="campus-note-below" class="campus-note">
-    For other campuses: If you want a pre-defined bell schedule with your school name and a special link, email your bell schedule to <a href="mailto:saydin19@gmail.com">saydin19@gmail.com</a>.
+    For other campuses: If you want a pre-defined bell schedule with your school name and a special link, email your bell schedule to
+    <a href="mailto:saydin19@gmail.com">saydin19@gmail.com</a>.
   </div>
 
-  <!-- Settings (simplified) -->
+  <!-- Settings -->
   <div id="settings-panel">
     <h3>Settings</h3>
     <input type="text" id="school-name-input" placeholder="Enter school name" />
@@ -174,34 +152,11 @@
 
   <button id="settings-button" style="position:fixed; bottom:20px; right:20px; padding:10px; background:#007bff; color:#fff; border:none; border-radius:50%; cursor:pointer; font-size:16px" onclick="openSettings()">⚙</button>
 
-  <!-- What's New -->
-  <div id="whats-new" style="margin-top:14px">
-    <h3 onclick="toggleWhatsNew()">What's New <span class="toggle-arrow">&#9660;</span></h3>
-    <div id="whats-new-content">
-      <ul>
-        <li>Added a thin CURRENT progress strip under each table header (color by block type). (2025‑08‑13)</li>
-        <li>Class=group color, Transition=red, Lunch=dark green. (2025‑08‑13)</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Footer -->
-  <div class="footer">
-    <a class="readme-link" href="readme.html" target="_blank">ReadMe</a>
-    <a class="track-link" href="track.html" target="_blank">Hallway Track</a>
-    <a class="timer-link" href="timer.html" target="_blank">Timer</a>
-    <span class="share">Share: 
-      <a class="twitter" href="https://twitter.com/intent/tweet?text=Explore%20this%20incredible%20free%20Bell%20Schedule%20Tool%20designed%20exclusively%20for%20educators!&url=https://classbellschedule.com" target="_blank">Twitter</a>
-      <a class="facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://classbellschedule.com" target="_blank">Facebook</a>
-      <a class="linkedin" href="https://www.linkedin.com/shareArticle?mini=true&url=https://classbellschedule.com&title=Explore%20this%20incredible%20free%20Bell%20Schedule%20Tool%20designed%20exclusively%20for%20educators!" target="_blank">LinkedIn</a>
-    </span>
-  </div>
-
   <!-- Color Custom Popup -->
   <div id="custom-color-box">
     <h3>Color Custom</h3>
     <label for="bg-color">Header Background</label>
-    <input type="color" id="bg-color" value="#000000">
+    <input type="color" id="bg-color" value="#0b2e6f">
     <label for="text-color">Header Text</label>
     <input type="color" id="text-color" value="#ffffff">
     <button onclick="saveColorCustom()">Save</button>
@@ -275,7 +230,6 @@
       S.push(makeBlock('Transition','09:43','09:48'));
       S.push(makeBlock('4th Period','09:48','10:24'));
       S.push(makeBlock('Transition','10:24','10:29'));
-      // Lunch waves
       S.push(makeBlock('L1 Lunch','10:29','11:05'));
       S.push(makeBlock('Transition','11:05','11:10'));
       S.push(makeBlock('L2 Lunch','11:10','11:46'));
@@ -286,6 +240,26 @@
       return S;
     }
 
+    /* ---------- Editable group titles (persisted) ---------- */
+    const TITLES_KEY = 'group_titles_v1';
+    const DEFAULT_TITLES = {
+      g1: '6th Grade & Freshman',
+      g2: '7th Grade & Sophomore',
+      g3: '8th Grade, Junior & Senior'
+    };
+    function loadGroupTitles(){
+      try {
+        const saved = JSON.parse(localStorage.getItem(TITLES_KEY) || '{}');
+        return { ...DEFAULT_TITLES, ...saved };
+      } catch { return { ...DEFAULT_TITLES }; }
+    }
+    function saveGroupTitle(group, title){
+      const cur = loadGroupTitles();
+      cur[group] = title && title.trim() ? title.trim() : DEFAULT_TITLES[group];
+      localStorage.setItem(TITLES_KEY, JSON.stringify(cur));
+    }
+    let GROUP_TITLES = loadGroupTitles();
+
     /* ---------- App State ---------- */
     let currentGroup = localStorage.getItem('gradeGroup') || 'g1';
     let selectedView = localStorage.getItem('selectedView') || currentGroup; // 'g1'|'g2'|'g3'|'all'
@@ -293,7 +267,6 @@
     let hidePastBreaks = (localStorage.getItem('hidePastBreaks') === '1');
     let isEditing = false;
 
-    const GROUP_TITLES = { g1:'6th Grade & Freshman', g2:'7th Grade & Sophomore', g3:'8th Grade, Junior & Senior' };
     function getEnabledGroups(){
       let obj; try{ obj = JSON.parse(localStorage.getItem('enabledGroups')||'{}'); }catch(_){ obj = {}; }
       const defaults = {g1:true,g2:true,g3:true}; obj = { ...defaults, ...obj };
@@ -321,9 +294,7 @@
     function applyHidePastBreaks(blocks, nowVal){ const now = nowVal || new Date(); return hidePastBreaks ? blocks.filter(b=> !( /^Transition$/i.test(b.label) && b.end < now)) : blocks; }
 
     /* ---------- Header strip palette ---------- */
-    function groupColor(group){ return group==='g1' ? '#1b6ef3' : (group==='g2' ? '#2e8b57' : '#6f42c1'); }
     function getStripPalette(group,label){
-      // Slightly darker palettes for better contrast under black text
       if(/Transition/i.test(label)) return ['#ff2d2d','#ff6b6b'];
       if(/Lunch/i.test(label)) return ['#b9e4c3','#d6f2db'];
       if(group==='g1') return ['#bcd4ff','#d5e6ff'];
@@ -398,13 +369,14 @@
     }
 
     function updateSchedule(){
-      if(isEditing) return; // pause live re-render while inline editing is active
+      if(isEditing) return;
       const singleHeader = document.getElementById('singleHeader');
       const table = document.getElementById('schedule');
       const multi = document.getElementById('multiWrapper');
       const vt = document.getElementById('viewTitle');
+      GROUP_TITLES = loadGroupTitles(); // refresh in case it changed
 
-      // Enabled groups and view safety
+      // Enabled groups safety
       const enabled = getEnabledGroups();
       if(['g1','g2','g3'].includes(selectedView) && !enabled.includes(selectedView)){
         selectedView = enabled[0] || 'all'; localStorage.setItem('selectedView', selectedView);
@@ -413,7 +385,7 @@
         currentGroup = enabled[0] || 'g1'; localStorage.setItem('gradeGroup', currentGroup);
       }
 
-      // Dynamic page header per view
+      // Page header per view (editable in single view)
       if(selectedView==='g1'){ vt.textContent=GROUP_TITLES.g1 + ' Bell Schedule'; vt.style.display='block'; }
       else if(selectedView==='g2'){ vt.textContent=GROUP_TITLES.g2 + ' Bell Schedule'; vt.style.display='block'; }
       else if(selectedView==='g3'){ vt.textContent=GROUP_TITLES.g3 + ' Bell Schedule'; vt.style.display='block'; }
@@ -430,7 +402,7 @@
           btn.setAttribute('aria-pressed', selectedView==='all');
         }
       });
-      // Cafeteria toggle state
+      // Cafeteria & hide-breaks states
       const cafBtn = document.getElementById('cafBtn');
       cafBtn.setAttribute('aria-pressed', cafOnly);
       cafBtn.textContent = cafOnly ? 'Disable Cafeteria' : 'Enable Cafeteria';
@@ -455,7 +427,6 @@
           tbl.innerHTML = `<thead><tr><th>Block</th><th>Start</th><th>End</th><th>Remaining</th></tr></thead>`;
           const tb=document.createElement('tbody');
           let full = getTodaySchedule(g.id); full = applyOverrides(full, g.id, getDayKey());
-          // Insert current strip row first
           tb.appendChild(buildCurrentRow(full, g.id, 4));
           const visible = applyHidePastBreaks(filterBlocks(full));
           renderRows(visible, tb, full, g.id);
@@ -468,14 +439,13 @@
         const tbody=table.querySelector('tbody');
         tbody.innerHTML='';
         let full = getTodaySchedule(selectedView); full = applyOverrides(full, selectedView, getDayKey());
-        // Insert current strip row first
         tbody.appendChild(buildCurrentRow(full, selectedView, 4));
         const visible = applyHidePastBreaks(filterBlocks(full));
         renderRows(visible, tbody, full, selectedView);
       }
     }
 
-    // Interactions
+    // Button interactions
     document.addEventListener('click', (e)=>{
       const btn = e.target.closest('.lvlbtn');
       if(!btn) return;
@@ -487,7 +457,7 @@
       }
       if(btn.dataset.view){
         const id = btn.dataset.view;
-        if(['g1','g2','g3'].includes(id) && !isGroupEnabled(id)) return; // ignore disabled group buttons
+        if(['g1','g2','g3'].includes(id) && !isGroupEnabled(id)) return;
         selectedView = id; localStorage.setItem('selectedView', selectedView);
         if(selectedView!=='all' && ['g1','g2','g3'].includes(selectedView)){
           currentGroup = selectedView; localStorage.setItem('gradeGroup', currentGroup);
@@ -496,7 +466,7 @@
       }
     });
 
-    // Double-click to edit school name, block label, and times (inline, no prompts)
+    // Inline editing helpers
     function selectAll(el){ const r=document.createRange(); r.selectNodeContents(el); const s=window.getSelection(); s.removeAllRanges(); s.addRange(r); }
     function commitCellEdit(td){
       const tr = td.closest('tr'); if(!tr) return;
@@ -521,8 +491,8 @@
       isEditing=false; td.removeAttribute('contenteditable'); updateSchedule();
     }
 
+    // Cell & school-name editing
     document.addEventListener('dblclick', (e)=>{
-      // School name inline edit
       if(e.target.closest('#school-name')){
         const sn=document.getElementById('school-name');
         isEditing=true; sn.setAttribute('contenteditable','true'); sn.focus(); selectAll(sn);
@@ -534,11 +504,14 @@
       isEditing=true; td.setAttribute('contenteditable','true'); td.focus(); selectAll(td);
     });
 
-    // Commit edits on Enter/Escape/blur
     document.addEventListener('keydown', (e)=>{
-      const ed = e.target.closest('td[contenteditable="true"], #school-name[contenteditable="true"]');
+      const ed = e.target.closest('td[contenteditable="true"], #school-name[contenteditable="true"], .editable-header[contenteditable="true"]');
       if(!ed) return;
-      if(e.key==='Enter'){ e.preventDefault(); if(ed.id==='school-name'){ ed.blur(); } else { commitCellEdit(ed); } }
+      if(e.key==='Enter'){ e.preventDefault();
+        if(ed.id==='school-name'){ ed.blur(); }
+        else if(ed.classList.contains('editable-header')){ ed.blur(); }
+        else { commitCellEdit(ed); }
+      }
       if(e.key==='Escape'){ e.preventDefault(); isEditing=false; ed.removeAttribute('contenteditable'); updateSchedule(); }
     });
     document.addEventListener('blur', (e)=>{
@@ -546,17 +519,75 @@
       if(!td) return; commitCellEdit(td);
     }, true);
 
+    /* ----- Header inline editing for group titles ----- */
+    function beginHeaderEdit(el, groupId){
+  if(!groupId) return;
+
+  // Pause re-rendering while editing
+  isEditing = true;
+
+  el.classList.add('editable-header');
+  el.setAttribute('contenteditable','true');
+
+  // select all text
+  const r=document.createRange(); r.selectNodeContents(el);
+  const s=window.getSelection(); s.removeAllRanges(); s.addRange(r);
+  el.focus();
+
+  const finish = (commit) => {
+    el.removeEventListener('blur', onBlur);
+    el.removeEventListener('keydown', onKey);
+    const text = el.textContent.replace(/Bell Schedule$/,'').trim();
+
+    el.removeAttribute('contenteditable');
+    el.classList.remove('editable-header');
+
+    if(commit && text){ 
+      saveGroupTitle(groupId, text);
+      GROUP_TITLES = loadGroupTitles();
+    }
+
+    // Resume re-rendering
+    isEditing = false;
+    updateSchedule();
+  };
+
+  const onBlur = () => finish(true);
+  const onKey = (e) => {
+    if(e.key==='Enter'){ e.preventDefault(); finish(true); }
+    if(e.key==='Escape'){ e.preventDefault(); finish(false); }
+  };
+
+  el.addEventListener('blur', onBlur, { once:true });
+  el.addEventListener('keydown', onKey);
+}
+
+
+    // Double-click single-view title to edit
+    document.addEventListener('dblclick', (e)=>{
+      const vt = e.target.closest('#viewTitle');
+      if(!vt) return;
+      if(!['g1','g2','g3'].includes(selectedView)) return;
+      vt.textContent = GROUP_TITLES[selectedView]; // remove suffix while editing
+      beginHeaderEdit(vt, selectedView);
+    });
+
+    // Double-click a card header in All view
+    document.addEventListener('dblclick', (e)=>{
+      const hdr = e.target.closest('.card-header');
+      if(!hdr) return;
+      const card = hdr.parentElement;
+      const groupId = card?.getAttribute('data-group');
+      if(!['g1','g2','g3'].includes(groupId)) return;
+      beginHeaderEdit(hdr, groupId);
+    });
+
     /* ---------- Date/Time in header ---------- */
     function displayDateTime(){
       const now=new Date();
-      const dayEl=document.getElementById('day');
-      const dateEl=document.getElementById('full-date');
-      const timeEl=document.getElementById('time');
-      if(dayEl&&dateEl&&timeEl){
-        dayEl.textContent = now.toLocaleDateString('en-US',{weekday:'long'});
-        dateEl.textContent = now.toLocaleDateString('en-US',{year:'numeric', month:'long', day:'numeric'});
-        timeEl.textContent = now.toLocaleTimeString('en-US',{hour:'numeric', minute:'numeric', second:'numeric'});
-      }
+      document.getElementById('day').textContent = now.toLocaleDateString('en-US',{weekday:'long'});
+      document.getElementById('full-date').textContent = now.toLocaleDateString('en-US',{year:'numeric', month:'long', day:'numeric'});
+      document.getElementById('time').textContent = now.toLocaleTimeString('en-US',{hour:'numeric', minute:'numeric', second:'numeric'});
     }
 
     /* ---------- Settings ---------- */
@@ -573,13 +604,10 @@
     function saveSettings(){
       const name=document.getElementById('school-name-input').value.trim();
       if(name){ localStorage.setItem('schoolName', name); document.getElementById('school-name').textContent = name; }
-      // default group
       currentGroup = document.getElementById('group-select').value; localStorage.setItem('gradeGroup', currentGroup);
-      // enabled groups
       const eg={ g1: !!document.getElementById('enabled-g1').checked, g2: !!document.getElementById('enabled-g2').checked, g3: !!document.getElementById('enabled-g3').checked };
-      if(!eg.g1 && !eg.g2 && !eg.g3){ eg.g1=true; } // ensure at least one
+      if(!eg.g1 && !eg.g2 && !eg.g3){ eg.g1=true; }
       setEnabledGroups(eg);
-      // fix selected view if disabled
       const enabledList = getEnabledGroups();
       if(selectedView!=='all' && !enabledList.includes(selectedView)){
         selectedView = enabledList[0] || 'all'; localStorage.setItem('selectedView', selectedView);
@@ -596,102 +624,20 @@
     function saveColorCustom(){
       const bg=document.getElementById('bg-color').value; const fg=document.getElementById('text-color').value;
       const header=document.getElementById('header-container');
-      header.style.backgroundColor = bg; document.getElementById('school-name').style.color = fg; document.getElementById('date').style.color = fg; document.getElementById('time').style.color = fg;
+      header.style.backgroundColor = bg;
+      document.getElementById('school-name').style.color = fg;
+      document.getElementById('date').style.color = fg;
+      document.getElementById('time').style.color = fg;
       localStorage.setItem('headerBgColor', bg); localStorage.setItem('textColor', fg);
       closeColorCustom();
     }
     document.getElementById('school-name').addEventListener('click', openColorCustom);
     function loadColorCustom(){
-      const bg=localStorage.getItem('headerBgColor')||'#000000';
+      const bg=localStorage.getItem('headerBgColor')||'#0b2e6f';
       const fg=localStorage.getItem('textColor')||'#ffffff';
       const header=document.getElementById('header-container');
       header.style.backgroundColor = bg; document.getElementById('school-name').style.color = fg; document.getElementById('date').style.color = fg; document.getElementById('time').style.color = fg;
       document.getElementById('bg-color').value = bg; document.getElementById('text-color').value = fg;
-    }
-
-    /* ---------- What's New toggle ---------- */
-    function toggleWhatsNew(){ const content=document.getElementById('whats-new-content'); const arrow=document.querySelector('.toggle-arrow'); if(content.style.display==='none'){ content.style.display='block'; arrow.innerHTML='&#9650;'; } else { content.style.display='none'; arrow.innerHTML='&#9660;'; } }
-
-    /* ---------- Wake Lock ---------- */
-    let wakeLock=null; async function requestWakeLock(){ try{ if('wakeLock' in navigator){ wakeLock = await navigator.wakeLock.request('screen'); } }catch(e){ console.warn('WakeLock failed', e); } }
-    document.addEventListener('visibilitychange', async()=>{ if(wakeLock!==null && document.visibilityState==='visible'){ await requestWakeLock(); } });
-
-    /* ---------- What's New helper (FIXED STRUCTURE) ---------- */
-    function appendWhatsNew(){
-      const ul=document.querySelector('#whats-new-content ul'); if(!ul) return;
-      const now=new Date();
-      const ds=now.toLocaleDateString('en-US', {year:'numeric', month:'2-digit', day:'2-digit'});
-      if(!ul.querySelector('li[data-key="hdr-cafe"]')){
-        const li=document.createElement('li');
-        li.setAttribute('data-key','hdr-cafe');
-        li.textContent = `Added group-specific page header and cafeteria mode filter. (${ds})`;
-        ul.prepend(li);
-      }
-    }
-
-    /* ---------- Lightweight runtime tests ---------- */
-    function runTests(){
-      try{
-        // schedule sizes (Mon-Thu) — each group has 17 blocks
-        const mt1=scheduleMT('g1'); const mt2=scheduleMT('g2'); const mt3=scheduleMT('g3');
-        console.assert(mt1.length===17, 'g1 MT length should be 17');
-        console.assert(mt2.length===17, 'g2 MT length should be 17');
-        console.assert(mt3.length===17, 'g3 MT length should be 17');
-        // Friday count
-        const fr=scheduleFri(); console.assert(fr.length===17, 'Friday length should be 17');
-        // Cafeteria filter: no transitions & all overlap some lunch window (using MT windows)
-        const wins=[...scheduleMT('g1'),...scheduleMT('g2'),...scheduleMT('g3')]
-          .filter(b=>/Lunch/i.test(b.label))
-          .map(b=>({start:b.start,end:b.end}));
-        const cafG1 = filterByLunchWindows(scheduleMT('g1'), wins);
-        console.assert(cafG1.every(b=>!/Transition/i.test(b.label)), 'Cafeteria filtered rows should exclude transitions');
-        console.assert(cafG1.every(b=>overlapsLunch(b,wins)), 'Cafeteria filtered rows should overlap lunch windows');
-        // current row builder sanity
-        const now=new Date();
-        const testBlock={label:'Test Period', start:new Date(now.getTime()-30000), end:new Date(now.getTime()+30000)};
-        const tr=buildCurrentRow([testBlock],'g1',4);
-        console.assert(tr.classList.contains('current-row'), 'Current row should have class current-row');
-        // time parsing helpers
-        const p1=parseInputTime('7:45 AM'); console.assert(p1 && p1.h===7 && p1.m===45, 'parse 7:45 AM');
-        const p2=parseInputTime('12:00 AM'); console.assert(p2 && p2.h===0 && p2.m===0, 'parse 12:00 AM');
-        const p3=parseInputTime('12:00 PM'); console.assert(p3 && p3.h===12 && p3.m===0, 'parse 12:00 PM');
-        console.assert(timeToHHMM(fmt(7,5))==='07:05','HH:MM formatter');
-        // invalid time parsing
-        console.assert(parseInputTime('25:00')===null, 'invalid hour rejected');
-        console.assert(parseInputTime('09:77')===null, 'invalid minute rejected');
-        // overrides round-trip (non-destructive)
-        const prev = loadOverrides();
-        try {
-          const tmp = { ...prev };
-          tmp.MT = tmp.MT || {}; tmp.MT.gX = { 0: { label: 'X Block', start: '07:00', end: '07:30' } };
-          localStorage.setItem(OV_KEY, JSON.stringify(tmp));
-          const base=[makeBlock('Base','07:10','07:20')];
-          const applied = applyOverrides(base.slice(), 'gX', 'MT');
-          console.assert(applied[0].label==='X Block', 'override label applied');
-          console.assert(applied[0].start.getHours()===7 && applied[0].start.getMinutes()===0, 'override start applied');
-        } finally {
-          localStorage.setItem(OV_KEY, JSON.stringify(prev));
-        }
-        // hide-past-breaks filter test
-        const prevHB = hidePastBreaks; hidePastBreaks = true;
-        try{
-          const now2=new Date();
-          const pastT={label:'Transition', start:new Date(now2.getTime()-600000), end:new Date(now2.getTime()-300000)};
-          const futureT={label:'Transition', start:new Date(now2.getTime()+60000), end:new Date(now2.getTime()+120000)};
-          const period={label:'1st Period', start:new Date(now2.getTime()-60000), end:new Date(now2.getTime()+600000)};
-          const out=applyHidePastBreaks([pastT,futureT,period], now2);
-          console.assert(!out.includes(pastT), 'past transition removed');
-          console.assert(out.includes(futureT), 'future transition kept');
-          console.assert(out.includes(period), 'period kept');
-        } finally { hidePastBreaks = prevHB; }
-        // enabled groups affect cafeteria windows
-        const prevEG = localStorage.getItem('enabledGroups');
-        try{
-          setEnabledGroups({g1:true,g2:false,g3:false});
-          const w = getLunchWindowsForToday();
-          console.assert(w.length>0 && w.every(x=>x.group==='g1'), 'Lunch windows limited to enabled groups');
-        } finally { if(prevEG){ localStorage.setItem('enabledGroups', prevEG); } else { localStorage.removeItem('enabledGroups'); } }
-      }catch(e){ console.warn('Self-tests encountered an error:', e); }
     }
 
     /* ---------- Boot ---------- */
@@ -699,13 +645,11 @@
       const savedName = localStorage.getItem('schoolName'); if(savedName) document.getElementById('school-name').textContent = savedName;
       loadColorCustom();
       displayDateTime(); setInterval(displayDateTime, 1000);
-      updateSchedule(); setInterval(updateSchedule, 1000); appendWhatsNew();
-      requestWakeLock();
-      runTests();
+      updateSchedule(); setInterval(updateSchedule, 1000);
     })();
   </script>
 
-  <!-- Simple cookie check (kept) -->
+  <!-- Simple cookie check (optional) -->
   <script>
     function setCookie(name, value, days){ const d=new Date(); d.setTime(d.getTime()+days*24*60*60*1000); document.cookie = `${name}=${value}; expires=${d.toUTCString()}; path=/`; }
     function getCookie(name){ const nameEQ=name+"="; return document.cookie.split(';').map(c=>c.trim()).find(c=>c.indexOf(nameEQ)===0)?.substring(nameEQ.length)||null; }
@@ -713,4 +657,3 @@
   </script>
 </body>
 </html>
-
