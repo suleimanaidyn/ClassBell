@@ -1,620 +1,653 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="color-scheme" content="light" />
-  <title>MyClassBell</title>
-  <link rel="icon" href="MyAppIcon.png" type="image/png" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MyClassBell</title>
+<link rel="icon" href="MyAppIcon.png" type="image/png"/>
 
-  <!-- Google tag (gtag.js) & heartbeat -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-M2QXES4LKK"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-M2QXES4LKK');
-    setInterval(() => { gtag('event', 'heartbeat', { event_category: 'engagement', event_label: 'page_still_open' }); }, 300000);
-  </script>
+<style>
+  :root{ --header-bg:#0b2e6f; --header-fg:#ffffff; --border:#eceff3; --bar-border:#cfd7e3; --accent:#007bff; }
+  *{box-sizing:border-box} body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Noto Sans,Ubuntu,Cantarell,Arial; margin:0; background:#fff; color:#111}
 
-  <style>
-    :root{ --header-bg:#000; --header-fg:#fff; --border:#eceff3; --bar-border:#cfd7e3; --accent:#007bff; color-scheme: only light; }
-    *{box-sizing:border-box}
-    body{font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Apple Color Emoji','Segoe UI Emoji'; line-height:1.4; font-size:16px; margin:20px; background:#fff; color:#111}
+  /* Sticky header */
+  #sticky-container{position:sticky; top:0; z-index:1000; background:#fff; border-bottom:1px solid var(--border)}
+  #header-container{display:grid; grid-template-columns:.35fr 1fr .35fr; align-items:center; justify-items:center; gap:8px; padding:8px; background:var(--header-bg); color:var(--header-fg)}
+  #school-name{cursor:pointer; font-size:1.2rem}
+  #date,#time{font-size:1.05rem}
 
-    /* Sticky header container */
-    #sticky-container{position:sticky; top:0; z-index:1000; background:#fff; border-bottom:1px solid var(--border)}
+  /* Controls */
+  #levelbar{display:flex; gap:8px; align-items:center; justify-content:space-between; padding:8px; border-bottom:1px solid var(--border); background:#fff; position:sticky; top:48px; z-index:1001; flex-wrap:wrap}
+  .lvlbtn{background:#f4f4f4; border:1px solid var(--border); border-radius:6px; padding:6px 10px; cursor:pointer}
+  .lvlbtn[aria-pressed="true"]{background:var(--accent); color:#fff}
+  .view-title{flex:1 0 100%; background:#0B2E6F; color:#fff; text-align:center; padding:8px 10px; border-radius:8px; margin-top:6px}
 
-    /* Header */
-    #header-container{display:grid; grid-template-columns:.3fr 1fr .3fr; justify-items:center; align-items:center; padding:6px 8px; background:var(--header-bg); color:var(--header-fg)}
-    #date,#time{font-size:1.5em; font-weight:400}
-    #school-name{font-size:1.5em; font-weight:400; padding:5px; text-align:center; width:80%; cursor:pointer}
-    #day{font-size:1.1em; font-weight:400}
+  /* Tables */
+  table{width:100%; border-collapse:collapse; table-layout:fixed; background:#fff}
+  th,td{border:1px solid var(--border); padding:8px; text-align:center}
+  #singleHeader thead th, #schedule thead th, #multiWrapper table thead th{background:#6B7280; color:#fff; font-weight:400}
 
-    /* Table base */
-    table{width:100%; border-collapse:collapse; table-layout:fixed; background:#fff}
-    th,td{border:1px solid var(--border); padding:8px; text-align:center}
-    /* Force gray headers */
-    #singleHeader thead th, #schedule thead th, #multiWrapper table thead th{background:#6B7280 !important; color:#fff !important; font-weight:400}
+  .current-row td{padding:0}
+  .current-strip{height:40px; background:#f7f9fc; border:1px solid var(--bar-border); border-radius:8px; position:relative; overflow:hidden}
+  .current-fill{position:absolute; inset:0 0 0 0; width:var(--fill,0%); background:linear-gradient(90deg, var(--c1,#e9f1ff), var(--c2,#f7fbff)); background-size:200% 100%; animation:stripWave 8s linear infinite; transition:width .5s ease}
+  .current-label{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-weight:500}
 
-    /* One-line CURRENT progress strip row */
-    .current-row td{ padding:0; background:#fff; }
-    .current-strip{ height:40px; background:#f7f9fc; position:relative; overflow:hidden; border:1px solid var(--bar-border); border-radius:8px; box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 1px 1px rgba(0,0,0,.04) }
-    .current-fill{ position:absolute; left:0; top:0; bottom:0; width:var(--fill,0%); background: linear-gradient(90deg, var(--c1,#e9f1ff), var(--c2,#f7fbff)); background-size:200% 100%; animation: stripWave 8s linear infinite; transition:width .5s ease }
-    .current-label{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-weight:400; color:#000; font-size:16px; letter-spacing:.3px; padding:0 8px }
+  tr.completed{opacity:.55; font-size:.9em}
+  tr.upcoming td{background:#DAECFF}
+  tr.lunch td{background:#FFF6D6; color:#0B6B2B; font-weight:800}
+  tr.lunch.upcoming td{background:#B7E3C4; color:#0B6B2B}
+  tr.upcoming td:first-child{box-shadow:inset 4px 0 0 #1b6ef3}
 
-    /* Rows */
-    tr.completed { opacity:.55; font-size:.85em; }
-    tr.lunch td { background:#FFF6D6 !important; color:#0B6B2B; font-weight:800; }
-    tr.upcoming td { background:#DAECFF !important; }
-    tr.lunch.upcoming td { background:#B7E3C4 !important; color:#0B6B2B !important; }
-    tr.upcoming td:first-child { box-shadow: inset 4px 0 0 #1b6ef3; }
+  /* Cards */
+  #multiWrapper{display:none; gap:12px; margin:10px}
+  .card{border:1px solid var(--border); border-radius:8px; overflow:hidden; background:#fff}
+  .card-header{padding:8px 10px; text-align:center; font-weight:500; cursor:default}
+  [data-group="g1"]>.card-header{background:#2F6ADF; color:#fff}
+  [data-group="g2"]>.card-header{background:#1F8552; color:#fff}
+  [data-group="g3"]>.card-header{background:#5A3DBF; color:#fff}
 
-    /* Levelbar */
-    #levelbar{display:flex; gap:8px; align-items:center; justify-content:space-between; padding:8px 6px; border-bottom:1px solid var(--border); background:#fff; position:sticky; top:0; z-index:1001; flex-wrap:wrap}
-    .lvlbtn{background:#f4f4f4; color:#000; border:1px solid var(--border); border-radius:6px; padding:6px 10px; cursor:pointer}
-    .lvlbtn[aria-pressed="true"]{background:var(--accent); color:#fff}
+  /* Editable */
+  td.editable{cursor:text}
+  td[contenteditable="true"]{outline:2px solid #5bb98a; background:#f6fffa}
+  #school-name[contenteditable="true"], .editable-header[contenteditable="true"]{outline:2px dashed #5bb98a; background:rgba(91,185,138,.12)}
 
-    /* All-view */
-    #multiWrapper{display:none; gap:12px; margin-top:8px; background:#fff;}
-    .card{border:1px solid var(--border); border-radius:8px; overflow:hidden; background:#fff !important}
-    .card-header{font-weight:400; padding:8px 10px; text-align:center}
-    [data-group="g1"] > .card-header{ background:#2F6ADF; color:#fff; }
-    [data-group="g2"] > .card-header{ background:#1F8552; color:#fff; }
-    [data-group="g3"] > .card-header{ background:#5A3DBF; color:#fff; }
+  @keyframes stripWave{0%{background-position:0% 0}100%{background-position:200% 0}}
 
-    /* Settings */
-    #settings-panel{display:none; position:fixed; top:10%; left:50%; transform:translate(-50%,0); background:#fff; border:1px solid #ddd; padding:20px; z-index:2000; box-shadow:0 2px 10px rgba(0,0,0,.1); max-height:80%; overflow:auto; width:340px}
-    #settings-panel input, #settings-panel select{margin:6px 0; width:100%; padding:8px}
+  /* Holiday banner */
+  #holidayBanner{
+    display:none; position:relative; justify-content:center; align-items:center; gap:10px;
+    padding:12px 16px; text-align:center; color:#fff; font-weight:700;
+    border-bottom:1px solid rgba(255,255,255,.15); animation:bannerSlide .5s ease-out 1;
+  }
+  #holidayBanner .inner{display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:center}
+  #holidayBanner .name{font-weight:800; text-shadow:0 1px 2px rgba(0,0,0,.25)}
+  #holidayBanner .count{font-variant-numeric:tabular-nums; padding:2px 8px; border-radius:10px; background:rgba(255,255,255,.15)}
+  #holidayBanner .tick{display:inline-block; min-width:1.7ch; animation:tickPulse 1s steps(1,end) infinite}
+  #holidayBanner .badge{background:#ffcc00; color:#111; border-radius:6px; padding:2px 6px; font-weight:800; display:none}
+  /* Dots layer */
+  #holidayBanner .dots{pointer-events:none; position:absolute; inset:0; overflow:hidden}
+  #holidayBanner .dot{position:absolute; width:6px; height:6px; border-radius:50%; opacity:.85; animation:floatDot var(--dur) linear infinite; filter:saturate(140%)}
+  @keyframes bannerSlide{from{opacity:0; transform:translateY(-6px)} to{opacity:1; transform:translateY(0)}}
+  @keyframes tickPulse{0%{transform:scale(1)}50%{transform:scale(1.06)}100%{transform:scale(1)}}
+  @keyframes floatDot{
+    0%{transform:translateY(100%)} 
+    100%{transform:translateY(-120%)}
+  }
 
-    /* Color custom */
-    #custom-color-box{display:none; position:fixed; top:10%; left:50%; transform:translate(-50%,0); background:#fff; border:1px solid #ddd; padding:20px; z-index:2000; box-shadow:0 2px 10px rgba(0,0,0,.1); width:300px}
-    #custom-color-box input{margin:10px 0; width:100%; padding:5px}
-
-    /* What's new */
-    #whats-new{font-family:'Open Sans', sans-serif; font-size:12px; font-style:italic}
-    #whats-new h3{font-size:16px; font-style:italic; cursor:pointer}
-    #whats-new-content{display:none}
-    .toggle-arrow{margin-left:5px}
-
-    .footer{width:100%; border-top:1px solid var(--border); padding:5px 20px; display:flex; align-items:center; gap:12px; font-size:.95rem; flex-wrap:wrap}
-    .footer a{text-decoration:none; border-radius:5px; padding:5px 10px; color:#fff}
-    .readme-link{background:#1b6ef3}
-    .track-link{background:#2e8b57}
-    .timer-link{background:#ff9800}
-    .share .twitter{background:#000}
-    .share .facebook{background:#3B5998}
-    .share .linkedin{background:#0A66C2}
-
-    @keyframes stripWave { 0% { background-position:0% 0; } 100% { background-position:200% 0; } }
-    @media (prefers-color-scheme: dark){ body, #sticky-container, table, th, td { background:#fff !important; color:#000 !important; } }
-
-    .view-title{font-size:1.1rem; font-weight:400; background:#0B2E6F; color:#fff; text-align:center; padding:8px 10px; border-radius:8px; flex:1 0 100%; margin:8px 0 0 0;}
-    #singleHeader{margin-top:4px}
-    .campus-note{margin-top:8px; font-style:normal; color:#333; background:transparent; text-align:left; padding:0; border-radius:0; font-weight:400}
-    .campus-note a{ color:#0645AD; text-decoration:underline; }
-    td.editable{cursor:text}
-    td[contenteditable="true"]{outline:2px solid #5bb98a; background:#f6fffa}
-    #school-name[contenteditable="true"]{outline:2px dashed #5bb98a; background:rgba(91,185,138,.12)}
-  </style>
+  /* Settings + Holiday modal (compact) */
+  #settings-panel, #breaksModal{display:none}
+  #settings-panel{position:fixed; top:10%; left:50%; transform:translateX(-50%); background:#fff; border:1px solid #ddd; padding:16px; z-index:2000; width:340px; box-shadow:0 8px 30px rgba(0,0,0,.15)}
+  #settings-panel input, #settings-panel select{width:100%; padding:8px; margin:6px 0}
+  #breaksModal{position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:2200; display:flex; align-items:center; justify-content:center}
+  #breaksCard{width:min(560px,94vw); background:#fff; border-radius:12px; padding:16px; border:1px solid #e7ebf0; box-shadow:0 18px 50px rgba(0,0,0,.2)}
+  #breaksCard h3{margin:0 0 8px}
+  #breaksCard .row{display:flex; gap:10px; flex-wrap:wrap; margin:8px 0}
+  #breaksCard label{font-size:.9rem; display:block}
+  #breaksCard input[type="text"], #breaksCard input[type="datetime-local"], #breaksCard select{padding:8px; border:1px solid #d6dbe3; border-radius:6px; width:100%}
+  #breaksCard .actions{display:flex; gap:8px; justify-content:flex-end; margin-top:10px}
+  #breaksCard button{padding:8px 12px; border-radius:8px; border:1px solid #cfd7e3; background:#f7f9fc; cursor:pointer}
+  #breaksCard button.primary{background:#0b6ef3; border-color:#0b6ef3; color:#fff}
+</style>
 </head>
 <body>
-  <div id="sticky-container">
-    <div id="header-container" role="banner">
-      <div id="date" aria-live="polite">
-        <span id="day"></span>
-        <span class="separator"> </span>
-        <span id="full-date"></span>
-      </div>
-      <div id="school-name" tabindex="0" title="Click to change header colors">HSA El Paso</div>
-      <div id="time" aria-live="polite"></div>
-    </div>
 
-    <!-- Top Level Toggle -->
-    <div id="levelbar">
-      <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap">
-        <button class="lvlbtn" data-view="g1" aria-pressed="false" title="L1 = 6th & 9th">L1</button>
-        <button class="lvlbtn" data-view="g2" aria-pressed="false" title="L2 = 7th & 10th">L2</button>
-        <button class="lvlbtn" data-view="g3" aria-pressed="false" title="L3 = 8th, 11th & 12th">L3</button>
-        <button class="lvlbtn" data-view="all" aria-pressed="false" title="Show all grade groups side-by-side">All</button>
-        <button id="cafBtn" class="lvlbtn" aria-pressed="false" title="Show only lunch times">Enable Cafeteria</button>
-      </div>
-      <div id="rightControls" style="display:flex; gap:6px; align-items:center; margin-left:auto">
-        <button id="hideBreaksBtn" class="lvlbtn" aria-pressed="false" title="Hide transitions that have already passed">Hide Passed Breaks</button>
-      </div>
-      <div id="viewTitle" class="view-title"></div>
-    </div>
-
-    <table id="singleHeader"><thead><tr><th>Block</th><th>Start</th><th>End</th><th>Remaining</th></tr></thead></table>
+<div id="sticky-container">
+  <div id="header-container">
+    <div id="date"><span id="day"></span> <span id="full-date"></span></div>
+    <div id="school-name" title="Click to change header colors">Harmony Science Academy</div>
+    <div id="time"></div>
   </div>
 
-  <table id="schedule" aria-label="Schedule table (single view)"><tbody></tbody></table>
-  <div id="multiWrapper"></div>
-
-  <div id="campus-note-below" class="campus-note">
-    For other campuses: If you want a pre-defined bell schedule with your school name and a special link, email your bell schedule to <a href="mailto:saydin19@gmail.com">saydin19@gmail.com</a>.
-  </div>
-
-  <!-- Settings -->
-  <div id="settings-panel">
-    <h3>Settings</h3>
-    <input type="text" id="school-name-input" placeholder="Enter school name" />
-    <label for="group-select"><strong>Default Grade Group</strong></label>
-    <select id="group-select">
-      <option value="g1">6th & 9th (L1)</option>
-      <option value="g2">7th & 10th (L2)</option>
-      <option value="g3">8th, 11th & 12th (L3)</option>
-    </select>
-    <div style="margin-top:8px">
-      <label><strong>Visible Grade Groups</strong></label>
-      <div style="display:flex; gap:10px; margin-top:6px">
-        <label><input type="checkbox" id="enabled-g1"> L1</label>
-        <label><input type="checkbox" id="enabled-g2"> L2</label>
-        <label><input type="checkbox" id="enabled-g3"> L3</label>
-      </div>
-    </div>
-    <button onclick="saveSettings()">Save</button>
-    <button onclick="closeSettings()">Close</button>
-  </div>
-
-  <button id="settings-button" style="position:fixed; bottom:20px; right:20px; padding:10px; background:#007bff; color:#fff; border:none; border-radius:50%; cursor:pointer; font-size:16px" onclick="openSettings()">⚙</button>
-
-  <!-- What's New -->
-  <div id="whats-new" style="margin-top:14px">
-    <h3 onclick="toggleWhatsNew()">What's New <span class="toggle-arrow">&#9660;</span></h3>
-    <div id="whats-new-content">
-      <ul>
-        <li>Fixed Friday mapping: L1=G1 lunch &amp; G2+G3 5th; L2=G2 lunch &amp; G1+G3 6th; L3=G3 lunch &amp; G1+G2 7th. (today)</li>
-        <li>Remaining time shows only for the current block; others show “Upcoming” or “Completed”. (today)</li>
-      </ul>
+  <!-- Holiday banner (no 'Next Holiday' text) -->
+  <div id="holidayBanner" role="status" aria-live="polite">
+    <div class="dots" aria-hidden="true"></div>
+    <div class="inner">
+      <span class="prefix"></span>
+      <span class="name"></span>
+      <span class="count">
+        <span class="days"><span class="tick">00</span>d</span>
+        <span class="hours" style="margin-left:6px;"><span class="tick">00</span>h</span>
+        <span class="mins" style="margin-left:6px;"><span class="tick">00</span>m</span>
+        <span class="secs" style="margin-left:6px;"><span class="tick">00</span>s</span>
+      </span>
+      <span class="suffix"></span>
+      <span class="badge">LAST DAY</span>
     </div>
   </div>
 
-  <div class="footer">
-    <a class="readme-link" href="readme.html" target="_blank">ReadMe</a>
-    <a class="track-link" href="track.html" target="_blank">Hallway Track</a>
-    <a class="timer-link" href="timer.html" target="_blank">Timer</a>
-    <span class="share">Share: 
-      <a class="twitter" href="https://twitter.com/intent/tweet?text=Explore%20this%20incredible%20free%20Bell%20Schedule%20designed%20for%20educators!&url=https://classbellschedule.com" target="_blank">Twitter</a>
-      <a class="facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://classbellschedule.com" target="_blank">Facebook</a>
-      <a class="linkedin" href="https://www.linkedin.com/shareArticle?mini=true&url=https://classbellschedule.com" target="_blank">LinkedIn</a>
-    </span>
+  <div id="levelbar">
+    <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap">
+      <button class="lvlbtn" data-view="g1" title="L1 = 6th & 9th">L1</button>
+      <button class="lvlbtn" data-view="g2" title="L2 = 7th & 10th">L2</button>
+      <button class="lvlbtn" data-view="g3" title="L3 = 8th, 11th & 12th">L3</button>
+      <button class="lvlbtn" data-view="all" title="Show all groups">All</button>
+      <button id="cafBtn" class="lvlbtn" title="Show only lunch times">Enable Cafeteria</button>
+    </div>
+    <div style="display:flex; gap:6px; align-items:center; margin-left:auto">
+      <button id="hideBreaksBtn" class="lvlbtn" title="Hide passed transitions">Hide Passed Breaks</button>
+      <button id="holidayBtn" class="lvlbtn" title="Manage holiday banner">Banner / Holiday</button>
+    </div>
+    <div id="viewTitle" class="view-title"></div>
   </div>
 
-  <!-- Color Custom Popup -->
-  <div id="custom-color-box">
-    <h3>Color Custom</h3>
-    <label for="bg-color">Header Background</label>
-    <input type="color" id="bg-color" value="#000000">
-    <label for="text-color">Header Text</label>
-    <input type="color" id="text-color" value="#ffffff">
-    <button onclick="saveColorCustom()">Save</button>
-    <button onclick="closeColorCustom()">Close</button>
+  <table id="singleHeader"><thead><tr><th>Block</th><th>Start</th><th>End</th><th>Remaining</th></tr></thead></table>
+</div>
+
+<table id="schedule"><tbody></tbody></table>
+<div id="multiWrapper"></div>
+
+<!-- Settings -->
+<div id="settings-panel">
+  <h3>Settings</h3>
+  <input id="school-name-input" placeholder="Enter school name"/>
+  <label><strong>Default Grade Group</strong></label>
+  <select id="group-select">
+    <option value="g1">6th & 9th (L1)</option>
+    <option value="g2">7th & 10th (L2)</option>
+    <option value="g3">8th, 11th & 12th (L3)</option>
+  </select>
+  <div style="margin-top:8px">
+    <label><strong>Visible Groups</strong></label>
+    <div style="display:flex; gap:10px; margin-top:6px">
+      <label><input type="checkbox" id="enabled-g1"> L1</label>
+      <label><input type="checkbox" id="enabled-g2"> L2</label>
+      <label><input type="checkbox" id="enabled-g3"> L3</label>
+    </div>
   </div>
+  <button onclick="saveSettings()">Save</button>
+  <button onclick="closeSettings()">Close</button>
+</div>
+<button id="settings-button" style="position:fixed; bottom:20px; right:20px; padding:10px; background:#007bff; color:#fff; border:none; border-radius:50%; cursor:pointer" onclick="openSettings()">⚙</button>
 
-  <script>
-    /* ---------- Utils ---------- */
-    const OV_KEY = 'mb_overrides_v1';
-    function timeToHHMM(d){ const h=d.getHours(); const m=d.getMinutes(); return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0'); }
-    function parseInputTime(str){ if(!str) return null; const s=str.trim().toUpperCase(); const m=s.match(/^(\d{1,2}):(\d{2})(?:\s*(AM|PM))?$/i); if(!m) return null; let h=parseInt(m[1],10); const mi=parseInt(m[2],10); const ap=m[3]; if(mi>59||h>23) return null; if(ap==='AM' && h===12) h=0; if(ap==='PM' && h<12) h+=12; return {h, m:mi}; }
-    function loadOverrides(){ try{ return JSON.parse(localStorage.getItem(OV_KEY)||'{}'); }catch(_){ return {}; } }
-    function saveOverrides(obj){ localStorage.setItem(OV_KEY, JSON.stringify(obj)); }
-    function saveOverride(dayKey, group, idx, patch){ const o=loadOverrides(); if(!o[dayKey]) o[dayKey]={}; if(!o[dayKey][group]) o[dayKey][group]={}; const cur=o[dayKey][group][idx]||{}; o[dayKey][group][idx] = {...cur, ...patch}; saveOverrides(o); }
-    function getDayKey(){ return isFriday() ? 'FRI' : 'MT'; }
-    function applyOverrides(full, group, dayKey){ const o=loadOverrides(); const map=(o[dayKey]&&o[dayKey][group])||{}; Object.keys(map).forEach(k=>{ const i=parseInt(k,10); if(Number.isNaN(i) || !full[i]) return; const p=map[k]; if(p.label) full[i].label=p.label; if(p.start){ const [h,mm]=p.start.split(':').map(Number); full[i].start=fmt(h,mm);} if(p.end){ const [h2,m2]=p.end.split(':').map(Number); full[i].end=fmt(h2,m2);} }); return full; }
-    function fmt(h,m){ const d=new Date(); d.setHours(h,m,0,0); return d; }
-    function parseHM(dt){ return dt.toLocaleTimeString('en-US',{hour:'2-digit', minute:'2-digit'}).replace(/^0/,''); }
-    function makeBlock(label, startHM, endHM){ const [sh,sm]=startHM.split(':').map(Number); const [eh,em]=endHM.split(':').map(Number); return { label, start: fmt(sh,sm), end: fmt(eh,em) }; }
+<!-- Holiday Manager -->
+<div id="breaksModal" aria-hidden="true">
+  <div id="breaksCard" role="dialog" aria-modal="true" aria-labelledby="breaksTitle">
+    <h3 id="breaksTitle">Holiday Banner & Countdown</h3>
+    <div class="row">
+      <div style="flex:1 1 260px">
+        <label>Holiday name</label>
+        <input id="brName" type="text" placeholder="e.g., Thanksgiving Break">
+      </div>
+      <div style="flex:1 1 220px">
+        <label>Target date &amp; time</label>
+        <input id="brWhen" type="datetime-local">
+      </div>
+    </div>
 
-    /* ---------- Canonical Schedules (Mon–Thu) ---------- */
-    function scheduleMT(group){
-      const S=[];
-      S.push(makeBlock('Breakfast','07:15','07:40'));
-      S.push(makeBlock('Transition','07:40','07:45'));
-      S.push(makeBlock('1st Period','07:45','08:41'));
-      S.push(makeBlock('Transition','08:41','08:46'));
-      S.push(makeBlock('2nd Period','08:46','09:42'));
-      S.push(makeBlock('Transition','09:42','09:47'));
-      S.push(makeBlock('3rd Period','09:47','10:43'));
-      S.push(makeBlock('Transition','10:43','10:48'));
+    <div class="row">
+      <div style="flex:1 1 160px">
+        <label>Text mode</label>
+        <select id="bnTextMode">
+          <option value="to">to [holiday]</option>
+          <option value="remained">remained</option>
+          <option value="none">no text</option>
+        </select>
+      </div>
+      <div style="flex:1 1 160px">
+        <label>Style</label>
+        <select id="bnStyle">
+          <option value="solid">Solid color</option>
+          <option value="gradient">Two-color gradient</option>
+          <option value="mix">Animated mix</option>
+        </select>
+      </div>
+      <div style="flex:1 1 120px; display:flex; align-items:end">
+        <label style="display:flex; gap:6px; align-items:center"><input id="bnDots" type="checkbox"> Moving dots</label>
+      </div>
+    </div>
 
-      if(group==='g1'){
-        S.push(makeBlock('L1 Lunch','10:48','11:23'));
-        S.push(makeBlock('Transition','11:23','11:28'));
-        S.push(makeBlock('5th Period','11:28','12:24'));
-        S.push(makeBlock('Transition','12:24','12:29'));
-        S.push(makeBlock('6th Period','12:29','13:25'));
-        S.push(makeBlock('Transition','13:25','13:30'));
-      } else if(group==='g2'){
-        S.push(makeBlock('4th Period','10:48','11:44'));
-        S.push(makeBlock('Transition','11:44','11:49'));
-        S.push(makeBlock('L2 Lunch','11:49','12:24'));
-        S.push(makeBlock('Transition','12:24','12:29'));
-        S.push(makeBlock('6th Period','12:29','13:25'));
-        S.push(makeBlock('Transition','13:25','13:30'));
-      } else {
-        S.push(makeBlock('4th Period','10:48','11:44'));
-        S.push(makeBlock('Transition','11:44','11:49'));
-        S.push(makeBlock('5th Period','11:49','12:45'));
-        S.push(makeBlock('Transition','12:45','12:50'));
-        S.push(makeBlock('L3 Lunch','12:50','13:25'));
-        S.push(makeBlock('Transition','13:25','13:30'));
-      }
+    <div id="solidRow" class="row">
+      <div style="flex:1 1 160px">
+        <label>Solid color</label>
+        <input id="bnSolid" type="color" value="#0b2e6f">
+      </div>
+    </div>
+    <div id="gradRow" class="row" style="display:none">
+      <div style="flex:1 1 160px">
+        <label>Color A</label>
+        <input id="bnGradA" type="color" value="#0b2e6f">
+      </div>
+      <div style="flex:1 1 160px">
+        <label>Color B</label>
+        <input id="bnGradB" type="color" value="#174ea6">
+      </div>
+    </div>
 
-      S.push(makeBlock('7th Period','13:30','14:26'));
-      S.push(makeBlock('Transition','14:26','14:31'));
-      S.push(makeBlock('8th Period','14:31','15:27'));
-      return S;
-    }
+    <div class="row">
+      <label><input id="brEnable" type="checkbox"> Show banner</label>
+    </div>
+    <div class="actions">
+      <button id="brSave" class="primary">Save / Activate</button>
+      <button id="brClear">Disable</button>
+      <button id="brClose">Close</button>
+    </div>
 
-    /* ---------- Friday (per-group, with 5th/6th/7th mapping) ---------- */
-    function scheduleFriByGroup(group){
-      const S=[];
-      // Morning shared
-      S.push(makeBlock('Breakfast','07:15','07:40'));
-      S.push(makeBlock('Transition','07:40','07:45'));
-      S.push(makeBlock('1st Period','07:45','08:21'));
-      S.push(makeBlock('Transition','08:21','08:26'));
-      S.push(makeBlock('2nd Period','08:26','09:02'));
-      S.push(makeBlock('Transition','09:02','09:07'));
-      S.push(makeBlock('3rd Period','09:07','09:43'));
-      S.push(makeBlock('Transition','09:43','09:48'));
-      S.push(makeBlock('4th Period','09:48','10:24'));
-      S.push(makeBlock('Transition','10:24','10:29'));
+    <div style="margin-top:10px; border-top:1px dashed #e6e9f1; padding-top:8px">
+      <strong>Saved holidays</strong>
+      <div id="brList"></div>
+    </div>
+  </div>
+</div>
 
-      // Midday mapping
-      if(group==='g1'){                 // 6th Grade & Freshman
-        S.push(makeBlock('L1 Lunch','10:29','11:05'));   // lunch
-        S.push(makeBlock('Transition','11:05','11:10'));
-        S.push(makeBlock('6th Period','11:10','11:46')); // during L2 window
-        S.push(makeBlock('Transition','11:46','11:51'));
-        S.push(makeBlock('7th Period','11:51','12:27')); // during L3 window
-        S.push(makeBlock('Transition','12:27','12:32'));
-      } else if(group==='g2'){          // 7th Grade & Sophomore
-        S.push(makeBlock('5th Period','10:29','11:05')); // during L1 window
-        S.push(makeBlock('Transition','11:05','11:10'));
-        S.push(makeBlock('L2 Lunch','11:10','11:46'));   // lunch
-        S.push(makeBlock('Transition','11:46','11:51'));
-        S.push(makeBlock('7th Period','11:51','12:27')); // during L3 window
-        S.push(makeBlock('Transition','12:27','12:32'));
-      } else {                              // 8th Grade, Junior & Senior
-        S.push(makeBlock('5th Period','10:29','11:05')); // during L1 window
-        S.push(makeBlock('Transition','11:05','11:10'));
-        S.push(makeBlock('6th Period','11:10','11:46')); // during L2 window
-        S.push(makeBlock('Transition','11:46','11:51'));
-        S.push(makeBlock('L3 Lunch','11:51','12:27'));   // lunch
-        S.push(makeBlock('Transition','12:27','12:32'));
-      }
+<script>
+/* ---------- Helpers ---------- */
+const OV_KEY='mb_overrides_v1';
+function parseHM(dt){return dt.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}).replace(/^0/,'');}
+function fmt(h,m){const d=new Date(); d.setHours(h,m,0,0); return d;}
+function parseInputTime(str){ if(!str) return null; const s=str.trim().toUpperCase(); const m=s.match(/^(\d{1,2}):(\d{2})(?:\s*(AM|PM))?$/); if(!m) return null; let h=+m[1], mi=+m[2]; if(m[3]==='AM'&&h===12) h=0; if(m[3]==='PM'&&h<12) h+=12; return {h, m:mi}; }
+function parseTime(s){const [H,M]=s.split(':').map(Number); return [H,M];}
+function makeBlock(label, a, b){const [sh,sm]=parseTime(a); const [eh,em]=parseTime(b); return {label,start:fmt(sh,sm),end:fmt(eh,em)};}
+function timeToHHMM(d){return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
+function loadOverrides(){try{return JSON.parse(localStorage.getItem(OV_KEY)||'{}')}catch(_){return{}}}
+function saveOverrides(obj){localStorage.setItem(OV_KEY, JSON.stringify(obj))}
+function saveOverride(dayKey, group, idx, patch){const o=loadOverrides(); if(!o[dayKey]) o[dayKey]={}; if(!o[dayKey][group]) o[dayKey][group]={}; const cur=o[dayKey][group][idx]||{}; o[dayKey][group][idx]={...cur,...patch}; saveOverrides(o)}
+function applyOverrides(full, group, dayKey){const o=loadOverrides(); const map=(o[dayKey]&&o[dayKey][group])||{}; Object.keys(map).forEach(k=>{const i=+k; if(!full[i]) return; const p=map[k]; if(p.label) full[i].label=p.label; if(p.start){const [h,mm]=p.start.split(':').map(Number); full[i].start=fmt(h,mm)} if(p.end){const [h2,m2]=p.end.split(':').map(Number); full[i].end=fmt(h2,m2)}}); return full}
+function isFriday(){return new Date().getDay()===5}
+function getDayKey(){return isFriday()?'FRI':'MT'}
 
-      // Afternoon shared
-      S.push(makeBlock('8th Period','12:32','13:08'));
-      return S;
-    }
+/* ---------- Schedules ---------- */
+function scheduleMT(group){
+  const S=[];
+  S.push(makeBlock('Breakfast','07:15','07:40'));
+  S.push(makeBlock('Transition','07:40','07:45'));
+  S.push(makeBlock('1st Period','07:45','08:41'));
+  S.push(makeBlock('Transition','08:41','08:46'));
+  S.push(makeBlock('2nd Period','08:46','09:42'));
+  S.push(makeBlock('Transition','09:42','09:47'));
+  S.push(makeBlock('3rd Period','09:47','10:43'));
+  S.push(makeBlock('Transition','10:43','10:48'));
+  if(group==='g1'){
+    S.push(makeBlock('L1 Lunch','10:48','11:23'));
+    S.push(makeBlock('Transition','11:23','11:28'));
+    S.push(makeBlock('5th Period','11:28','12:24'));
+    S.push(makeBlock('Transition','12:24','12:29'));
+    S.push(makeBlock('6th Period','12:29','13:25'));
+    S.push(makeBlock('Transition','13:25','13:30'));
+  }else if(group==='g2'){
+    S.push(makeBlock('4th Period','10:48','11:44'));
+    S.push(makeBlock('Transition','11:44','11:49'));
+    S.push(makeBlock('L2 Lunch','11:49','12:24'));
+    S.push(makeBlock('Transition','12:24','12:29'));
+    S.push(makeBlock('6th Period','12:29','13:25'));
+    S.push(makeBlock('Transition','13:25','13:30'));
+  }else{
+    S.push(makeBlock('4th Period','10:48','11:44'));
+    S.push(makeBlock('Transition','11:44','11:49'));
+    S.push(makeBlock('5th Period','11:49','12:45'));
+    S.push(makeBlock('Transition','12:45','12:50'));
+    S.push(makeBlock('L3 Lunch','12:50','13:25'));
+    S.push(makeBlock('Transition','13:25','13:30'));
+  }
+  S.push(makeBlock('7th Period','13:30','14:26'));
+  S.push(makeBlock('Transition','14:26','14:31'));
+  S.push(makeBlock('8th Period','14:31','15:27'));
+  return S;
+}
 
-    /* ---------- App State ---------- */
-    let currentGroup = localStorage.getItem('gradeGroup') || 'g1';
-    let selectedView = localStorage.getItem('selectedView') || currentGroup; // 'g1'|'g2'|'g3'|'all'
-    let cafOnly = (localStorage.getItem('cafOnly') === '1');
-    let hidePastBreaks = (localStorage.getItem('hidePastBreaks') === '1');
-    let isEditing = false;
+/* Friday now depends on group: only that group’s lunch is shown */
+function scheduleFri(group){
+  const S=[];
+  S.push(makeBlock('Breakfast','07:15','07:40'));
+  S.push(makeBlock('Transition','07:40','07:45'));
+  S.push(makeBlock('1st Period','07:45','08:21'));
+  S.push(makeBlock('Transition','08:21','08:26'));
+  S.push(makeBlock('2nd Period','08:26','09:02'));
+  S.push(makeBlock('Transition','09:02','09:07'));
+  S.push(makeBlock('3rd Period','09:07','09:43'));
+  S.push(makeBlock('Transition','09:43','09:48'));
+  S.push(makeBlock('4th Period','09:48','10:24'));
+  S.push(makeBlock('Transition','10:24','10:29'));
 
-    const GROUP_TITLES = { g1:'6th Grade & Freshman', g2:'7th Grade & Sophomore', g3:'8th Grade, Junior & Senior' };
+  if(group==='g1'){                 // 6th & 9th
+    S.push(makeBlock('L1 Lunch','10:29','11:05'));
+    S.push(makeBlock('Transition','11:05','11:10'));
+    S.push(makeBlock('6th Period','11:10','11:46'));
+    S.push(makeBlock('Transition','11:46','11:51'));
+    S.push(makeBlock('7th Period','11:51','12:27'));
+  }else if(group==='g2'){           // 7th & 10th
+    S.push(makeBlock('5th Period','10:29','11:05'));
+    S.push(makeBlock('Transition','11:05','11:10'));
+    S.push(makeBlock('L2 Lunch','11:10','11:46'));
+    S.push(makeBlock('Transition','11:46','11:51'));
+    S.push(makeBlock('7th Period','11:51','12:27'));
+  }else{                            // g3: 8th, 11th, 12th
+    S.push(makeBlock('5th Period','10:29','11:05'));
+    S.push(makeBlock('Transition','11:05','11:10'));
+    S.push(makeBlock('6th Period','11:10','11:46'));
+    S.push(makeBlock('Transition','11:46','11:51'));
+    S.push(makeBlock('L3 Lunch','11:51','12:27'));
+  }
+  S.push(makeBlock('Transition','12:27','12:32'));
+  S.push(makeBlock('8th Period','12:32','13:08'));
+  return S;
+}
 
-    function getEnabledGroups(){
-      let obj; try{ obj = JSON.parse(localStorage.getItem('enabledGroups')||'{}'); }catch(_){ obj = {}; }
-      const defaults = {g1:true,g2:true,g3:true}; obj = { ...defaults, ...obj };
-      const list = Object.keys(defaults).filter(k => !!obj[k]);
-      return list.length ? list : ['g1'];
-    }
-    function setEnabledGroups(obj){ localStorage.setItem('enabledGroups', JSON.stringify(obj)); }
-    function isGroupEnabled(id){ return getEnabledGroups().includes(id); }
+function getTodaySchedule(group){ return isFriday()?scheduleFri(group):scheduleMT(group); }
 
-    function isFriday(){ return new Date().getDay() === 5; }
-    function getTodaySchedule(group){ return isFriday() ? scheduleFriByGroup(group) : scheduleMT(group); }
+/* ---------- Titles ---------- */
+const TITLES_KEY='group_titles_v1';
+const DEFAULT_TITLES={g1:'6th Grade & Freshman', g2:'7th Grade & Sophomore', g3:'8th Grade, Junior & Senior'};
+function loadGroupTitles(){try{const s=JSON.parse(localStorage.getItem(TITLES_KEY)||'{}'); return {...DEFAULT_TITLES,...s}}catch(_){return {...DEFAULT_TITLES}}}
+function saveGroupTitle(g,t){const cur=loadGroupTitles(); cur[g]=(t&&t.trim())?t.trim():DEFAULT_TITLES[g]; localStorage.setItem(TITLES_KEY, JSON.stringify(cur))}
+let GROUP_TITLES=loadGroupTitles();
 
-    /* ---------- Cafeteria mode ---------- */
-    function getLunchWindowsForToday(groups){
-      const gs = Array.isArray(groups) ? groups : getEnabledGroups();
-      const wins=[]; const dayKey=getDayKey();
-      gs.forEach(g=>{
-        let sched = getTodaySchedule(g); sched = applyOverrides(sched, g, dayKey);
-        sched.forEach(b=>{ if(/Lunch/i.test(b.label)) wins.push({start:b.start, end:b.end, group:g, label:b.label}); });
-      });
-      return wins;
-    }
-    function overlapsLunch(block, windows){ return windows.some(w=> block.start < w.end && block.end > w.start ); }
-    function filterByLunchWindows(blocks, windows){ return blocks.filter(b=> !/^Transition$/i.test(b.label) && overlapsLunch(b, windows)); }
-    function applyHidePastBreaks(blocks, nowVal){ const now = nowVal || new Date(); return hidePastBreaks ? blocks.filter(b=> !( /^Transition$/i.test(b.label) && b.end < now)) : blocks; }
+/* ---------- App state ---------- */
+let currentGroup=localStorage.getItem('gradeGroup')||'g1';
+let selectedView=localStorage.getItem('selectedView')||currentGroup;
+let cafOnly=(localStorage.getItem('cafOnly')==='1');
+let hidePastBreaks=(localStorage.getItem('hidePastBreaks')==='1');
+let isEditing=false, editTimeout=null;
 
-    /* ---------- Strip palette ---------- */
-    function getStripPalette(group,label){
-      if(/Transition/i.test(label)) return ['#ff2d2d','#ff6b6b'];
-      if(/Lunch/i.test(label)) return ['#b9e4c3','#d6f2db'];
-      if(group==='g1') return ['#bcd4ff','#d5e6ff'];
-      if(group==='g2') return ['#cdeed8','#e2f6e8'];
-      return ['#cec3ff','#e2d9ff'];
-    }
+function getEnabledGroups(){
+  let obj; try{obj=JSON.parse(localStorage.getItem('enabledGroups')||'{}')}catch(_){obj={}}
+  const d={g1:true,g2:true,g3:true}; obj={...d,...obj};
+  const list=Object.keys(d).filter(k=>!!obj[k]); return list.length?list:['g1'];
+}
+function setEnabledGroups(o){localStorage.setItem('enabledGroups', JSON.stringify(o))}
+function isGroupEnabled(id){return getEnabledGroups().includes(id)}
 
-    /* ---------- Current row and table rendering ---------- */
-    function findCurrent(full){
-      const now = new Date();
-      for(let i=0;i<full.length;i++){ const b=full[i]; if(now>=b.start && now<b.end) return { idx:i, b }; }
-      return null;
-    }
-    function buildCurrentRow(full, group, colCount){
-      const row=document.createElement('tr'); row.className='current-row';
-      const td=document.createElement('td'); td.colSpan=colCount;
-      const strip=document.createElement('div'); strip.className='current-strip';
-      const fill=document.createElement('div'); fill.className='current-fill';
-      const label=document.createElement('div'); label.className='current-label';
-      const now=new Date();
-      const cur=findCurrent(full);
-      if(cur){
-        const total=cur.b.end - cur.b.start; const elapsed=now - cur.b.start; const pct=Math.max(0, Math.min(1, elapsed/total))*100;
-        const rem = cur.b.end - now; const m=Math.floor(rem/60000); const s=Math.floor((rem%60000)/1000); const showSec = rem <= 180000;
-        const rText = showSec ? `${m}:${s.toString().padStart(2,'0')}` : `${m} min`;
-        fill.style.setProperty('--fill', pct+'%');
-        const pal = getStripPalette(group, cur.b.label);
-        fill.style.setProperty('--c1', pal[0]); fill.style.setProperty('--c2', pal[1]);
-        label.textContent = `${cur.b.label} — ${rText} left`;
-      } else {
-        const next = full.find(b=> now < b.start);
-        fill.style.setProperty('--fill','0%');
-        const pal = getStripPalette(group, '');
-        fill.style.setProperty('--c1', pal[0]); fill.style.setProperty('--c2', pal[1]);
-        label.textContent = next ? `Next: ${next.label} at ${parseHM(next.start)}` : 'Schedule complete';
-      }
-      strip.append(fill,label); td.appendChild(strip); row.appendChild(td); return row;
-    }
+/* ---------- Lunch filters (for cafeteria mode) ---------- */
+function getLunchWindowsForToday(groups){
+  const gs=Array.isArray(groups)?groups:getEnabledGroups();
+  const wins=[]; const dayKey=getDayKey();
+  gs.forEach(g=>{
+    let sched=getTodaySchedule(g); sched=applyOverrides(sched,g,dayKey);
+    sched.forEach(b=>{if(/Lunch/i.test(b.label)) wins.push({start:b.start, end:b.end})})
+  });
+  return wins;
+}
+function overlapsLunch(block,windows){return windows.some(w=> block.start<w.end && block.end>w.start)}
+function filterByLunchWindows(arr,windows){return arr.filter(b=> !/^Transition$/i.test(b.label) && overlapsLunch(b,windows))}
+function applyHidePastBreaks(arr){const now=new Date(); return hidePastBreaks?arr.filter(b=>!( /^Transition$/i.test(b.label) && b.end<now )):arr}
 
-    function renderRows(blocks, tbody, full, groupId){
-      const now=new Date();
-      blocks.forEach(b=>{
-        const isLunch = /Lunch/i.test(b.label);
-        const isOngoing = now>=b.start && now<b.end;
-        const isCompleted = now>=b.end;
-        const remaining = Math.max(0, b.end - now);
-        const remainingSec = Math.floor(remaining/1000);
-        const rMin = Math.floor(remainingSec/60);
-        const rSec = remainingSec % 60;
-        const showSec = remaining <= 180000;
-        const remainingText = isOngoing ? (showSec ? `${rMin} min ${rSec.toString().padStart(2,'0')} sec` : `${rMin} min`) : (isCompleted ? 'Completed' : 'Upcoming');
+/* ---------- Current strip ---------- */
+function getStripPalette(group,label){
+  if(/Transition/i.test(label)) return ['#ff2d2d','#ff6b6b'];
+  if(/Lunch/i.test(label)) return ['#0f5a2e','#1d8b4d'];
+  if(group==='g1') return ['#bcd4ff','#d5e6ff'];
+  if(group==='g2') return ['#cdeed8','#e2f6e8'];
+  return ['#cec3ff','#e2d9ff'];
+}
+function findCurrent(full){const now=new Date(); for(let i=0;i<full.length;i++){const b=full[i]; if(now>=b.start && now<b.end) return {idx:i,b};} return null}
+function buildCurrentRow(full, group, colCount){
+  const row=document.createElement('tr'); row.className='current-row';
+  const td=document.createElement('td'); td.colSpan=colCount;
+  const strip=document.createElement('div'); strip.className='current-strip';
+  const fill=document.createElement('div'); fill.className='current-fill';
+  const label=document.createElement('div'); label.className='current-label';
+  const now=new Date(); const cur=findCurrent(full);
+  if(cur){
+    const total=cur.b.end-cur.b.start, elapsed=now-cur.b.start, pct=Math.max(0,Math.min(1,elapsed/total))*100;
+    const rem=cur.b.end-now; const m=Math.floor(rem/60000), s=Math.floor((rem%60000)/1000); const showSec=rem<=180000;
+    fill.style.setProperty('--fill', pct+'%'); const pal=getStripPalette(group,cur.b.label); fill.style.setProperty('--c1',pal[0]); fill.style.setProperty('--c2',pal[1]);
+    label.textContent=`${cur.b.label} — ${showSec?`${m}:${String(s).padStart(2,'0')}`:`${m} min`} left`;
+  }else{
+    const next=full.find(b=>now<b.start); const pal=getStripPalette(group,''); fill.style.setProperty('--c1',pal[0]); fill.style.setProperty('--c2',pal[1]);
+    label.textContent=next?`Next: ${next.label} at ${parseHM(next.start)}`:'Schedule complete';
+  }
+  strip.appendChild(fill); strip.appendChild(label); td.appendChild(strip); row.appendChild(td); return row;
+}
+function renderRows(blocks, tbody, full, gid){
+  const now=new Date();
+  blocks.forEach(b=>{
+    const isLunch=/Lunch/i.test(b.label), isOngoing=now>=b.start&&now<b.end, isCompleted=now>=b.end;
+    const remaining=Math.max(0,b.end-now), sec=Math.floor(remaining/1000); const rMin=Math.floor(sec/60), rSec=sec%60; const showSec=remaining<=180000;
+    const tr=document.createElement('tr'); tr.classList.add('data-row'); tr.dataset.index=String(full.indexOf(b)); tr.dataset.group=gid||'';
+    if(isLunch) tr.classList.add('lunch'); if(isOngoing) tr.classList.add('upcoming'); if(isCompleted) tr.classList.add('completed');
+    tr.innerHTML=`<td class="editable">${b.label}</td><td class="editable">${parseHM(b.start)}</td><td class="editable">${parseHM(b.end)}</td><td>${isOngoing?(showSec?`${rMin} min ${String(rSec).padStart(2,'0')} sec`:`${rMin} min`): (isCompleted?'Completed':'Upcoming')}</td>`;
+    tbody.appendChild(tr);
+  });
+}
 
-        const tr=document.createElement('tr');
-        tr.classList.add('data-row');
-        tr.dataset.index = String(full.indexOf(b));
-        tr.dataset.group = groupId || '';
-        if(isLunch) tr.classList.add('lunch');
-        if(isOngoing) tr.classList.add('upcoming');
-        if(isCompleted) tr.classList.add('completed');
+/* ---------- Render ---------- */
+function updateSchedule(){
+  if(isEditing) return;
+  const singleHeader=document.getElementById('singleHeader'), table=document.getElementById('schedule'), multi=document.getElementById('multiWrapper'), vt=document.getElementById('viewTitle');
+  GROUP_TITLES=loadGroupTitles();
+  const enabled=getEnabledGroups();
+  if(['g1','g2','g3'].includes(selectedView) && !enabled.includes(selectedView)){selectedView=enabled[0]||'all'; localStorage.setItem('selectedView',selectedView)}
+  if(['g1','g2','g3'].includes(currentGroup) && !enabled.includes(currentGroup)){currentGroup=enabled[0]||'g1'; localStorage.setItem('gradeGroup',currentGroup)}
 
-        tr.innerHTML = `
-          <td class="editable" title="Double-click to edit block name">${b.label}</td>
-          <td class="editable" title="Double-click to edit start time">${parseHM(b.start)}</td>
-          <td class="editable" title="Double-click to edit end time">${parseHM(b.end)}</td>
-          <td>${remainingText}</td>`;
-        tbody.appendChild(tr);
-      });
-    }
+  if(selectedView==='g1'){vt.textContent=GROUP_TITLES.g1+' Bell Schedule'; vt.style.display='block'}
+  else if(selectedView==='g2'){vt.textContent=GROUP_TITLES.g2+' Bell Schedule'; vt.style.display='block'}
+  else if(selectedView==='g3'){vt.textContent=GROUP_TITLES.g3+' Bell Schedule'; vt.style.display='block'}
+  else{vt.textContent=''; vt.style.display='none'}
 
-    function updateSchedule(){
-      if(isEditing) return;
-      const singleHeader = document.getElementById('singleHeader');
-      const table = document.getElementById('schedule');
-      const multi = document.getElementById('multiWrapper');
-      const vt = document.getElementById('viewTitle');
+  document.querySelectorAll('.lvlbtn[data-view]').forEach(b=>{
+    const id=b.getAttribute('data-view');
+    if(['g1','g2','g3'].includes(id)){ b.style.display=enabled.includes(id)?'':'none'; b.setAttribute('aria-pressed', id===selectedView); }
+    else if(id==='all'){ b.style.display=enabled.length?'':'none'; b.setAttribute('aria-pressed', selectedView==='all'); }
+  });
+  const cafBtn=document.getElementById('cafBtn'); cafBtn.setAttribute('aria-pressed', cafOnly); cafBtn.textContent=cafOnly?'Disable Cafeteria':'Enable Cafeteria';
+  const hbBtn=document.getElementById('hideBreaksBtn'); hbBtn.setAttribute('aria-pressed', hidePastBreaks); hbBtn.textContent=hidePastBreaks?'Show Passed Breaks':'Hide Passed Breaks';
 
-      const enabled = getEnabledGroups();
-      if(['g1','g2','g3'].includes(selectedView) && !enabled.includes(selectedView)){
-        selectedView = enabled[0] || 'all'; localStorage.setItem('selectedView', selectedView);
-      }
-      if(['g1','g2','g3'].includes(currentGroup) && !enabled.includes(currentGroup)){
-        currentGroup = enabled[0] || 'g1'; localStorage.setItem('gradeGroup', currentGroup);
-      }
+  const lunchWindows=cafOnly?getLunchWindowsForToday(enabled):null;
+  const filterBlocks=(arr)=>cafOnly?filterByLunchWindows(arr,lunchWindows):arr;
 
-      if(selectedView==='g1'){ vt.textContent=GROUP_TITLES.g1 + ' Bell Schedule'; vt.style.display='block'; }
-      else if(selectedView==='g2'){ vt.textContent=GROUP_TITLES.g2 + ' Bell Schedule'; vt.style.display='block'; }
-      else if(selectedView==='g3'){ vt.textContent=GROUP_TITLES.g3 + ' Bell Schedule'; vt.style.display='block'; }
-      else { vt.textContent=''; vt.style.display='none'; }
-
-      document.querySelectorAll('.lvlbtn[data-view]').forEach(btn=>{
-        const id = btn.getAttribute('data-view');
-        if(['g1','g2','g3'].includes(id)){
-          btn.style.display = enabled.includes(id) ? '' : 'none';
-          btn.setAttribute('aria-pressed', id===selectedView);
-        } else if(id==='all'){
-          btn.style.display = enabled.length>=1 ? '' : 'none';
-          btn.setAttribute('aria-pressed', selectedView==='all');
-        }
-      });
-
-      const cafBtn = document.getElementById('cafBtn');
-      cafBtn.setAttribute('aria-pressed', cafOnly);
-      cafBtn.textContent = cafOnly ? 'Disable Cafeteria' : 'Enable Cafeteria';
-      const hbBtn = document.getElementById('hideBreaksBtn');
-      hbBtn.setAttribute('aria-pressed', hidePastBreaks);
-      hbBtn.textContent = hidePastBreaks ? 'Show Passed Breaks' : 'Hide Passed Breaks';
-
-      const lunchWindows = cafOnly ? getLunchWindowsForToday(enabled) : null;
-      const filterBlocks = (arr)=> cafOnly ? filterByLunchWindows(arr, lunchWindows) : arr;
-
-      if(selectedView==='all'){
-        singleHeader.style.display='none';
-        table.style.display='none';
-        multi.style.display='grid';
-        multi.style.gridTemplateColumns='repeat(3, minmax(260px, 1fr))';
-        multi.innerHTML='';
-        const groups = getEnabledGroups().map(id=>({id, title: GROUP_TITLES[id]}));
-        groups.forEach(g=>{
-          const card=document.createElement('div'); card.className='card'; card.setAttribute('data-group', g.id);
-          const hdr=document.createElement('div'); hdr.className='card-header'; hdr.textContent=g.title;
-          const tbl=document.createElement('table');
-          tbl.innerHTML = `<thead><tr><th>Block</th><th>Start</th><th>End</th><th>Remaining</th></tr></thead>`;
-          const tb=document.createElement('tbody');
-          let full = getTodaySchedule(g.id); full = applyOverrides(full, g.id, getDayKey());
-          tb.appendChild(buildCurrentRow(full, g.id, 4));
-          const visible = applyHidePastBreaks(filterBlocks(full));
-          renderRows(visible, tb, full, g.id);
-          tbl.append(tb); card.append(hdr,tbl); multi.appendChild(card);
-        });
-      } else {
-        singleHeader.style.display='table';
-        table.style.display='table';
-        multi.style.display='none';
-        const tbody=table.querySelector('tbody');
-        tbody.innerHTML='';
-        let full = getTodaySchedule(selectedView); full = applyOverrides(full, selectedView, getDayKey());
-        tbody.appendChild(buildCurrentRow(full, selectedView, 4));
-        const visible = applyHidePastBreaks(filterBlocks(full));
-        renderRows(visible, tbody, full, selectedView);
-      }
-    }
-
-    /* Interactions (buttons + editing) */
-    document.addEventListener('click', (e)=>{
-      const btn = e.target.closest('.lvlbtn');
-      if(!btn) return;
-      if(btn.id==='cafBtn'){
-        cafOnly = !cafOnly; localStorage.setItem('cafOnly', cafOnly ? '1' : '0'); updateSchedule(); return;
-      }
-      if(btn.id==='hideBreaksBtn'){
-        hidePastBreaks = !hidePastBreaks; localStorage.setItem('hidePastBreaks', hidePastBreaks ? '1' : '0'); updateSchedule(); return;
-      }
-      if(btn.dataset.view){
-        const id = btn.dataset.view;
-        if(['g1','g2','g3'].includes(id) && !isGroupEnabled(id)) return;
-        selectedView = id; localStorage.setItem('selectedView', selectedView);
-        if(selectedView!=='all' && ['g1','g2','g3'].includes(selectedView)){
-          currentGroup = selectedView; localStorage.setItem('gradeGroup', currentGroup);
-        }
-        updateSchedule();
-      }
+  if(selectedView==='all'){
+    singleHeader.style.display='none'; table.style.display='none'; multi.style.display='grid'; multi.style.gridTemplateColumns='repeat(3, minmax(260px,1fr))'; multi.innerHTML='';
+    getEnabledGroups().forEach(id=>{
+      const card=document.createElement('div'); card.className='card'; card.setAttribute('data-group',id);
+      const hdr=document.createElement('div'); hdr.className='card-header'; hdr.textContent=GROUP_TITLES[id];
+      const tbl=document.createElement('table'); tbl.innerHTML=`<thead><tr><th>Block</th><th>Start</th><th>End</th><th>Remaining</th></tr></thead>`;
+      const tb=document.createElement('tbody'); let full=getTodaySchedule(id); full=applyOverrides(full,id,getDayKey());
+      tb.appendChild(buildCurrentRow(full,id,4));
+      const visible=applyHidePastBreaks(filterBlocks(full)); renderRows(visible,tb,full,id);
+      tbl.appendChild(tb); card.appendChild(hdr); card.appendChild(tbl); multi.appendChild(card);
     });
+  }else{
+    singleHeader.style.display='table'; table.style.display='table'; multi.style.display='none';
+    const tbody=table.querySelector('tbody'); tbody.innerHTML='';
+    let full=getTodaySchedule(selectedView); full=applyOverrides(full,selectedView,getDayKey());
+    tbody.appendChild(buildCurrentRow(full,selectedView,4));
+    const visible=applyHidePastBreaks(filterBlocks(full)); renderRows(visible,tbody,full,selectedView);
+  }
+}
 
-    // Inline editing (school, block names, times)
-    function selectAll(el){ const r=document.createRange(); r.selectNodeContents(el); const s=window.getSelection(); s.removeAllRanges(); s.addRange(r); }
-    function commitCellEdit(td){
-      const tr = td.closest('tr'); if(!tr) return;
-      const idx = parseInt(tr.dataset.index,10); if(Number.isNaN(idx)) return;
-      const groupId = tr.dataset.group || (selectedView==='all' ? 'g1' : selectedView);
-      const dayKey = getDayKey();
-      let full = applyOverrides(getTodaySchedule(groupId), groupId, dayKey);
-      const blk = full[idx]; if(!blk) return;
-      const col = td.cellIndex;
-      const raw = td.textContent.trim();
-      if(col===0){ // label
-        if(raw){ saveOverride(dayKey, groupId, idx, {label:raw}); }
-      } else if(col===1 || col===2){
-        const t = parseInputTime(raw);
-        if(!t){ alert('Use H:MM or H:MM AM/PM'); td.textContent = col===1?parseHM(blk.start):parseHM(blk.end); return; }
-        const newD = fmt(t.h, t.m);
-        if(col===1 && newD>=blk.end){ alert('Start must be before end.'); td.textContent=parseHM(blk.start); return; }
-        if(col===2 && newD<=blk.start){ alert('End must be after start.'); td.textContent=parseHM(blk.end); return; }
-        const patch={}; patch[col===1?'start':'end']=timeToHHMM(newD);
-        saveOverride(dayKey, groupId, idx, patch);
-      }
-      isEditing=false; td.removeAttribute('contenteditable'); updateSchedule();
-    }
+/* ---------- Interactions ---------- */
+document.addEventListener('click', (e)=>{
+  const btn=e.target.closest('.lvlbtn'); if(!btn) return;
+  if(btn.id==='cafBtn'){cafOnly=!cafOnly; localStorage.setItem('cafOnly',cafOnly?'1':'0'); updateSchedule(); return;}
+  if(btn.id==='hideBreaksBtn'){hidePastBreaks=!hidePastBreaks; localStorage.setItem('hidePastBreaks',hidePastBreaks?'1':'0'); updateSchedule(); return;}
+  if(btn.dataset.view){const id=btn.dataset.view; if(['g1','g2','g3'].includes(id)&&!isGroupEnabled(id)) return; selectedView=id; localStorage.setItem('selectedView',id); if(id!=='all') {currentGroup=id; localStorage.setItem('gradeGroup',id);} updateSchedule();}
+});
+function selectAll(el){const r=document.createRange(); r.selectNodeContents(el); const s=window.getSelection(); s.removeAllRanges(); s.addRange(r);}
+function commitCellEdit(td){
+  const tr=td.closest('tr'); if(!tr) return; const idx=+tr.dataset.index; const gid=tr.dataset.group || (selectedView==='all'?'g1':selectedView); const dayKey=getDayKey();
+  let full=applyOverrides(getTodaySchedule(gid),gid,dayKey); const blk=full[idx]; if(!blk) return;
+  const col=td.cellIndex; const raw=td.textContent.trim();
+  if(col===0){ if(raw) saveOverride(dayKey,gid,idx,{label:raw}); }
+  else if(col===1||col===2){
+    const t=parseInputTime(raw); if(!t){ alert('Use H:MM or H:MM AM/PM'); td.textContent=(col===1?parseHM(blk.start):parseHM(blk.end)); return; }
+    const newD=fmt(t.h,t.m); if(col===1 && newD>=blk.end){ alert('Start must be before end.'); td.textContent=parseHM(blk.start); return; }
+    if(col===2 && newD<=blk.start){ alert('End must be after start.'); td.textContent=parseHM(blk.end); return; }
+    const patch={}; patch[col===1?'start':'end']=timeToHHMM(newD); saveOverride(dayKey,gid,idx,patch);
+  }
+  isEditing=false; td.removeAttribute('contenteditable'); updateSchedule();
+}
+function beginHeaderEdit(el, gid){
+  if(!gid) return; isEditing=true; el.classList.add('editable-header'); el.setAttribute('contenteditable','true'); selectAll(el); el.focus();
+  const finish=(commit)=>{el.removeEventListener('blur',onB); el.removeEventListener('keydown',onK); const t=el.textContent.replace(/Bell Schedule$/,'').trim(); el.removeAttribute('contenteditable'); el.classList.remove('editable-header'); if(commit&&t) saveGroupTitle(gid,t); isEditing=false; updateSchedule();};
+  const onB=()=>finish(true); const onK=(e)=>{if(e.key==='Enter'){e.preventDefault(); finish(true)} if(e.key==='Escape'){e.preventDefault(); finish(false)}};
+  el.addEventListener('blur',onB,{once:true}); el.addEventListener('keydown',onK);
+}
+document.addEventListener('dblclick', (e)=>{
+  if(e.target.closest('#school-name')){
+    const sn=document.getElementById('school-name'); isEditing=true; sn.setAttribute('contenteditable','true'); sn.focus(); selectAll(sn);
+    const onBlur=()=>{const v=sn.textContent.trim(); if(v){localStorage.setItem('schoolName',v)} sn.removeAttribute('contenteditable'); isEditing=false; sn.removeEventListener('blur',onBlur);}; sn.addEventListener('blur',onBlur,{once:true}); return;
+  }
+  const vt=e.target.closest('#viewTitle'); if(vt && ['g1','g2','g3'].includes(selectedView)){ vt.textContent=loadGroupTitles()[selectedView]; beginHeaderEdit(vt,selectedView); return;}
+  const hdr=e.target.closest('.card-header'); if(hdr){ const gid=hdr.parentElement?.getAttribute('data-group'); if(['g1','g2','g3'].includes(gid)) beginHeaderEdit(hdr,gid); return; }
+  const td=e.target.closest('td.editable'); if(!td) return; const tr=td.closest('tr'); if(!tr||!tr.classList.contains('data-row')) return;
+  isEditing=true; td.setAttribute('contenteditable','true'); td.focus(); selectAll(td); clearTimeout(editTimeout); editTimeout=setTimeout(()=>{ if(td.isContentEditable) commitCellEdit(td); }, 5*60*1000);
+});
+document.addEventListener('keydown',(e)=>{const ed=e.target.closest('td[contenteditable="true"], #school-name[contenteditable="true"], .editable-header[contenteditable="true"]'); if(!ed) return; if(e.key==='Enter'){e.preventDefault(); ed.blur();} if(e.key==='Escape'){e.preventDefault(); isEditing=false; ed.removeAttribute('contenteditable'); updateSchedule();}});
+document.addEventListener('blur',(e)=>{const td=e.target.closest('td[contenteditable="true"]'); if(!td) return; commitCellEdit(td);}, true);
 
-    document.addEventListener('dblclick', (e)=>{
-      if(e.target.closest('#school-name')){
-        const sn=document.getElementById('school-name');
-        isEditing=true; sn.setAttribute('contenteditable','true'); sn.focus(); selectAll(sn);
-        const onBlur=()=>{ const val=sn.textContent.trim(); if(val){ localStorage.setItem('schoolName', val); } sn.removeAttribute('contenteditable'); isEditing=false; sn.removeEventListener('blur', onBlur); };
-        sn.addEventListener('blur', onBlur, {once:true});
-        return;
-      }
-      const td = e.target.closest('td.editable'); if(!td) return; const tr=td.closest('tr'); if(!tr || !tr.classList.contains('data-row')) return;
-      isEditing=true; td.setAttribute('contenteditable','true'); td.focus(); selectAll(td);
-    });
+/* ---------- Date/time ---------- */
+function displayDateTime(){const now=new Date(); document.getElementById('day').textContent=now.toLocaleDateString('en-US',{weekday:'long'}); document.getElementById('full-date').textContent=now.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}); document.getElementById('time').textContent=now.toLocaleTimeString('en-US',{hour:'numeric',minute:'numeric',second:'numeric'})}
 
-    document.addEventListener('keydown', (e)=>{
-      const ed = e.target.closest('td[contenteditable="true"], #school-name[contenteditable="true"]');
-      if(!ed) return;
-      if(e.key==='Enter'){ e.preventDefault(); if(ed.id==='school-name'){ ed.blur(); } else { commitCellEdit(ed); } }
-      if(e.key==='Escape'){ e.preventDefault(); isEditing=false; ed.removeAttribute('contenteditable'); updateSchedule(); }
-    });
-    document.addEventListener('blur', (e)=>{
-      const td = e.target.closest('td[contenteditable="true"]');
-      if(!td) return; commitCellEdit(td);
-    }, true);
+/* ---------- Settings ---------- */
+function openSettings(){document.getElementById('school-name-input').value=localStorage.getItem('schoolName')||''; document.getElementById('group-select').value=currentGroup; const en=getEnabledGroups(); ['g1','g2','g3'].forEach(id=>document.getElementById('enabled-'+id).checked=en.includes(id)); document.getElementById('settings-panel').style.display='block'}
+function closeSettings(){document.getElementById('settings-panel').style.display='none'}
+function saveSettings(){
+  const name=document.getElementById('school-name-input').value.trim(); if(name){localStorage.setItem('schoolName',name); document.getElementById('school-name').textContent=name}
+  currentGroup=document.getElementById('group-select').value; localStorage.setItem('gradeGroup',currentGroup);
+  const eg={g1:!!document.getElementById('enabled-g1').checked,g2:!!document.getElementById('enabled-g2').checked,g3:!!document.getElementById('enabled-g3').checked}; if(!eg.g1&&!eg.g2&&!eg.g3) eg.g1=true; setEnabledGroups(eg);
+  const enabled=getEnabledGroups(); if(selectedView!=='all' && !enabled.includes(selectedView)){selectedView=enabled[0]||'all'; localStorage.setItem('selectedView',selectedView)} if(currentGroup && !enabled.includes(currentGroup)){currentGroup=enabled[0]||'g1'; localStorage.setItem('gradeGroup',currentGroup)}
+  closeSettings(); updateSchedule();
+}
 
-    /* Header date/time */
-    function displayDateTime(){
-      const now=new Date();
-      document.getElementById('day').textContent = now.toLocaleDateString('en-US',{weekday:'long'});
-      document.getElementById('full-date').textContent = now.toLocaleDateString('en-US',{year:'numeric', month:'long', day:'numeric'});
-      document.getElementById('time').textContent = now.toLocaleTimeString('en-US',{hour:'numeric', minute:'numeric', second:'numeric'});
-    }
+/* ---------- Banner/holiday storage ---------- */
+const BR_STORE='mcb_breaks_v1', BR_ACTIVE='mcb_break_active_id', BR_ENABLED='mcb_break_enabled';
+const BN_OPTS='mcb_banner_opts_v1'; // {style:'solid'|'gradient'|'mix', text:'to'|'remained'|'none', dots:true, solid:'#hex', gradA:'#', gradB:'#'}
+function readBreaks(){try{return JSON.parse(localStorage.getItem(BR_STORE)||'[]')}catch(_){return[]}}
+function writeBreaks(x){localStorage.setItem(BR_STORE, JSON.stringify(x))}
+function setActiveBreak(id){localStorage.setItem(BR_ACTIVE, id||'')}
+function getActiveBreakId(){return localStorage.getItem(BR_ACTIVE)||''}
+function setBreakEnabled(on){localStorage.setItem(BR_ENABLED, on?'1':'0')}
+function isBreakEnabled(){return localStorage.getItem(BR_ENABLED)==='1'}
+function readBannerOpts(){try{return JSON.parse(localStorage.getItem(BN_OPTS)||'{}')}catch(_){return{}}}
+function writeBannerOpts(o){localStorage.setItem(BN_OPTS, JSON.stringify(o))}
 
-    /* Settings & Color Custom */
-    function openSettings(){
-      document.getElementById('school-name-input').value = localStorage.getItem('schoolName') || '';
-      document.getElementById('group-select').value = currentGroup;
-      const enabled = getEnabledGroups();
-      document.getElementById('enabled-g1').checked = enabled.includes('g1');
-      document.getElementById('enabled-g2').checked = enabled.includes('g2');
-      document.getElementById('enabled-g3').checked = enabled.includes('g3');
-      document.getElementById('settings-panel').style.display='block';
-    }
-    function closeSettings(){ document.getElementById('settings-panel').style.display='none'; }
-    function saveSettings(){
-      const name=document.getElementById('school-name-input').value.trim();
-      if(name){ localStorage.setItem('schoolName', name); document.getElementById('school-name').textContent = name; }
-      currentGroup = document.getElementById('group-select').value; localStorage.setItem('gradeGroup', currentGroup);
-      const eg={ g1: !!document.getElementById('enabled-g1').checked, g2: !!document.getElementById('enabled-g2').checked, g3: !!document.getElementById('enabled-g3').checked };
-      if(!eg.g1 && !eg.g2 && !eg.g3){ eg.g1=true; }
-      setEnabledGroups(eg);
-      const enabledList = getEnabledGroups();
-      if(selectedView!=='all' && !enabledList.includes(selectedView)){
-        selectedView = enabledList[0] || 'all'; localStorage.setItem('selectedView', selectedView);
-      }
-      if(currentGroup && !enabledList.includes(currentGroup)){
-        currentGroup = enabledList[0] || 'g1'; localStorage.setItem('gradeGroup', currentGroup);
-      }
-      closeSettings(); updateSchedule();
-    }
+/* ---------- Banner rendering ---------- */
+let brTimer=null;
+function fmt2(n){return n.toString().padStart(2,'0')}
+function ensureDots(container){
+  if(container.children.length) return;
+  const colors=['#ff4757','#ffa502','#2ed573','#1e90ff','#a55eea','#ff6b81','#2ecc71','#eccc68'];
+  for(let i=0;i<18;i++){
+    const s=document.createElement('span'); s.className='dot';
+    const left=Math.random()*100, delay=Math.random()*6, dur=6+Math.random()*8, size=4+Math.random()*6;
+    s.style.left=left+'%'; s.style.bottom='-10px'; s.style.animationDelay=`-${delay}s`; s.style.setProperty('--dur', dur+'s');
+    s.style.width=size+'px'; s.style.height=size+'px'; s.style.background=colors[i%colors.length];
+    container.appendChild(s);
+  }
+}
+function applyBannerStyle(banner, opts){
+  if(opts.style==='gradient'){
+    const a=opts.gradA||'#0b2e6f', b=opts.gradB||'#174ea6';
+    banner.style.background=`linear-gradient(90deg, ${a}, ${b})`;
+    banner.style.backgroundSize='200% 100%';
+    banner.style.animation='bannerSlide .5s ease-out 1, stripWave 14s linear infinite';
+  }else if(opts.style==='mix'){
+    banner.style.background='linear-gradient(135deg, #b3004b, #006241, #d62400, #b3004b)';
+    banner.style.backgroundSize='300% 300%';
+    banner.style.animation='bannerSlide .5s ease-out 1, stripWave 12s linear infinite';
+  }else{
+    banner.style.background=opts.solid||'#0b2e6f';
+    banner.style.animation='bannerSlide .5s ease-out 1';
+  }
+}
+function renderHolidayBanner(){
+  const banner=document.getElementById('holidayBanner');
+  const nameEl=banner.querySelector('.name'); const daysEl=banner.querySelector('.days .tick'); const hoursEl=banner.querySelector('.hours .tick'); const minsEl=banner.querySelector('.mins .tick'); const secsEl=banner.querySelector('.secs .tick'); const badge=banner.querySelector('.badge'); const prefix=banner.querySelector('.prefix'); const suffix=banner.querySelector('.suffix'); const dots=banner.querySelector('.dots');
 
-    function openColorCustom(){ document.getElementById('custom-color-box').style.display='block'; }
-    function closeColorCustom(){ document.getElementById('custom-color-box').style.display='none'; }
-    function saveColorCustom(){
-      const bg=document.getElementById('bg-color').value; const fg=document.getElementById('text-color').value;
-      const header=document.getElementById('header-container');
-      header.style.backgroundColor = bg; document.getElementById('school-name').style.color = fg; document.getElementById('date').style.color = fg; document.getElementById('time').style.color = fg;
-      localStorage.setItem('headerBgColor', bg); localStorage.setItem('textColor', fg);
-      closeColorCustom();
-    }
-    document.getElementById('school-name').addEventListener('click', openColorCustom);
-    function loadColorCustom(){
-      const bg=localStorage.getItem('headerBgColor')||'#000000';
-      const fg=localStorage.getItem('textColor')||'#ffffff';
-      const header=document.getElementById('header-container');
-      header.style.backgroundColor = bg; document.getElementById('school-name').style.color = fg; document.getElementById('date').style.color = fg; document.getElementById('time').style.color = fg;
-      document.getElementById('bg-color').value = bg; document.getElementById('text-color').value = fg;
-    }
+  const enabled=isBreakEnabled(); const activeId=getActiveBreakId(); const list=readBreaks(); const br=list.find(b=>b.id===activeId);
+  if(!enabled||!br){ banner.style.display='none'; return; }
+  banner.style.display='flex';
 
-    /* What's New toggle */
-    function toggleWhatsNew(){ const content=document.getElementById('whats-new-content'); const arrow=document.querySelector('.toggle-arrow'); if(content.style.display==='none'){ content.style.display='block'; arrow.innerHTML='&#9650;'; } else { content.style.display='none'; arrow.innerHTML='&#9660;'; } }
+  const opts={style:'solid',text:'to',dots:false,solid:'#0b2e6f',gradA:'#0b2e6f',gradB:'#174ea6', ...readBannerOpts()};
+  applyBannerStyle(banner, opts);
+  if(opts.dots){ ensureDots(dots); dots.style.display='block'; } else { dots.style.display='none'; }
 
-    /* Wake Lock */
-    let wakeLock=null; async function requestWakeLock(){ try{ if('wakeLock' in navigator){ wakeLock = await navigator.wakeLock.request('screen'); } }catch(e){ console.warn('WakeLock failed', e); } }
-    document.addEventListener('visibilitychange', async()=>{ if(wakeLock!==null && document.visibilityState==='visible'){ await requestWakeLock(); } });
+  // text mode
+  prefix.textContent = (opts.text==='to') ? 'to' : '';
+  suffix.textContent = (opts.text==='remained') ? 'remained' : '';
 
-    /* Boot */
-    (function init(){
-      const savedName = localStorage.getItem('schoolName'); if(savedName) document.getElementById('school-name').textContent = savedName;
-      loadColorCustom();
-      displayDateTime(); setInterval(displayDateTime, 1000);
-      updateSchedule(); setInterval(updateSchedule, 1000);
-      requestWakeLock();
-    })();
-  </script>
+  nameEl.textContent = br.name||'Holiday';
+  const now=new Date(); const target=new Date(br.when); const diff=target-now;
+  if(diff<=0){ daysEl.textContent='00'; hoursEl.textContent='00'; minsEl.textContent='00'; secsEl.textContent='00'; badge.style.display='none'; return; }
+  const totalSec=Math.floor(diff/1000); const d=Math.floor(totalSec/86400); const rem=totalSec%86400; const h=Math.floor(rem/3600); const m=Math.floor((rem%3600)/60); const s=rem%60;
+  daysEl.textContent=fmt2(d); hoursEl.textContent=fmt2(h); minsEl.textContent=fmt2(m); secsEl.textContent=fmt2(s);
+  badge.style.display = (d===0) ? 'inline-block' : 'none';
 
-  <!-- Simple cookie check -->
-  <script>
-    function setCookie(name, value, days){ const d=new Date(); d.setTime(d.getTime()+days*24*60*60*1000); document.cookie = `${name}=${value}; expires=${d.toUTCString()}; path=/`; }
-    function getCookie(name){ const nameEQ=name+"="; return document.cookie.split(';').map(c=>c.trim()).find(c=>c.indexOf(nameEQ)===0)?.substring(nameEQ.length)||null; }
-    setCookie('test_cookie','active',7); if(getCookie('test_cookie')) console.log('Cookies OK');
-  </script>
+  // if no text mode, hide prefix/name/suffix spacing
+  if(opts.text==='none'){ prefix.textContent=''; suffix.textContent=''; }
+}
+function startHolidayTicker(){ if(brTimer) clearInterval(brTimer); brTimer=setInterval(renderHolidayBanner,1000); renderHolidayBanner(); }
+
+/* ---------- Holiday modal ---------- */
+function openBreaksModal(){ document.getElementById('breaksModal').style.display='flex'; document.getElementById('breaksModal').setAttribute('aria-hidden','false'); populateBreaksUI(); }
+function closeBreaksModal(){ document.getElementById('breaksModal').style.display='none'; document.getElementById('breaksModal').setAttribute('aria-hidden','true'); }
+function populateBreaksUI(){
+  const list=readBreaks(); const act=getActiveBreakId(); const br=list.find(b=>b.id===act);
+  document.getElementById('brName').value=br?.name||''; document.getElementById('brWhen').value=br?toLocalInput(br.when):''; document.getElementById('brEnable').checked=isBreakEnabled();
+
+  const opts={style:'solid',text:'to',dots:false,solid:'#0b2e6f',gradA:'#0b2e6f',gradB:'#174ea6', ...readBannerOpts()};
+  document.getElementById('bnTextMode').value=opts.text; document.getElementById('bnStyle').value=opts.style; document.getElementById('bnDots').checked=!!opts.dots;
+  document.getElementById('bnSolid').value=opts.solid; document.getElementById('bnGradA').value=opts.gradA; document.getElementById('bnGradB').value=opts.gradB;
+  toggleStyleRows();
+
+  const wrap=document.getElementById('brList'); wrap.innerHTML='';
+  list.sort((a,b)=> new Date(a.when)-new Date(b.when)).forEach(item=>{
+    const row=document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.padding='6px 0'; row.style.gap='8px';
+    const left=document.createElement('span'); left.innerHTML=`<strong>${item.name||'Unnamed'}</strong> <span style="opacity:.7">(${new Date(item.when).toLocaleString()})</span>`;
+    const right=document.createElement('span');
+    const use=document.createElement('button'); use.textContent=item.id===act?'Active':'Use'; use.className=item.id===act?'primary':''; use.onclick=()=>{setActiveBreak(item.id); populateBreaksUI(); renderHolidayBanner();}
+    const del=document.createElement('button'); del.textContent='Delete'; del.onclick=()=>{writeBreaks(readBreaks().filter(x=>x.id!==item.id)); if(getActiveBreakId()===item.id) setActiveBreak(''); populateBreaksUI(); renderHolidayBanner();}
+    right.appendChild(use); right.appendChild(del); row.appendChild(left); row.appendChild(right); wrap.appendChild(row);
+  });
+}
+function toggleStyleRows(){
+  const st=document.getElementById('bnStyle').value;
+  document.getElementById('solidRow').style.display = (st==='solid')?'flex':'none';
+  document.getElementById('gradRow').style.display  = (st==='gradient')?'flex':'none';
+}
+document.getElementById('bnStyle').addEventListener('change', toggleStyleRows);
+
+function toLocalInput(iso){const d=new Date(iso); const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const day=String(d.getDate()).padStart(2,'0'); const hh=String(d.getHours()).padStart(2,'0'); const mm=String(d.getMinutes()).padStart(2,'0'); return `${y}-${m}-${day}T${hh}:${mm}`}
+
+function saveActiveBreakFromUI(){
+  const name=document.getElementById('brName').value.trim();
+  const whenVal=document.getElementById('brWhen').value;
+  const enabled=!!document.getElementById('brEnable').checked;
+  if(!whenVal){alert('Please select a date & time.'); return;}
+  const when=new Date(whenVal); if(Number.isNaN(when.getTime())){alert('Invalid date & time.'); return;}
+  let list=readBreaks(); let act=getActiveBreakId(); let br=list.find(b=>b.id===act);
+  if(!br){ br={id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())), name, when:when.toISOString()}; list.push(br); setActiveBreak(br.id); }
+  else{ br.name=name||br.name; br.when=when.toISOString(); }
+  writeBreaks(list); setBreakEnabled(enabled);
+
+  // save banner opts
+  const opts={
+    style: document.getElementById('bnStyle').value,
+    text:  document.getElementById('bnTextMode').value,
+    dots:  !!document.getElementById('bnDots').checked,
+    solid: document.getElementById('bnSolid').value,
+    gradA: document.getElementById('bnGradA').value,
+    gradB: document.getElementById('bnGradB').value
+  };
+  writeBannerOpts(opts);
+
+  renderHolidayBanner(); startHolidayTicker(); populateBreaksUI();
+}
+document.getElementById('holidayBtn').addEventListener('click', openBreaksModal);
+document.getElementById('brClose').addEventListener('click', closeBreaksModal);
+document.getElementById('brSave').addEventListener('click', saveActiveBreakFromUI);
+document.getElementById('brClear').addEventListener('click', ()=>{ setBreakEnabled(false); renderHolidayBanner(); closeBreaksModal(); });
+document.getElementById('breaksModal').addEventListener('click', (e)=>{ if(e.target.id==='breaksModal') closeBreaksModal(); });
+
+/* ---------- Header color custom via name click ---------- */
+document.getElementById('school-name').addEventListener('click', ()=>{
+  const bg=prompt('Header background hex (e.g. #0b2e6f):', localStorage.getItem('headerBgColor')||'#0b2e6f');
+  const fg=prompt('Header text hex (e.g. #ffffff):', localStorage.getItem('textColor')||'#ffffff');
+  if(bg){document.getElementById('header-container').style.backgroundColor=bg; localStorage.setItem('headerBgColor',bg);}
+  if(fg){['school-name','date','time'].forEach(id=>document.getElementById(id).style.color=fg); localStorage.setItem('textColor',fg);}
+});
+function loadHeaderColors(){
+  const bg=localStorage.getItem('headerBgColor')||'#0b2e6f', fg=localStorage.getItem('textColor')||'#ffffff';
+  document.getElementById('header-container').style.backgroundColor=bg; ['school-name','date','time'].forEach(id=>document.getElementById(id).style.color=fg);
+}
+
+/* ---------- Boot ---------- */
+(function init(){
+  const saved=localStorage.getItem('schoolName'); if(saved) document.getElementById('school-name').textContent=saved;
+  loadHeaderColors();
+  displayDateTime(); setInterval(displayDateTime,1000);
+  updateSchedule(); setInterval(()=>{ if(!isEditing) updateSchedule(); },1000);
+  startHolidayTicker();
+})();
+</script>
 </body>
 </html>
